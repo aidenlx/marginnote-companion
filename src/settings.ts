@@ -22,22 +22,22 @@ export class MNCompSettingTab extends PluginSettingTab {
 
   display(): void {
     for (const o of this.options) {
-      this.setOption(o);
+      // this.setOption(o);
     }
   }
 
-  setOption(this: MNCompSettingTab, { k, name, desc }: option) {
-    new Setting(this.containerEl)
-      .setName(name)
-      .setDesc(desc)
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings[k]).onChange(async (value) => {
-          this.plugin.settings[k] = value;
-          this.plugin.saveData(this.plugin.settings);
-          this.display();
-        })
-      );
-  }
+  // setOption(this: MNCompSettingTab, { k, name, desc }: option) {
+  //   new Setting(this.containerEl)
+  //     .setName(name)
+  //     .setDesc(desc)
+  //     .addToggle((toggle) =>
+  //       toggle.setValue(this.plugin.settings[k]).onChange(async (value) => {
+  //         this.plugin.settings[k] = value;
+  //         this.plugin.saveData(this.plugin.settings);
+  //         this.display();
+  //       })
+  //     );
+  // }
 
   options: option[] = [
     {
