@@ -11,7 +11,7 @@ export function getFrontmatterRange(
     if ((endLineNum = FindLine(cm, /^---$/, 1)) !== -1) {
       return {
         from: { line: 0, ch: 0 },
-        to: { line: endLineNum + 1, ch: 0 },
+        to: { line: endLineNum, ch: Infinity },
       };
     } else return null;
   }
@@ -26,9 +26,10 @@ export function addToFrontmatter(
   cm: CodeMirror.Editor | Editor
 ) {
   const fmRange = getFrontmatterRange(cm);
+  let fmStr: string;
   if (fmRange) {
     const { from, to } = fmRange;
-    let fmStr = cm.getRange(from, to);
+    fmStr = cm.getRange(from, to);
     let fmObj = matter(fmStr).data;
     if (fmObj[entry]){
       if (Array.isArray(fmObj[entry])&&Array.isArray(items)){
@@ -42,13 +43,13 @@ export function addToFrontmatter(
     } else {
       fmObj[entry] = items;
     }
-    fmStr = matter.stringify("",fmObj);
+    fmStr = matter.stringify("",fmObj).replace(/^\s+|\s+$/g,"");;
     cm.replaceRange(fmStr,from,to);
     
   } else {
-    const fmStr = matter.stringify("",{
+    fmStr = matter.stringify("",{
       [entry]: items
-    })
+    }).replace(/^\s+|\s+$/g,"");
     InsertTo(fmStr,cm,0,0);
   }
 }

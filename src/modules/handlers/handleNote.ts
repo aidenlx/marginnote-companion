@@ -131,9 +131,10 @@ function importMeta(
       addToFrontmatter("aliases", aliases, cm);
     }
 
+    // add first title to h1 if not exist
     if (FindLine(cm, /^# /) === -1) {
       const range = getFrontmatterRange(cm);
-      const titleText = `# ${title}\n\n`;
+      const titleText = `\n\n# ${title}\n\n`;
       if (range) InsertTo(titleText, cm, range.to);
       else InsertTo(titleText, cm, 0, 0);
     }
