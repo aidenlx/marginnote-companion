@@ -17,13 +17,12 @@ export default class ClipboardListener {
   listener: EventListener = (v) => {};
   init = true;
 
-  
-  public get Watching() : boolean {
-    return this.isWatching
+  public get Watching(): boolean {
+    return this.isWatching;
   }
-  
-  public set Watching(v : boolean) {
-    if (v){
+
+  public set Watching(v: boolean) {
+    if (v) {
       this.listen();
     } else {
       this.stop();

@@ -96,15 +96,14 @@ export const tlSeparator = /[;；]/;
 /**
  * recieve all params and return a merged json2md.DataObject array
  * @param objs string is consider to be "p"
- * @returns 
+ * @returns
  */
 export function toMDObjs(
   ...params: Array<string | mdObj[] | mdObj | null | undefined>
 ): mdObj[] {
-
   const objs: Array<string | mdObj | null | undefined> = params.flat(Infinity);
 
-  const mdObjs = objs.reduce(reducer,[])
+  const mdObjs = objs.reduce(reducer, []);
 
   function getPara(obj: string | mdObj): string[] | null {
     if (typeof obj === "string") return [obj];
@@ -122,10 +121,9 @@ export function toMDObjs(
         const lastIndex = acc.length - 1;
         const last = acc[lastIndex];
         const curPara = getPara(cur);
-        if (last.p && curPara){
-          if (typeof last.p === "string")
-            last.p = [last.p,...curPara];
-          else last.p.push(...curPara)
+        if (last.p && curPara) {
+          if (typeof last.p === "string") last.p = [last.p, ...curPara];
+          else last.p.push(...curPara);
         } else {
           accPush(cur, acc);
         }
@@ -140,7 +138,10 @@ export function toMDObjs(
 
 /** render only main content (title, excrept, text comments) as paragraphs */
 export function transformBasicNote(note: MbBookNote): mdObj[] {
-  return toMDObjs(transformBasicNote_Title(note), transformBasicNote_Body(note));
+  return toMDObjs(
+    transformBasicNote_Title(note),
+    transformBasicNote_Body(note)
+  );
 }
 
 /** render note title as paragraphs */
@@ -175,7 +176,7 @@ export function transformFullNote_Title(
   let aliasStr = "";
   if (!srcTitle) return null;
 
-  const {title, aliases} = TitlelinkToAlias(srcTitle);
+  const { title, aliases } = TitlelinkToAlias(srcTitle);
 
   if (keepAlias && aliases) aliasStr = aliases.join(", ");
 

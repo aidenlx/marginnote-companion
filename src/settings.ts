@@ -2,15 +2,18 @@ import MNComp from "main";
 import { PluginSettingTab, App, Setting } from "obsidian";
 
 export interface MNCompSettings {
-	hello:boolean;
+  hello: boolean;
 }
 
 export const DEFAULT_SETTINGS: MNCompSettings = {
-	hello:true
-}
+  hello: true,
+};
 
-
-type option = { k: keyof MNCompSettings; name: string; desc: string|DocumentFragment; }
+type option = {
+  k: keyof MNCompSettings;
+  name: string;
+  desc: string | DocumentFragment;
+};
 
 export class MNCompSettingTab extends PluginSettingTab {
   plugin: MNComp;

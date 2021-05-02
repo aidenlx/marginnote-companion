@@ -13,15 +13,7 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [
-      "dom",
-      "es5",
-      "scripthost",
-      "es2020"
-    ]
+    "lib": ["dom", "es5", "scripthost", "es2020"]
   },
-  "include": [
-    "src/**/*.ts",
-    "node_modules/@alx-plugins/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "node_modules/@alx-plugins/**/*.ts"]
 }

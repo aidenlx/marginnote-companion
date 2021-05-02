@@ -3,12 +3,10 @@ import { App, MarkdownView, Menu, WorkspaceLeaf } from "obsidian";
 const label = "Go to Source";
 
 export function addSourceButton(app: App) {
-
   const apply = () => app.workspace.iterateAllLeaves(addButton.bind(app));
 
   app.workspace.onLayoutReady(apply);
   app.workspace.on("layout-change", apply);
-  
 }
 
 function addButton(this: App, leaf: WorkspaceLeaf) {
@@ -41,4 +39,3 @@ function addButton(this: App, leaf: WorkspaceLeaf) {
     });
   }
 }
-

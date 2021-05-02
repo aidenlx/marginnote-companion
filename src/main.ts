@@ -1,42 +1,41 @@
-import { aliasBelowH1 } from 'modules/controls/aliasBelowH1';
-import { addSourceButton } from 'modules/controls/sourceButton';
-import { autoPaste } from 'modules/receivers/autopaste';
-import ClipboardListener from 'modules/receivers/cbListener';
-import { handlePastedNote } from 'modules/receivers/pasteEvt';
-import { Plugin } from 'obsidian';
+import { aliasBelowH1 } from "modules/controls/aliasBelowH1";
+import { addSourceButton } from "modules/controls/sourceButton";
+import { autoPaste } from "modules/receivers/autopaste";
+import ClipboardListener from "modules/receivers/cbListener";
+import { handlePastedNote } from "modules/receivers/pasteEvt";
+import { Plugin } from "obsidian";
 // import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from 'settings';
 
 export default class MNComp extends Plugin {
-	// settings: MNCompSettings = DEFAULT_SETTINGS;
+  // settings: MNCompSettings = DEFAULT_SETTINGS;
 
-	cbListener = new ClipboardListener();
-	
-	async onload() {
-		console.log('loading plugin');
+  cbListener = new ClipboardListener();
 
-		// await this.loadSettings();
+  async onload() {
+    console.log("loading plugin");
 
-		// this.addSettingTab(new MNCompSettingTab(this.app, this));
+    // await this.loadSettings();
 
-		this.registerCodeMirror(handlePastedNote)
+    // this.addSettingTab(new MNCompSettingTab(this.app, this));
 
-		addSourceButton(this.app);
-		
-		this.registerMarkdownPostProcessor(aliasBelowH1);
+    this.registerCodeMirror(handlePastedNote);
 
-		autoPaste(this);
+    addSourceButton(this.app);
 
-	}
+    this.registerMarkdownPostProcessor(aliasBelowH1);
 
-	onunload() {
-		console.log('unloading plugin');
-	}
+    autoPaste(this);
+  }
 
-	// async loadSettings() {
-	// 	this.settings = {...this.settings,...(await this.loadData())};
-	// }
+  onunload() {
+    console.log("unloading plugin");
+  }
 
-	// async saveSettings() {
-	// 	await this.saveData(this.settings);
-	// }
+  // async loadSettings() {
+  // 	this.settings = {...this.settings,...(await this.loadData())};
+  // }
+
+  // async saveSettings() {
+  // 	await this.saveData(this.settings);
+  // }
 }

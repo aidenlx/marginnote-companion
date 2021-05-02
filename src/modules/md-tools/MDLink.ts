@@ -2,10 +2,10 @@ import assertNever from "assert-never";
 import { mnUrl } from "modules/misc";
 
 /**
- * 
+ *
  * @param id note id
  * @param lt \[linktext\](url...)
- * @returns 
+ * @returns
  */
 export function getAnchor(type: MDLinkType, id: string, lt?: string): string {
   switch (type) {
@@ -47,16 +47,11 @@ export class MDLink {
    * @param title \[\](... "title")
    * @param label 未提供则生成随机label
    */
-  constructor(
-    url: string,
-    link_text?: string,
-    title?: string,
-    label?: string
-  ) {
+  constructor(url: string, link_text?: string, title?: string, label?: string) {
     this.url = url;
     this.title = title;
     this.link_text = link_text;
-    this.label = label ?? makeid(6) ;
+    this.label = label ?? makeid(6);
 
     if (label !== undefined) {
       this._type = MDLinkType.Ref;

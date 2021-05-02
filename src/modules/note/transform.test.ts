@@ -62,8 +62,7 @@ describe("toMDObjs merge funtion", () => {
     expect(toMDObjs(nested)).toEqual([
       p("hello", "there", "123", ";", "hello", "again"),
     ]);
-  })
-
+  });
 });
 
 const comment = {
@@ -90,8 +89,7 @@ const comment = {
     q_htext: "以文本内容为载体、以知识内化为主打功能的阅读应用",
   } as linkComment,
   link_pic: {
-    q_htext:
-      "以文本内容为载体、以知识内化为主打功能的阅读应用",
+    q_htext: "以文本内容为载体、以知识内化为主打功能的阅读应用",
     q_hpic: {
       paint: "df1aafb90d29f8b8717d151e80376341",
       size: {},
@@ -143,7 +141,6 @@ describe("transformComments function", () => {
       p("以文本内容为载体、以知识内化为主打功能的阅读应用"),
     ]);
   });
-
 });
 
 // describe("title transform", () => {

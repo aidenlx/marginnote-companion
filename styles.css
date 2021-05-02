@@ -1,4 +1,4 @@
-span.heading-alias{
+span.heading-alias {
   text-decoration: none;
   background-color: var(--background-secondary-alt);
   border-radius: 30px;
@@ -11,34 +11,34 @@ span.heading-alias{
   white-space: nowrap;
 }
 
-div.heading-alias-container{
+div.heading-alias-container {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   margin-top: 5px;
 }
 
-div.rec-container{
+div.rec-container {
   padding: 0;
 }
 
-input.rec:checked{
-	/* animation: pulse-red 2s infinite; */
-	background: red;
+input.rec:checked {
+  /* animation: pulse-red 2s infinite; */
+  background: red;
 }
 
 input.rec {
   --radius: 12px;
-	width: var(--radius);
-	height: var(--radius);
-	font-size: 0;
-	/* box-shadow: 0 0 0 0 rgba(255, 82, 82, 1); */
-	border: 0;
-	border-radius: var(--radius);
-	padding: unset;
-	/* outline: none; */
-	appearance: none;
-	background-color: darkred;
+  width: var(--radius);
+  height: var(--radius);
+  font-size: 0;
+  /* box-shadow: 0 0 0 0 rgba(255, 82, 82, 1); */
+  border: 0;
+  border-radius: var(--radius);
+  padding: unset;
+  /* outline: none; */
+  appearance: none;
+  background-color: darkred;
 }
 
 @keyframes pulse-red {
@@ -46,12 +46,12 @@ input.rec {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
   }
-  
+
   70% {
     transform: scale(1);
     box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
   }
-  
+
   100% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);

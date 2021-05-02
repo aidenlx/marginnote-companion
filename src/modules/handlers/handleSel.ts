@@ -5,10 +5,10 @@ import { Editor } from "obsidian";
 
 export function handleSel(
   obj: ReturnBody_Sel,
-  cm: CodeMirror.Editor | Editor): boolean {
+  cm: CodeMirror.Editor | Editor
+): boolean {
+  const { sel } = obj.data;
 
-    const { sel } = obj.data;
-    
-    InsertToCursor(textProcess(sel),cm);
-    return true;
+  InsertToCursor(textProcess(sel), cm);
+  return true;
 }

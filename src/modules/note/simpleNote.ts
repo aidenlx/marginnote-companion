@@ -21,7 +21,7 @@ export type simpleNote = excerptNote | noteOnly | excerptOnly;
 /**
  * 仅摘录
  */
- export interface excerptOnly {
+export interface excerptOnly {
   type: "excerpt";
   id: string;
   docMd5: string;
@@ -49,7 +49,7 @@ export interface excerptNote {
   excerpt: excerpt;
 }
 
-export const isSimpleNote = (n: any): n is simpleNote => 
+export const isSimpleNote = (n: any): n is simpleNote =>
   (n as simpleNote)?.type !== undefined &&
   (n as simpleNote)?.id !== undefined &&
   (n as simpleNote)?.docMd5 !== undefined;
@@ -65,7 +65,7 @@ export const isExcerptNote = (n: simpleNote): n is excerptNote =>
  * Get simplified MbBookNote
  * @returns simplified MbBookNote with all text unprocessed
  */
- export function getSimpleNote(src: MbBookNote): simpleNote {
+export function getSimpleNote(src: MbBookNote): simpleNote {
   const {
     noteId: id,
     docMd5,

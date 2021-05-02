@@ -1,10 +1,10 @@
 {
-	"id": "myplugin",
-	"name": "myplugin",
-	"version": "0.0.0",
-	"minAppVersion": "0.9.12",
-	"description": "myplugin",
-	"author": "",
-	"authorUrl": "",
-	"isDesktopOnly": true
+  "id": "myplugin",
+  "name": "myplugin",
+  "version": "0.0.0",
+  "minAppVersion": "0.9.12",
+  "description": "myplugin",
+  "author": "",
+  "authorUrl": "",
+  "isDesktopOnly": true
 }

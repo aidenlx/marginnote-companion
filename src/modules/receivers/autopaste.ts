@@ -3,12 +3,12 @@ import { handleMNData } from "../handlers/handler";
 import { InsertTo } from "modules/cm-tools";
 import { Notice, MarkdownView } from "obsidian";
 
-function addRecButton(rec: HTMLInputElement, plugin:MNComp) {
+function addRecButton(rec: HTMLInputElement, plugin: MNComp) {
   rec.addEventListener("input", (event) => {
     let input = event.target as HTMLInputElement;
     plugin.cbListener.Watching = input.checked;
-    let state = plugin.cbListener.Watching ? "started" : "stopped"
-    new Notice('auto paste '+ state);
+    let state = plugin.cbListener.Watching ? "started" : "stopped";
+    new Notice("auto paste " + state);
   });
   setTimeout(() => {
     const container = plugin.addStatusBarItem();
@@ -24,7 +24,7 @@ const recCommandCallback = (rec: HTMLInputElement, plugin: MNComp) => () => {
   new Notice("auto paste " + state);
 };
 
-export function autoPaste(plugin:MNComp){
+export function autoPaste(plugin: MNComp) {
   const rec = createEl("input", {
     type: "checkbox",
     cls: "rec status-bar-item",
@@ -39,14 +39,13 @@ export function autoPaste(plugin:MNComp){
 
       // fallback option if fails
       if (!handleMNData(value, cm)) {
-        InsertTo(value+"\n", cm, cm.getCursor());
+        InsertTo(value + "\n", cm, cm.getCursor());
       }
     }
   };
-  
-  addRecButton(rec,plugin);
 
-  
+  addRecButton(rec, plugin);
+
   plugin.addCommand({
     id: "rec",
     name: "Auto Paste to Active Editor",

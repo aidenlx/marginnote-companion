@@ -14,7 +14,10 @@ import { getAnchor, MDLink, MDLinkType } from "modules/md-tools/MDLink";
 import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
 import { mnUrl } from "modules/misc";
 import { json2md, mdObj } from "../note/render";
-import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
+import {
+  addToFrontmatter,
+  getFrontmatterRange,
+} from "modules/md-tools/frontmatter";
 
 export const enum NoteImportMode {
   /** Insert only link to cursor */
@@ -135,13 +138,14 @@ function importMeta(
     let H1LineNum = FindLine(cm, /^# /);
 
     // add first title to h1 if not exist
-    if (H1LineNum===-1) {
+    if (H1LineNum === -1) {
       const range = getFrontmatterRange(cm);
       const titleText = `\n\n# ${title}\n\n`;
       if (range) InsertTo(titleText, cm, range.to);
       else InsertTo(titleText, cm, 0, 0);
-    } else if (updateH1) {  // update h1 with first title
-      SetLine(cm,H1LineNum,`# ${title}`);
+    } else if (updateH1) {
+      // update h1 with first title
+      SetLine(cm, H1LineNum, `# ${title}`);
     }
   }
 

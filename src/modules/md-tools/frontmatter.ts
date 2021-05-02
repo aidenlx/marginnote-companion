@@ -1,6 +1,6 @@
-import matter from 'gray-matter';
-import { Editor, EditorRange } from 'obsidian';
-import { FindLine, InsertTo } from '../cm-tools';
+import matter from "gray-matter";
+import { Editor, EditorRange } from "obsidian";
+import { FindLine, InsertTo } from "../cm-tools";
 
 export function getFrontmatterRange(
   cm: CodeMirror.Editor | Editor
@@ -31,25 +31,26 @@ export function addToFrontmatter(
     const { from, to } = fmRange;
     fmStr = cm.getRange(from, to);
     let fmObj = matter(fmStr).data;
-    if (fmObj[entry]){
-      if (Array.isArray(fmObj[entry])&&Array.isArray(items)){
+    if (fmObj[entry]) {
+      if (Array.isArray(fmObj[entry]) && Array.isArray(items)) {
         (fmObj[entry] as string[]).push(...items);
         fmObj[entry] = [...new Set(fmObj[entry])]; // 去重复
-      } else if (!Array.isArray(fmObj[entry])&&!Array.isArray(items)) {
-        fmObj[entry] = {...fmObj[entry],...items};
+      } else if (!Array.isArray(fmObj[entry]) && !Array.isArray(items)) {
+        fmObj[entry] = { ...fmObj[entry], ...items };
       } else {
         fmObj[entry] = items;
       }
     } else {
       fmObj[entry] = items;
     }
-    fmStr = matter.stringify("",fmObj).replace(/^\s+|\s+$/g,"");;
-    cm.replaceRange(fmStr,from,to);
-    
+    fmStr = matter.stringify("", fmObj).replace(/^\s+|\s+$/g, "");
+    cm.replaceRange(fmStr, from, to);
   } else {
-    fmStr = matter.stringify("",{
-      [entry]: items
-    }).replace(/^\s+|\s+$/g,"");
-    InsertTo(fmStr,cm,0,0);
+    fmStr = matter
+      .stringify("", {
+        [entry]: items,
+      })
+      .replace(/^\s+|\s+$/g, "");
+    InsertTo(fmStr, cm, 0, 0);
   }
 }

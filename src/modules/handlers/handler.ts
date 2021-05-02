@@ -1,28 +1,27 @@
 import { Editor } from "obsidian";
-import assertNever from "assert-never"
+import assertNever from "assert-never";
 import { handleSel } from "./handleSel";
 import { handleNote, NoteImportMode } from "./handleNote";
 import { ReturnBody, MNMark } from "@alx-plugins/obsidian-bridge";
 
 /**
- * 
+ *
  * @param src a json string from @alx-plugins/obsidian-bridge
- * @param cm 
+ * @param cm
  * @returns if the function completed successfully
  */
 export function handleMNData(
   src: string,
   cm: CodeMirror.Editor | Editor
 ): boolean {
-
   const obj = isMNData(src);
   if (!obj) return false;
-  
+
   switch (obj.type) {
     case "sel":
-      return handleSel(obj,cm);
+      return handleSel(obj, cm);
     case "note":
-      return handleNote(obj,cm,NoteImportMode.MetaMerge);
+      return handleNote(obj, cm, NoteImportMode.MetaMerge);
     default:
       assertNever(obj);
   }
@@ -32,9 +31,9 @@ const MNMark: MNMark = "<!--MN-->\n";
 
 /**
  * Determine if string is data from obsidian-bridge
- * @returns ReturnBody or null (if not MNData)  
+ * @returns ReturnBody or null (if not MNData)
  */
- export function isMNData(str: string): ReturnBody | null {
+export function isMNData(str: string): ReturnBody | null {
   if (str.startsWith(MNMark)) {
     const json = str.substring(MNMark.length);
     try {

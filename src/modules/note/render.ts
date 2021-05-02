@@ -2,8 +2,8 @@ import TurndownService from "turndown";
 import json2md, { DataObject } from "json2md";
 
 export interface mdObj extends DataObject {
-  comment?: string,
-  html?: string
+  comment?: string;
+  html?: string;
 }
 
 const tdService = new TurndownService();
@@ -19,4 +19,3 @@ for (const k in extension) {
 }
 
 export { json2md };
-
