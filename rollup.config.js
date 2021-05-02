@@ -21,7 +21,7 @@ export default {
     exports: 'default',
     banner,
   },
-  external: ['obsidian','electron'],
+  external: ['obsidian','electron','codemirror','turndown'],
   plugins: [
     typescript(),
     nodeResolve({browser: true}),
