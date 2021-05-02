@@ -16,6 +16,15 @@ import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
 import { mnUrl } from "modules/misc";
 import json2md, { DataObject as mdObj } from "json2md";
 import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
+import TurndownService from "turndown";
+
+const tdService = new TurndownService();
+
+export const ext = {
+  comment: (input: string): string => `%%${input}%%`,
+  html: (html: string): string =>
+    tdService.turndown(html.replace(/<head>.+<\/head>/g, "")),
+};
 
 const enum NoteImportMode {
   /** Insert only link to cursor */

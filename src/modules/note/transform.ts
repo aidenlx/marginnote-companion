@@ -6,18 +6,10 @@ import {
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
 import json2md, { DataObject as mdObj } from "json2md";
-import TurndownService from "turndown";
+import { ext } from "modules/handlers/handleNote";
 import { MDLink } from "../md-tools/MDLink";
 import { mnUrl, Range } from "../misc";
 import { getSimpleNote } from "./simpleNote";
-
-const tdService = new TurndownService();
-
-const ext = {
-  comment: (input: string): string => `%%${input}%%`,
-  html: (html: string): string =>
-    tdService.turndown(html.replace(/<head>.+<\/head>/g, "")),
-};
 
 for (const k in ext) {
   json2md.converters[k] = ext[k as keyof typeof ext];
@@ -64,14 +56,9 @@ export function transformComments(
         case "LinkNote":
           if (full) {
             out.push({ comment: mnUrl("note", c.noteid) });
-            if (isLC_pic(c) && !c.q_htext) {
-              out.push({ comment: "PaintNote" });
-            } else {
-              out.push({ p: c.q_htext });
-            }
-          } else {
-            if (c.q_htext) out.push({ p: c.q_htext });
+            if (isLC_pic(c)) out.push({ comment: "PaintNote" });
           }
+          if (c.q_htext) out.push({ p: c.q_htext });
           break;
         case "PaintNote":
           if (!full) break;
