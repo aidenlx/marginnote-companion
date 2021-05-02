@@ -1,6 +1,6 @@
 import matter from 'gray-matter';
 import { Editor, EditorRange } from 'obsidian';
-import { FindLine, InsertTo } from './cm-tools';
+import { FindLine, InsertTo } from '../cm-tools';
 
 export function getFrontmatterRange(
   cm: CodeMirror.Editor | Editor

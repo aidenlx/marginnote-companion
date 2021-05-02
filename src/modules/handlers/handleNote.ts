@@ -15,7 +15,7 @@ import { getAnchor, MDLink, MDLinkType } from "modules/md-tools/MDLink";
 import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
 import { mnUrl } from "modules/misc";
 import json2md, { DataObject as mdObj } from "json2md";
-import { addToFrontmatter, getFrontmatterRange } from "modules/frontmatter";
+import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
 
 const enum NoteImportMode {
   /** Insert only link to cursor */
