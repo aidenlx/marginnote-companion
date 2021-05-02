@@ -11,7 +11,7 @@ const tdService = new TurndownService();
 const extension = {
   comment: (input: string): string => `%%${input}%%`,
   html: (html: string): string =>
-    tdService.turndown(html.replace(/<head>.+<\/head>/g, "")),
+    tdService.turndown(html.replace(/<head>(?:.|\n)+<\/head>/g, "")),
 };
 
 for (const k in extension) {
