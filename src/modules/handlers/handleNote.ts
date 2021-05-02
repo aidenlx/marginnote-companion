@@ -2,7 +2,7 @@ import { Editor } from "obsidian";
 import { getSimpleNote } from "modules/note/simpleNote";
 import { ReturnBody_Note } from "@alx-plugins/obsidian-bridge";
 import assertNever from "assert-never";
-import { FindLine, InsertTo, InsertToCursor } from "modules/cm-tools";
+import { FindLine, InsertTo, InsertToCursor, SetLine } from "modules/cm-tools";
 import {
   transformBasicNote,
   transformBasicNote_Body,
@@ -69,15 +69,15 @@ export function handleNote(
       insertLink(MDLinkType.Ref, note, cm);
       break;
     case NoteImportMode.MetaMerge:
-      importMeta(note, book, cm);
+      importMeta(note, book, false, cm);
       break;
     case NoteImportMode.BasicMerge:
-      importMeta(note, book, cm);
+      importMeta(note, book, false, cm);
       objs = transformBasicNote_Body(note);
       InsertMDToCursor(objs);
       break;
     case NoteImportMode.FullMerge:
-      importMeta(note, book, cm);
+      importMeta(note, book, false, cm);
       objs = transformFullNote_Body(note);
       InsertMDToCursor(objs);
       break;
@@ -119,6 +119,7 @@ function insertLink(
 function importMeta(
   srcNote: MbBookNote,
   book: MbBook,
+  updateH1: boolean,
   cm: CodeMirror.Editor | Editor
 ): void {
   const note = getSimpleNote(srcNote);
@@ -131,12 +132,16 @@ function importMeta(
       addToFrontmatter("aliases", aliases, cm);
     }
 
+    let H1LineNum = FindLine(cm, /^# /);
+
     // add first title to h1 if not exist
-    if (FindLine(cm, /^# /) === -1) {
+    if (H1LineNum===-1) {
       const range = getFrontmatterRange(cm);
       const titleText = `\n\n# ${title}\n\n`;
       if (range) InsertTo(titleText, cm, range.to);
       else InsertTo(titleText, cm, 0, 0);
+    } else if (updateH1) {  // update h1 with first title
+      SetLine(cm,H1LineNum,`# ${title}`);
     }
   }
 
