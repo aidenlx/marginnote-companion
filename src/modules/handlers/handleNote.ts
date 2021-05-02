@@ -149,7 +149,11 @@ function importMeta(
   const { id } = note;
   const { docMd5, docTitle, pathFile: docPath } = book;
 
-  const sourceName = (docMd5 as string).slice(-6);
-
-  addToFrontmatter("sources", { [sourceName]: mnUrl("note", id) }, cm);
+  if (docMd5)
+    addToFrontmatter(
+      "sources",
+      { [docTitle ?? "null"]: [docMd5, mnUrl("note", id)] },
+      cm
+    );
+  else console.error("docMd5 missing");
 }

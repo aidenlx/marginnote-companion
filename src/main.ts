@@ -1,3 +1,4 @@
+import { addSourceButton } from 'modules/controls/sourceButton';
 import ClipboardListener from 'modules/receivers/cbListener';
 import { handlePastedNote } from 'modules/receivers/pasteEvt';
 import { Plugin } from 'obsidian';
@@ -16,6 +17,8 @@ export default class MNComp extends Plugin {
 		// this.addSettingTab(new MNCompSettingTab(this.app, this));
 
 		this.registerCodeMirror(handlePastedNote)
+
+		addSourceButton(this.app)
 
 	}
 

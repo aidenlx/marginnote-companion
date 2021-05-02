@@ -18,8 +18,8 @@ export function getFrontmatterRange(
 }
 
 type keyValue = {
-  [key:string]:string
-}
+  [key: string]: string | string[];
+};
 export function addToFrontmatter(
   entry: string,
   items: keyValue | string[],
