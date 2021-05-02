@@ -6,15 +6,17 @@ import {
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
 import json2md, { DataObject as mdObj } from "json2md";
-import MNComp from "main";
+import TurndownService from "turndown";
 import { MDLink } from "../md-tools/MDLink";
 import { mnUrl, Range } from "../misc";
 import { getSimpleNote } from "./simpleNote";
 
+const tdService = new TurndownService();
+
 const ext = {
   comment: (input: string): string => `%%${input}%%`,
   html: (html: string): string =>
-    MNComp.tdService.turndown(html.replace(/<head>.+<\/head>/g, "")),
+    tdService.turndown(html.replace(/<head>.+<\/head>/g, "")),
 };
 
 for (const k in ext) {
