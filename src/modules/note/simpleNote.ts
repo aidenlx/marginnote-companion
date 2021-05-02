@@ -77,7 +77,7 @@ export const isExcerptNote = (n: simpleNote): n is excerptNote =>
   if (!id || !docMd5) throw new Error("noteId或docMd5不存在");
 
   let note = { id, docMd5, title } as simpleNote;
-  if (!comments || comments.length === 0)
+  if (comments && comments.length !== 0)
     // @ts-ignore
     note.comments = comments;
   if (excerptText || excerptPic)
