@@ -5,15 +5,10 @@ import {
   noteComment,
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
-import json2md, { DataObject as mdObj } from "json2md";
-import { ext } from "modules/handlers/handleNote";
+import { mdObj } from "modules/handlers/render";
 import { MDLink } from "../md-tools/MDLink";
 import { mnUrl, Range } from "../misc";
 import { getSimpleNote } from "./simpleNote";
-
-for (const k in ext) {
-  json2md.converters[k] = ext[k as keyof typeof ext];
-}
 
 /** determine if link comment is a picture */
 const isLC_pic = (lc: linkComment): lc is linkComment_pic =>

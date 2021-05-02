@@ -2,29 +2,19 @@ import { Editor } from "obsidian";
 import { getSimpleNote } from "modules/note/simpleNote";
 import { ReturnBody_Note } from "@alx-plugins/obsidian-bridge";
 import assertNever from "assert-never";
-import { FindLine, InsertTo, InsertToCursor, SetLine } from "modules/cm-tools";
+import { FindLine, InsertTo, InsertToCursor } from "modules/cm-tools";
 import {
   transformBasicNote,
   transformBasicNote_Body,
   transformFullNote,
   transformFullNote_Body,
-  tlSeparator,
   TitlelinkToAlias,
 } from "modules/note/transform";
 import { getAnchor, MDLink, MDLinkType } from "modules/md-tools/MDLink";
 import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
 import { mnUrl } from "modules/misc";
-import json2md, { DataObject as mdObj } from "json2md";
+import { json2md, mdObj } from "./render";
 import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
-import TurndownService from "turndown";
-
-const tdService = new TurndownService();
-
-export const ext = {
-  comment: (input: string): string => `%%${input}%%`,
-  html: (html: string): string =>
-    tdService.turndown(html.replace(/<head>.+<\/head>/g, "")),
-};
 
 const enum NoteImportMode {
   /** Insert only link to cursor */
@@ -53,7 +43,7 @@ const enum NoteImportMode {
 export function handleNote(
   obj: ReturnBody_Note,
   cm: CodeMirror.Editor | Editor,
-  mode: NoteImportMode = NoteImportMode.BasicInsert
+  mode: NoteImportMode = NoteImportMode.FullInsert
 ): boolean {
   const { data: note, currentBook: book } = obj;
   if (!book) {
@@ -62,6 +52,7 @@ export function handleNote(
   }
 
   const InsertMDToCursor = (objs: mdObj[]) => InsertToCursor(json2md(objs), cm);
+  json2md.converters
   let objs: mdObj[];
   switch (mode) {
     case NoteImportMode.LinkInsert:
