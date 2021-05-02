@@ -13,10 +13,10 @@ import {
 import { getAnchor, MDLink, MDLinkType } from "modules/md-tools/MDLink";
 import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
 import { mnUrl } from "modules/misc";
-import { json2md, mdObj } from "./render";
+import { json2md, mdObj } from "../note/render";
 import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
 
-const enum NoteImportMode {
+export const enum NoteImportMode {
   /** Insert only link to cursor */
   LinkInsert,
   /** Insert only main content (title, excrept, text comments) to cursor */
@@ -43,7 +43,7 @@ const enum NoteImportMode {
 export function handleNote(
   obj: ReturnBody_Note,
   cm: CodeMirror.Editor | Editor,
-  mode: NoteImportMode = NoteImportMode.FullInsert
+  mode: NoteImportMode
 ): boolean {
   const { data: note, currentBook: book } = obj;
   if (!book) {
@@ -52,7 +52,7 @@ export function handleNote(
   }
 
   const InsertMDToCursor = (objs: mdObj[]) => InsertToCursor(json2md(objs), cm);
-  json2md.converters
+
   let objs: mdObj[];
   switch (mode) {
     case NoteImportMode.LinkInsert:

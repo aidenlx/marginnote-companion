@@ -5,7 +5,7 @@ import {
   noteComment,
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
-import { mdObj } from "modules/handlers/render";
+import { mdObj } from "modules/note/render";
 import { MDLink } from "../md-tools/MDLink";
 import { mnUrl, Range } from "../misc";
 import { getSimpleNote } from "./simpleNote";

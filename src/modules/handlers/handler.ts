@@ -1,7 +1,7 @@
 import { Editor } from "obsidian";
 import assertNever from "assert-never"
 import { handleSel } from "./handleSel";
-import { handleNote } from "./handleNote";
+import { handleNote, NoteImportMode } from "./handleNote";
 import { ReturnBody, MNMark } from "@alx-plugins/obsidian-bridge";
 
 /**
@@ -22,7 +22,7 @@ export function handleMNData(
     case "sel":
       return handleSel(obj,cm);
     case "note":
-      return handleNote(obj,cm);
+      return handleNote(obj,cm,NoteImportMode.MetaMerge);
     default:
       assertNever(obj);
   }
