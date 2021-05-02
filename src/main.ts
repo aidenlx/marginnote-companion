@@ -1,3 +1,4 @@
+import { aliasBelowH1 } from 'modules/controls/aliasBelowH1';
 import { addSourceButton } from 'modules/controls/sourceButton';
 import ClipboardListener from 'modules/receivers/cbListener';
 import { handlePastedNote } from 'modules/receivers/pasteEvt';
@@ -18,7 +19,9 @@ export default class MNComp extends Plugin {
 
 		this.registerCodeMirror(handlePastedNote)
 
-		addSourceButton(this.app)
+		addSourceButton(this.app);
+		
+		this.registerMarkdownPostProcessor(aliasBelowH1);
 
 	}
 

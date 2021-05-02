@@ -1,0 +1,19 @@
+span.heading-alias{
+  text-decoration: none;
+  background-color: var(--background-secondary-alt);
+  border-radius: 30px;
+  color: var(--text-normal);
+  font-size: 0.8em;
+  padding: 2px 8px;
+  margin: 2px 4px;
+  line-height: 19px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+div.heading-alias-container{
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 5px;
+}
