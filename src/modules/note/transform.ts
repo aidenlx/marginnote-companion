@@ -107,24 +107,30 @@ export function transformTitle(str: string, level: Range<1, 7> = 2): mdObj {
 /** title link separator */
 export const tlSeparator = /[;；]/;
 
-export function toMDObj(
+/**
+ * recieve all params and return a merged json2md.DataObject array
+ * @param srcs string is consider to be "p"
+ * @returns 
+ */
+export function toMDObjs(
   ...srcs: Array<string | mdObj[] | mdObj | null | undefined>
 ): mdObj[] {
-
   const mdObjs: mdObj[] = [];
-  let tempParas: string[] = [] ;
+  let tempParas: string[] = [];
 
-  function processObj(obj:mdObj){
-    if (obj.p){
+  const paras = () => (tempParas.length === 1 ? tempParas[0] : tempParas);
+
+  function processObj(obj: mdObj) {
+    if (obj?.p) {
       if (typeof obj.p === "string") tempParas.push(obj.p);
       else tempParas.push(...obj.p);
     } else {
       // push para first if exists
-      if (tempParas.length!==0){
-        mdObjs.push({p:tempParas});
+      if (tempParas.length !== 0) {
+        mdObjs.push({ p: paras() });
         tempParas = [];
       }
-      mdObjs.push(obj)
+      mdObjs.push(obj);
     }
   }
 
@@ -144,7 +150,7 @@ export function toMDObj(
     }
 
     if (i === srcs.length - 1 && tempParas.length !== 0)
-      mdObjs.push({ p: tempParas });
+      mdObjs.push({ p: paras() });
   }
 
   return mdObjs;
@@ -152,19 +158,19 @@ export function toMDObj(
 
 /** render only main content (title, excrept, text comments) as paragraphs */
 export function transformBasicNote(note: MbBookNote): mdObj[] {
-  return toMDObj(transformBasicNote_Title(note), transformBasicNote_Body(note));
+  return toMDObjs(transformBasicNote_Title(note), transformBasicNote_Body(note));
 }
 
 /** render note title as paragraphs */
 export function transformBasicNote_Title(note: MbBookNote): mdObj[] {
-  return toMDObj(note.noteTitle);
+  return toMDObjs(note.noteTitle);
 }
 
 /** render excrept and text comments as paragraphs */
 export function transformBasicNote_Body(note: MbBookNote): mdObj[] {
   const { comments, excerptText } = note;
 
-  return toMDObj(excerptText, transformComments(comments));
+  return toMDObjs(excerptText, transformComments(comments));
 }
 
 /** render full note (linked notes, html comment...) in markdown format */
@@ -174,7 +180,7 @@ export function transformFullNote(
   keepAlias: boolean
 ): mdObj[] {
   const title = transformFullNote_Title(note, headingLevel, keepAlias);
-  return toMDObj(title, transformFullNote_Body(note));
+  return toMDObjs(title, transformFullNote_Body(note));
 }
 
 /** render full note title */
@@ -204,7 +210,7 @@ export function transformFullNote_Body(src: MbBookNote): mdObj[] {
   switch (note.type) {
     case "excerptNote": {
       const { excerpt, comments } = note;
-      obj = toMDObj(
+      obj = toMDObjs(
         { blockquote: excerpt.text },
         transformComments(comments, true)
       );
@@ -212,12 +218,12 @@ export function transformFullNote_Body(src: MbBookNote): mdObj[] {
     }
     case "note": {
       const { comments } = note;
-      obj = toMDObj(transformComments(comments, true));
+      obj = toMDObjs(transformComments(comments, true));
       break;
     }
     case "excerpt": {
       const { excerpt } = note;
-      obj = toMDObj(excerpt.text);
+      obj = toMDObjs(excerpt.text);
       break;
     }
     default:

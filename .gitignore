@@ -12,3 +12,6 @@ main.js
 
 # saved config
 data.json
+
+# Jest
+coverage
