@@ -51,17 +51,19 @@ describe("toMDObjs merge funtion", () => {
     expect(toMDObjs(p("123"), p("hello", "there"))).toEqual([
       p("123", "hello", "there"),
     ]);
-
-    // const nested = [
-    //   [p("hello"), p("there", "123")],
-    //   p(";"),
-    //   p("hello", "again"),
-    // ];
-
-    // expect(toMDObjs(nested)).toEqual([
-    //   p("hello", "there", "123", ";", "hello", "again"),
-    // ]);
   });
+  test("merge nested paragraphs", () => {
+    const nested = [
+      [p("hello"), p("there", "123")],
+      p(";"),
+      p("hello", "again"),
+    ];
+
+    expect(toMDObjs(nested)).toEqual([
+      p("hello", "there", "123", ";", "hello", "again"),
+    ]);
+  })
+
 });
 
 const comment = {
@@ -141,7 +143,6 @@ describe("transformComments function", () => {
       p("以文本内容为载体、以知识内化为主打功能的阅读应用"),
     ]);
   });
-
 
 });
 

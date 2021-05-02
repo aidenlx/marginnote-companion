@@ -95,50 +95,46 @@ export const tlSeparator = /[;；]/;
 
 /**
  * recieve all params and return a merged json2md.DataObject array
- * @param srcs string is consider to be "p"
+ * @param objs string is consider to be "p"
  * @returns 
  */
 export function toMDObjs(
-  ...srcs: Array<string | mdObj[] | mdObj | null | undefined>
+  ...params: Array<string | mdObj[] | mdObj | null | undefined>
 ): mdObj[] {
-  const mdObjs: mdObj[] = [];
-  let tempParas: string[] = [];
 
-  const paras = () => (tempParas.length === 1 ? tempParas[0] : tempParas);
+  const objs: Array<string | mdObj | null | undefined> = params.flat(Infinity);
 
-  function processObj(obj: mdObj) {
-    if (obj?.p) {
-      if (typeof obj.p === "string") tempParas.push(obj.p);
-      else tempParas.push(...obj.p);
-    } else {
-      // push para first if exists
-      if (tempParas.length !== 0) {
-        mdObjs.push({ p: paras() });
-        tempParas = [];
-      }
-      mdObjs.push(obj);
-    }
+  const mdObjs = objs.reduce(reducer,[])
+
+  function getPara(obj: string | mdObj): string[] | null {
+    if (typeof obj === "string") return [obj];
+    else if (obj.p) return typeof obj.p === "string" ? [obj.p] : obj.p;
+    else return null;
+  }
+  function accPush(cur: string | mdObj, acc: mdObj[]) {
+    if (typeof cur === "string") acc.push({ p: cur });
+    else acc.push(cur);
   }
 
-  for (let i = 0; i < srcs.length; i++) {
-    const curr = srcs[i];
-    if (curr) {
-      if (typeof curr === "string") {
-        tempParas.push(curr);
-      } else if (Array.isArray(curr)) {
-        for (const arrayObj of curr) {
-          processObj(arrayObj);
+  function reducer(acc: mdObj[], cur: typeof objs[0], i: number): mdObj[] {
+    if (cur) {
+      if (acc.length > 0) {
+        const lastIndex = acc.length - 1;
+        const last = acc[lastIndex];
+        const curPara = getPara(cur);
+        if (last.p && curPara){
+          if (typeof last.p === "string")
+            last.p = [last.p,...curPara];
+          else last.p.push(...curPara)
+        } else {
+          accPush(cur, acc);
         }
       } else {
-        // typeof curr => mdObj
-        processObj(curr);
+        accPush(cur, acc);
       }
     }
-
-    if (i === srcs.length - 1 && tempParas.length !== 0)
-      mdObjs.push({ p: paras() });
+    return acc;
   }
-
   return mdObjs;
 }
 
