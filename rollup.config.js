@@ -14,17 +14,14 @@ if you want to view the source visit the plugins github repository
 export default {
   input: "src/main.ts",
   output: {
-    dir: '.',
-    sourcemap: 'inline',
+    dir: ".",
+    sourcemap: "inline",
     sourcemapExcludeSources: isProd,
-    format: 'cjs',
-    exports: 'default',
+    format: "cjs",
+    exports: "default",
     banner,
   },
-  external: ['obsidian','electron','codemirror','turndown'],
-  plugins: [
-    typescript(),
-    nodeResolve({browser: true}),
-    commonjs(),
-  ]
+  external: ["obsidian", "electron", "codemirror"],
+  global: ['turndown'],
+  plugins: [typescript(), nodeResolve({ browser: true }), commonjs()],
 };
