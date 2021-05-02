@@ -69,3 +69,19 @@ export function SetLine(
     { line: lineNum, ch: Infinity }
   );
 }
+
+export function getStartIndexOfSel(cm: CodeMirror.Editor): number {
+  // @ts-ignore
+  const from = cm.getCursor(true);
+  // @ts-ignore
+  const to = cm.getCursor(false);
+  return cm.indexFromPos(getAheadPos(from, to));
+}
+
+function getAheadPos(a: CodeMirror.Position, b: CodeMirror.Position) {
+  if (a.line !== b.line) {
+    return a.line < b.line ? a : b;
+  } else {
+    return a.ch < b.ch ? a : b;
+  }
+}
