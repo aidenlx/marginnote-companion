@@ -28,6 +28,8 @@ export function handleMNData(
   }
 }
 
+const MNMark: MNMark = "<!--MN-->\n";
+
 /**
  * Determine if string is data from obsidian-bridge
  * @returns ReturnBody or null (if not MNData)  
