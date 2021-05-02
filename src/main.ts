@@ -1,5 +1,6 @@
 import { aliasBelowH1 } from 'modules/controls/aliasBelowH1';
 import { addSourceButton } from 'modules/controls/sourceButton';
+import { autoPaste } from 'modules/receivers/autopaste';
 import ClipboardListener from 'modules/receivers/cbListener';
 import { handlePastedNote } from 'modules/receivers/pasteEvt';
 import { Plugin } from 'obsidian';
@@ -22,6 +23,8 @@ export default class MNComp extends Plugin {
 		addSourceButton(this.app);
 		
 		this.registerMarkdownPostProcessor(aliasBelowH1);
+
+		autoPaste(this);
 
 	}
 
