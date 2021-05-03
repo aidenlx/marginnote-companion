@@ -1,10 +1,3 @@
-
-const chs = /[\u4e00-\u9fa5]/g;
-
-export const ExtractMNAlias = (mnAlias: string): string[] =>
-  mnAlias.replace(/,/g, "_").split(";");
-
-
 function cleanText(src: string) {
   return src
     .trim()                                   // 去除条目开头与结尾的多余空格

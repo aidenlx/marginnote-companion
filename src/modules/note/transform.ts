@@ -10,6 +10,9 @@ import { MDLink } from "../md-tools/MDLink";
 import { mnUrl, Range } from "../misc";
 import { getSimpleNote } from "./simpleNote";
 
+/** title link separator */
+export const tlSeparator = /[;；]/;
+
 /** determine if link comment is a picture */
 const isLC_pic = (lc: linkComment): lc is linkComment_pic =>
   (lc as linkComment_pic).q_hpic !== undefined;
@@ -19,7 +22,7 @@ export function TitlelinkToAlias(
 ): { title: string; aliases: string[] | null } {
   if (!tlSeparator.test(srcTitle)) return { title: srcTitle, aliases: null };
   else {
-    const [title, ...aliases] = srcTitle.split(tlSeparator);
+    const [title, ...aliases] = srcTitle.replace(/,/g, "_").split(tlSeparator);
     return { title, aliases };
   }
 }
@@ -89,9 +92,6 @@ export function transformTitle(str: string, level: Range<1, 7> = 2): mdObj {
     return { [headingType]: str };
   } else throw new TypeError(`level ${level} invalid`);
 }
-
-/** title link separator */
-export const tlSeparator = /[;；]/;
 
 /**
  * recieve all params and return a merged json2md.DataObject array
