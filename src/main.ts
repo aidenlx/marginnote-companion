@@ -2,7 +2,7 @@ import { aliasBelowH1 } from "modules/controls/aliasBelowH1";
 import { addSourceButton } from "modules/controls/sourceButton";
 import { autoPaste } from "modules/receivers/autopaste";
 import ClipboardListener from "modules/receivers/cbListener";
-import { handlePastedNote } from "modules/receivers/pasteEvt";
+import { PastedNoteHandler } from "modules/receivers/pasteEvt";
 import { Plugin } from "obsidian";
 // import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from 'settings';
 
@@ -12,13 +12,13 @@ export default class MNComp extends Plugin {
   cbListener = new ClipboardListener();
 
   async onload() {
-    console.log("loading plugin");
+    console.log("loading marginnote-companion");
 
     // await this.loadSettings();
 
     // this.addSettingTab(new MNCompSettingTab(this.app, this));
 
-    this.registerCodeMirror(handlePastedNote);
+    this.registerCodeMirror((cm) => cm.on("paste", PastedNoteHandler));
 
     addSourceButton(this.app);
 
@@ -28,7 +28,9 @@ export default class MNComp extends Plugin {
   }
 
   onunload() {
-    console.log("unloading plugin");
+    console.log("unloading marginnote-companion");
+
+    this.registerCodeMirror((cm) => cm.off("paste", PastedNoteHandler));
   }
 
   // async loadSettings() {
