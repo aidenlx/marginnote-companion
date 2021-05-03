@@ -26,11 +26,12 @@ export function addToFrontmatter(
   cm: CodeMirror.Editor | Editor
 ) {
   const fmRange = getFrontmatterRange(cm);
-  let fmStr: string;
+  const render = (fmObj: { [k: string]: any }) =>
+    matter.stringify("", fmObj).replace(/^\s+|\s+$/g, "") + "\n";
+  
   if (fmRange) {
     const { from, to } = fmRange;
-    fmStr = cm.getRange(from, to);
-    let fmObj = matter(fmStr).data;
+    const fmObj = matter(cm.getRange(from, to)).data;
     if (fmObj[entry]) {
       if (Array.isArray(fmObj[entry]) && Array.isArray(items)) {
         (fmObj[entry] as string[]).push(...items);
@@ -43,14 +44,10 @@ export function addToFrontmatter(
     } else {
       fmObj[entry] = items;
     }
-    fmStr = matter.stringify("", fmObj).replace(/^\s+|\s+$/g, "");
-    cm.replaceRange(fmStr, from, to);
+    cm.replaceRange(render(fmObj), from, to);
   } else {
-    fmStr = matter
-      .stringify("", {
-        [entry]: items,
-      })
-      .replace(/^\s+|\s+$/g, "");
-    InsertTo(fmStr, cm, 0, 0);
+    InsertTo(render({
+      [entry]: items,
+    }), cm, 0, 0);
   }
 }
