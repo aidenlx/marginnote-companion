@@ -1,9 +1,9 @@
 {
-  "id": "myplugin",
-  "name": "myplugin",
+  "id": "marginnote-companion",
+  "name": "Marginnote Companion",
   "version": "0.0.0",
   "minAppVersion": "0.9.12",
-  "description": "myplugin",
+  "description": "",
   "author": "",
   "authorUrl": "",
   "isDesktopOnly": true

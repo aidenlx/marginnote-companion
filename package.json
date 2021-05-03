@@ -1,7 +1,7 @@
 {
-  "name": "myplugin",
+  "name": "marginnote-companion",
   "version": "0.0.0",
-  "description": "myplugin",
+  "description": "",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
