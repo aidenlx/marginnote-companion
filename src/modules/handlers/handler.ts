@@ -1,7 +1,7 @@
 import { Editor } from "obsidian";
 import assertNever from "assert-never";
 import { handleSel } from "./handleSel";
-import { handleNote, NoteImportMode } from "./handleNote";
+import { handleNote, NoteImportMode, NoteImportOption, NoteImportStyle } from "./handleNote";
 import { ReturnBody, MNMark } from "@alx-plugins/obsidian-bridge";
 
 /**
@@ -12,7 +12,12 @@ import { ReturnBody, MNMark } from "@alx-plugins/obsidian-bridge";
  */
 export function handleMNData(
   src: string,
-  cm: CodeMirror.Editor | Editor
+  cm: CodeMirror.Editor | Editor,
+  noteOptions: NoteImportOption = {
+    importMode: NoteImportMode.Insert,
+    importStyle: NoteImportStyle.Basic,
+    blanksAroundSingleLine: false
+  }
 ): boolean {
   const obj = isMNData(src);
   if (!obj) return false;
@@ -21,7 +26,7 @@ export function handleMNData(
     case "sel":
       return handleSel(obj, cm);
     case "note":
-      return handleNote(obj, cm, NoteImportMode.MetaMerge);
+      return handleNote(obj, cm, noteOptions);
     default:
       assertNever(obj);
   }
