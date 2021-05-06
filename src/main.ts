@@ -57,6 +57,21 @@ export default class MNComp extends Plugin {
     // Enable GUI Modification
     addSourceButton(this.app);
     this.registerMarkdownPostProcessor(aliasBelowH1);
+
+    // URL Scheme handlers
+    this.registerObsidianProtocolHandler("mncomp",(params) =>{
+      const macroName = params.macro
+      if (macroName)
+        switch (macroName) {
+          case "autodef":
+            SelToAilas(this.app)
+            break;
+          default:
+            console.error("unsupported macro");
+            break;
+        }
+
+    })
   }
 
   onunload() {
