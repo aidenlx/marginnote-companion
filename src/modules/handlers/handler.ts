@@ -13,11 +13,7 @@ import { ReturnBody, MNMark } from "@alx-plugins/obsidian-bridge";
 export function handleMNData(
   src: string,
   cm: CodeMirror.Editor | Editor,
-  noteOptions: NoteImportOption = {
-    importMode: NoteImportMode.Insert,
-    importStyle: NoteImportStyle.Basic,
-    blanksAroundSingleLine: false
-  }
+  noteOptions: NoteImportOption
 ): boolean {
   const obj = isMNData(src);
   if (!obj) return false;

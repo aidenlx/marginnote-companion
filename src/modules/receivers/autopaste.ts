@@ -38,7 +38,7 @@ export function autoPaste(plugin: MNComp) {
       const cm = activeView.editor;
 
       // fallback option if fails
-      if (!handleMNData(value, cm)) {
+      if (!handleMNData(value, cm, plugin.settings.noteImportOption)) {
         InsertTo(value + "\n", cm, cm.getCursor());
       }
     }
