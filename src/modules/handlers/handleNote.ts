@@ -75,21 +75,47 @@ export function handleNote(
 
       const anchor = getAnchor(linkType, id, id.slice(-6));
 
-      const insertLinkTo = (index: number, fallback:Function) => {
-        const whitelist : (keyof mdObj)[]= ["p", "blockquote"];
-        let success = false;
-        for (const k of whitelist) {
-          if (body[index][k]) {
-            body[index][k] += anchor;
-            success = true;
+      const insertLinkTo = (index: number, fallback: Function) => {
+        let curIndex = 0;
+        for (const obj of body) {
+          const typeKey = Object.keys(obj)[0] as keyof mdObj;
+          const value = obj[typeKey];
+          if (Array.isArray(value) && value.length>0 && typeof value[0] === "string"){
+            for (let i = 0; i < value.length; i++) {
+              if (curIndex === index){
+                value[i] += anchor;
+                return;
+              }
+              curIndex++;
+            }
+          } else if (typeof value ==="string"){
+            if (curIndex === index){
+              obj[typeKey] += anchor;
+              return;
+            }
+          } else {
+            if (curIndex === index){
+              fallback();
+              return;
+            }
           }
         }
-        if (!success) fallback();
       };
 
-      if (body.length === 0) {
+      function getLength(array:mdObj[]):number {
+        let length = 0;
+        for (const obj of array) {
+          if (obj.p && Array.isArray(obj.p)){
+            length = length + obj.p.length;
+          } else length++;
+        }
+        return length;        
+      }
+
+      const length = getLength(body);
+      if (length === 0) {
         body.push({ p: anchor });
-      } else if (body.length === 1) {
+      } else if (length === 1) {
         insertLinkTo(0, () => body.push({ p: anchor }));
       } else {
         insertLinkTo(1, () => body.splice(2, 0, { p: anchor }));
