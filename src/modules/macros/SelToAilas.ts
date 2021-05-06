@@ -12,9 +12,8 @@ export function SelToAilas(app:App) {
   
   const sel = editor.getSelection();
 
-  console.log(ExtractDef(sel))
-
-  addToFrontmatter('aliases',ExtractDef(sel),editor)
-
-  editor.replaceSelection('');
+  if (sel) {
+    addToFrontmatter('aliases',ExtractDef(sel),editor)
+    editor.replaceSelection('');
+  }
 }
