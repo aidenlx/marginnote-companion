@@ -11,7 +11,7 @@ const Pos = (line: number, ch: number) => ({ line, ch });
  * @param label
  * @returns the url of label
  */
-export function extractSource(
+function extractSource(
   cm: CodeMirror.Editor | Editor,
   label: string
 ): string | null {
