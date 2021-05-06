@@ -27,7 +27,7 @@ export function addToFrontmatter(
 ) {
   const fmRange = getFrontmatterRange(cm);
   const render = (fmObj: { [k: string]: any }) =>
-    matter.stringify("", fmObj).replace(/^\s+|\s+$/g, "") + "\n";
+    matter.stringify("", fmObj).replace(/^\s+|\s+$/g, "");
   
   if (fmRange) {
     const { from, to } = fmRange;

@@ -105,6 +105,8 @@ export function handleNote(
       assertNever(options.importMode);
   }
 
+  if (body.length === 0) return true;
+
   let insert = json2md(body).replace(/\n{3,}/g,"\n\n");
   
   if (

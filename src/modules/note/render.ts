@@ -67,12 +67,12 @@ export function importMeta(
       addToFrontmatter("aliases", aliases, cm);
     }
 
-    let H1LineNum = FindLine(cm, /^# /);
+    const H1LineNum = FindLine(cm, /^# /);
 
     // add first title to h1 if not exist
     if (H1LineNum === -1) {
       const range = getFrontmatterRange(cm);
-      const titleText = `\n\n# ${title}\n\n`;
+      const titleText = `\n\n# ${title}\n`;
       if (range) InsertTo(titleText, cm, range.to);
       else InsertTo(titleText, cm, 0, 0);
     } else if (updateH1) {
