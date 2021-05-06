@@ -4,9 +4,7 @@ import assertNever from "assert-never";
 import { InsertToCursor } from "modules/cm-tools";
 import {
   transformBasicNote,
-  transformBasicNote_Body,
   transformFullNote,
-  transformFullNote_Body,
 } from "modules/note/transform";
 import { getAnchor, MDLinkType } from "modules/md-tools/MDLink";
 import { importMeta, insertRefSource, json2md, mdObj } from "../note/render";
@@ -31,7 +29,11 @@ export const enum NoteImportMode {
 export interface NoteImportOption {
   importStyle: NoteImportStyle,
   importMode: NoteImportMode,
-  blanksAroundSingleLine: boolean
+  blanksAroundSingleLine: boolean,
+  /** whether update existing H1 with metadata title, 
+   * Passed to importMeta()
+   */
+  updateH1: boolean
 }
 
 export function handleNote(
@@ -97,7 +99,7 @@ export function handleNote(
         insertRefSource(mnUrl("note", id), id.slice(-6), cm);
     } break;
     case NoteImportMode.Merge:
-      importMeta(note, book, false, cm);
+      importMeta(note, book, options.updateH1, cm);
       break;
     default:
       assertNever(options.importMode);

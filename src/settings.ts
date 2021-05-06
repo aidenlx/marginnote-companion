@@ -10,7 +10,8 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
   noteImportOption: {
     importMode: NoteImportMode.Insert,
     importStyle: NoteImportStyle.Basic,
-    blanksAroundSingleLine: false
+    blanksAroundSingleLine: false,
+    updateH1: false
   }
 };
 
