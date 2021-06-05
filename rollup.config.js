@@ -20,7 +20,6 @@ export default {
     exports: "default",
     banner,
   },
-  external: ["obsidian", "electron", "codemirror"],
-  global: ["turndown"],
+  external: ["obsidian", "electron", "codemirror", "turndown", "moment"],
   plugins: [typescript(), nodeResolve({ browser: true }), commonjs()],
 };

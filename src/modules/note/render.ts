@@ -1,4 +1,3 @@
-import TurndownService from "turndown";
 import json2md, { DataObject } from "json2md";
 import { MDLink } from "modules/md-tools/MDLink";
 import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
@@ -8,6 +7,11 @@ import { mnUrl } from "modules/misc";
 import { getSimpleNote } from "./simpleNote";
 import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
 import { TitlelinkToAlias } from "./transform";
+
+import type turndown from "turndown"
+declare global {
+  const TurndownService: typeof turndown;
+}
 
 export interface mdObj extends DataObject {
   comment?: string;
