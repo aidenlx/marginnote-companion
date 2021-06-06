@@ -35,7 +35,7 @@ export default class MNComp extends Plugin {
           ...DEFAULT_SETTINGS.noteImportOption,
           importMode: NoteImportMode.Merge,
           importStyle: NoteImportStyle.Metadata,
-          updateH1: true
+          updateH1: false
         }),
     });
 

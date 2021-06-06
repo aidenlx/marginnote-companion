@@ -46,8 +46,6 @@ export function addToFrontmatter(
     }
     cm.replaceRange(render(fmObj), from, to);
   } else {
-    InsertTo(render({
-      [entry]: items,
-    }), cm, 0, 0);
+    InsertTo(render({ [entry]: items }) + "\n", cm, 0, 0);
   }
 }
