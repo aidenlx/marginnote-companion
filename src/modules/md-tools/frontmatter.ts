@@ -18,7 +18,7 @@ export function getFrontmatterRange(
 }
 
 type keyValue = {
-  [key: string]: string | string[];
+  [key: string]: any;
 };
 export function addToFrontmatter(
   entry: string,
@@ -26,8 +26,9 @@ export function addToFrontmatter(
   cm: CodeMirror.Editor | Editor
 ) {
   const fmRange = getFrontmatterRange(cm);
-  const render = (fmObj: { [k: string]: any }) =>
-    matter.stringify("", fmObj).replace(/^\s+|\s+$/g, "");
+  const render = (fmObj: { [k: string]: any }) => 
+    // @ts-ignore
+    matter.stringify("", fmObj, { flowLevel: 3 }).replace(/^\s+|\s+$/g, "");
   
   if (fmRange) {
     const { from, to } = fmRange;

@@ -4,11 +4,14 @@ import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
 import { Editor } from "obsidian";
 import { InsertTo, FindLine, SetLine } from "modules/cm-tools";
 import { mnUrl } from "modules/misc";
-import { getSimpleNote } from "./simpleNote";
-import { addToFrontmatter, getFrontmatterRange } from "modules/md-tools/frontmatter";
+import { excerptNote, getSimpleNote } from "./simpleNote";
+import {
+  addToFrontmatter,
+  getFrontmatterRange,
+} from "modules/md-tools/frontmatter";
 import { TitlelinkToAlias } from "./transform";
 
-import type turndown from "turndown"
+import type turndown from "turndown";
 declare global {
   const TurndownService: typeof turndown;
 }
@@ -49,7 +52,7 @@ export function insertRefSource(
       if (!/^\[[A-Z0-9]{6,6}\]:/.test(<string>cm.getLine(i)))
         refSource = "\n" + refSource;
       InsertTo(refSource, cm, { line: i, ch: Infinity });
-      if (cm.getCursor()!=cursorLoc) cm.setCursor(cursorLoc)
+      if (cm.getCursor() != cursorLoc) cm.setCursor(cursorLoc);
       break;
     }
   }
@@ -87,13 +90,19 @@ export function importMeta(
 
   // import source
   const { id } = note;
-  const { docMd5, docTitle, pathFile: docPath } = book;
+  const { docMd5: md5, docTitle, pathFile: docPath } = book;
 
-  if (docMd5)
+  if (md5) {
+    const pageRange = (note as excerptNote).pageRange;
+    const info: any = {
+      md5,
+      url: mnUrl("note", id),
+    };
+    if (pageRange) info.page = pageRange;
     addToFrontmatter(
       "sources",
-      { [docTitle ?? "null"]: [docMd5, mnUrl("note", id)] },
+      { [docTitle ?? docPath ?? "null"]: info },
       cm
     );
-  else console.error("docMd5 missing");
+  } else console.error("docMd5 missing");
 }

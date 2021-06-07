@@ -23,6 +23,7 @@ export type simpleNote = excerptNote | noteOnly | excerptOnly;
  */
 export interface excerptOnly {
   type: "excerpt";
+  pageRange?: [number, number] | number;
   id: string;
   docMd5: string;
   excerpt: excerpt;
@@ -42,6 +43,7 @@ export interface noteOnly {
  */
 export interface excerptNote {
   type: "excerptNote";
+  pageRange?: [number, number] | number;
   id: string;
   docMd5: string;
   title?: string;
@@ -55,43 +57,44 @@ export const isSimpleNote = (n: any): n is simpleNote =>
   (n as simpleNote)?.docMd5 !== undefined;
 
 export const isNoteOnly = (n: simpleNote): n is noteOnly =>
-  !(n as excerptNote).excerpt;
+  !(n as excerptNote).pageRange;
 export const isExcerptOnly = (n: simpleNote): n is excerptOnly =>
   !(n as noteOnly).comments && !(n as noteOnly)?.title;
 export const isExcerptNote = (n: simpleNote): n is excerptNote =>
-  !(isNoteOnly(n) || isExcerptOnly(n));
+  !isNoteOnly(n) && !isExcerptOnly(n);
 
 /**
  * Get simplified MbBookNote
  * @returns simplified MbBookNote with all text unprocessed
  */
 export function getSimpleNote(src: MbBookNote): simpleNote {
-  const {
+  let {
     noteId: id,
+    startPage,
+    endPage,
     docMd5,
     noteTitle: title,
     comments,
     excerptText,
     excerptPic,
   } = src;
+  comments = comments ?? [];
   if (!id || !docMd5) throw new Error("noteId或docMd5不存在");
 
-  let note = { id, docMd5, title } as simpleNote;
-  if (comments && comments.length !== 0)
-    // @ts-ignore
-    note.comments = comments;
-  if (excerptText || excerptPic)
-    // @ts-ignore
-    note.excerpt = { text: excerptText, pic: excerptPic };
-  if (isNoteOnly(note)) {
-    note.type = "note";
-  } else {
-    if (isExcerptOnly(note)) {
-      note.type = "excerpt";
-    } else {
-      note.type = "excerptNote";
-    }
-  }
+  if (startPage) {
+    let excerpt: excerpt;
+    if (excerptPic) excerpt = { text: excerptText, pic: excerptPic } as ePic;
+    else excerpt = { text: excerptText } as eText;
 
-  return note;
+    if (!startPage || !endPage) {
+      console.error(src);
+      throw new Error("missing page");
+    }
+    const pageRange: excerptNote["pageRange"] =
+      startPage === endPage ? startPage : [startPage, endPage];
+
+    if (title || (comments && comments.length !== 0))
+      return { type: "excerptNote", id, docMd5, excerpt, comments, title, pageRange };
+    else return { type: "excerpt", id, docMd5, excerpt, pageRange };
+  } else return { type: "note", comments, id, docMd5, title };
 }

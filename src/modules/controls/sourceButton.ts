@@ -26,7 +26,7 @@ function addButton(this: App, leaf: WorkspaceLeaf) {
       const menu = new Menu(this);
       for (const key in sources) {
         const docName = key;
-        const url = sources[key][1];
+        const url = sources[key].url;
         if (url)
           menu.addItem((item) => {
             item
