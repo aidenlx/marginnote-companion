@@ -1,7 +1,7 @@
 import json2md, { DataObject } from "json2md";
 import { MDLink } from "modules/md-tools/MDLink";
 import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
-import { Editor } from "obsidian";
+import { Editor, htmlToMarkdown } from "obsidian";
 import { InsertTo, FindLine, SetLine } from "modules/cm-tools";
 import { mnUrl } from "modules/misc";
 import { excerptNote, getSimpleNote } from "./simpleNote";
@@ -11,22 +11,15 @@ import {
 } from "modules/md-tools/frontmatter";
 import { TitlelinkToAlias } from "./transform";
 
-import type turndown from "turndown";
-declare global {
-  const TurndownService: typeof turndown;
-}
-
 export interface mdObj extends DataObject {
   comment?: string;
   html?: string;
 }
 
-const tdService = new TurndownService();
-
 const extension = {
   comment: (input: string): string => `%%${input}%%`,
   html: (html: string): string =>
-    tdService.turndown(html.replace(/<head>(?:.|\n)+<\/head>/g, "")),
+    htmlToMarkdown(html.replace(/<head>(?:.|\n)+<\/head>/g, ""))
 };
 
 for (const k in extension) {
