@@ -1,4 +1,4 @@
-import MNComp from "main";
+import MNComp from "mn-main";
 import { handleMNData } from "../handlers/handler";
 
 export function PastedNoteHandler(this: MNComp, cm: CodeMirror.Editor, e: ClipboardEvent) {

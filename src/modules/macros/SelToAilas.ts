@@ -3,9 +3,9 @@ import { MarkdownView, App } from "obsidian";
 import { ExtractDef } from "./autodef";
 
 export function SelToAilas(app:App) {
-  const view = app.workspace.activeLeaf.view;
+  const view = app.workspace.activeLeaf?.view;
   if (!(view instanceof MarkdownView)){
-    console.log(`activeLeaf view type ${view.getViewType()}: not markdown`);
+    console.log(`activeLeaf view type ${view?.getViewType()}: not markdown`);
     return;
   }
   const editor = view.editor;

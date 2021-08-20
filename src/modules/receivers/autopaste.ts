@@ -1,4 +1,4 @@
-import MNComp from "main";
+import MNComp from "mn-main";
 import { handleMNData } from "../handlers/handler";
 import { InsertTo } from "modules/cm-tools";
 import { Notice, MarkdownView } from "obsidian";
@@ -33,7 +33,7 @@ export function autoPaste(plugin: MNComp) {
   // add clipboard listener callback
   plugin.cbListener.listener = (value) => {
     if (!value) return;
-    const activeView = plugin.app.workspace.activeLeaf.view;
+    const activeView = plugin.app.workspace.activeLeaf?.view;
     if (activeView instanceof MarkdownView) {
       const cm = activeView.editor;
 

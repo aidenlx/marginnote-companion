@@ -1,4 +1,4 @@
-import MNComp from "main";
+import MNComp from "mn-main";
 import { NoteImportMode, NoteImportOption, NoteImportStyle } from "modules/handlers/handleNote";
 import { PluginSettingTab, App, Setting } from "obsidian";
 

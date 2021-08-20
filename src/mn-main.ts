@@ -11,6 +11,8 @@ import { PastedNoteHandler } from "modules/receivers/pasteEvt";
 import { MarkdownView, Plugin } from "obsidian";
 import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from 'settings';
 
+import "./main.css"
+
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
@@ -49,7 +51,7 @@ export default class MNComp extends Plugin {
       id: "extractLabelFromSel",
       name: "Extract Label From Selection",
       callback: () => {
-        if (this.app.workspace.activeLeaf.view instanceof MarkdownView)
+        if (this.app.workspace.activeLeaf?.view instanceof MarkdownView)
           extractLabelFromSel(this.app.workspace.activeLeaf.view.sourceMode.cmEditor)
       }
     })
