@@ -1,91 +1,72 @@
-// https://github.com/venomaze/clipboard-listener
+import type { Clipboard } from "electron";
+import { EventRef, Events } from "obsidian";
 
-import events from "events";
-import { clipboard } from "electron";
-
-interface EventListener {
-  (v: string): void;
-}
-
-export default class ClipboardListener {
-  eventEmitter = new events.EventEmitter();
-  timeInterval = 500;
-  immediate = false;
-  interval: ReturnType<typeof setInterval> | undefined;
+export default class ClipboardListener extends Events {
+  intervalId?: number;
   lastValue: string | null = null;
-  private isWatching = false;
-  listener: EventListener = (v) => {};
+  clipboard: Clipboard | null = null;
   init = true;
+  /**
+   * @param immediate emit event immediately after calling start()
+   */
+  constructor(public timeInterval = 500, public immediate = false) {
+    super();
+  }
 
   public get Watching(): boolean {
-    return this.isWatching;
+    return this.intervalId !== undefined;
   }
-
   public set Watching(v: boolean) {
-    if (v) {
-      this.listen();
-    } else {
-      this.stop();
-    }
+    v ? this.start() : this.stop();
   }
 
-  /**
-   * Create an event emitter and start watching
-   * @param options Custom options object (optional)
-   */
-  constructor(timeInterval?: number, immediate?: boolean) {
-    if (timeInterval) {
-      this.timeInterval = timeInterval;
-    }
-    if (immediate) {
-      this.immediate = immediate;
-    }
+  // refs: EventRef[] = [];
+  on(name: "changed", callback: (str: string) => any, ctx?: any): EventRef {
+    const ref = super.on(name, callback);
+    // this.refs.push(ref);
+    return ref;
+  }
+  trigger(name: "changed", str: string): void {
+    super.trigger(name, str);
   }
 
   /**
    * Start watching for the clipboard changes
    */
-  private watch(): void {
-    if (!this.isWatching) {
-      this.isWatching = true;
-    }
-
-    this.interval = setInterval(() => {
-      const value = clipboard.readText();
-      if (value !== this.lastValue) {
-        if (this.immediate || !this.init) {
-          this.eventEmitter.emit("change", value);
-        }
-
-        if (this.init) this.init = false;
-
-        this.lastValue = value;
+  async start(): Promise<void> {
+    if (!this.clipboard) {
+      try {
+        this.clipboard = (await import("electron")).clipboard;
+      } catch (error) {
+        console.error("fail to get clipboard from electron");
+        throw new Error(error);
       }
-    }, this.timeInterval);
-  }
-
-  /**
-   * Start watching and listening again
-   * @returns Returns event emitter listener if it wasn't watching already
-   */
-  listen(listener?: EventListener) {
-    if (!this.isWatching) {
-      this.init = true;
-      this.watch();
-      if (listener) this.listener = listener;
-      if (this.listener) return this.eventEmitter.on("change", this.listener);
     }
-    return null;
+    const clipboard = this.clipboard as Clipboard;
+    if (this.intervalId === undefined) {
+      this.init = true;
+      this.intervalId = window.setInterval(() => {
+        const value = clipboard.readText();
+        if (value !== this.lastValue) {
+          this.lastValue = value;
+
+          if (this.immediate || !this.init) {
+            this.trigger("changed", value);
+          }
+          if (this.init) this.init = false;
+        }
+      }, this.timeInterval);
+    }
   }
 
   /**
-   * Stop listening and watching
+   * Stop watching
    */
   stop(): void {
-    if (this.isWatching) {
-      this.isWatching = false;
-      if (this.interval) clearInterval(this.interval);
-      this.eventEmitter.removeAllListeners();
+    if (this.intervalId !== undefined) {
+      clearInterval(this.intervalId);
+      this.intervalId = undefined;
+      // this.refs.forEach((ref) => this.offref(ref));
       this.lastValue = null;
     }
   }

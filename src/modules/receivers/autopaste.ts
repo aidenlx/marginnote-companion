@@ -5,10 +5,17 @@ import { Notice, MarkdownView } from "obsidian";
 
 function addRecButton(rec: HTMLInputElement, plugin: MNComp) {
   rec.addEventListener("input", (event) => {
-    let input = event.target as HTMLInputElement;
-    plugin.cbListener.Watching = input.checked;
-    let state = plugin.cbListener.Watching ? "started" : "stopped";
-    new Notice("auto paste " + state);
+    let input = event.target as HTMLInputElement,
+      watching: boolean;
+
+    if (plugin.cbListener) {
+      const setTo = input.checked;
+      plugin.cbListener.Watching = setTo;
+      watching = setTo;
+    } else {
+      throw new Error("Not Implemented");
+    }
+    new Notice("auto paste " + (watching ? "started" : "stopped"));
   });
   setTimeout(() => {
     const container = plugin.addStatusBarItem();
@@ -18,10 +25,16 @@ function addRecButton(rec: HTMLInputElement, plugin: MNComp) {
 }
 
 const recCommandCallback = (rec: HTMLInputElement, plugin: MNComp) => () => {
-  plugin.cbListener.Watching = !rec.checked;
-  rec.checked = plugin.cbListener.Watching;
-  let state = plugin.cbListener.Watching ? "started" : "stopped";
-  new Notice("auto paste " + state);
+  let watching: boolean;
+  if (plugin.cbListener) {
+    const setTo = !rec.checked;
+    plugin.cbListener.Watching = setTo;
+    rec.checked = setTo;
+    watching = setTo;
+  } else {
+    throw new Error("Not Implemented");
+  }
+  new Notice("auto paste " + (watching ? "started" : "stopped"));
 };
 
 export function autoPaste(plugin: MNComp) {
@@ -30,19 +43,23 @@ export function autoPaste(plugin: MNComp) {
     cls: "rec status-bar-item",
   });
 
-  // add clipboard listener callback
-  plugin.cbListener.listener = (value) => {
-    if (!value) return;
-    const activeView = plugin.app.workspace.activeLeaf?.view;
-    if (activeView instanceof MarkdownView) {
-      const cm = activeView.editor;
+  if (plugin.cbListener) {
+    // add clipboard listener callback
+    plugin.cbListener.on("changed", (value) => {
+      if (!value) return;
+      const activeView = plugin.app.workspace.activeLeaf?.view;
+      if (activeView instanceof MarkdownView) {
+        const cm = activeView.editor;
 
-      // fallback option if fails
-      if (!handleMNData(value, cm, plugin.settings.noteImportOption)) {
-        InsertTo(value + "\n", cm, cm.getCursor());
+        // fallback option if fails
+        if (!handleMNData(value, cm, plugin.settings.noteImportOption)) {
+          InsertTo(value + "\n", cm, cm.getCursor());
+        }
       }
-    }
-  };
+    });
+  } else {
+    throw new Error("Not Implemented");
+  }
 
   addRecButton(rec, plugin);
 

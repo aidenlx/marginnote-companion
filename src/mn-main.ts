@@ -9,14 +9,14 @@ import ClipboardListener from "modules/receivers/cbListener";
 import { cmdPastedNoteHandler } from "modules/receivers/cmd";
 import { PastedNoteHandler } from "modules/receivers/pasteEvt";
 import { MarkdownView, Plugin } from "obsidian";
-import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from 'settings';
+import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from "settings";
 
-import "./main.css"
+import "./main.css";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
-  cbListener = new ClipboardListener();
+  cbListener = this.app.isMobile ? null : new ClipboardListener();
 
   PastedNoteHandler = PastedNoteHandler.bind(this);
 
@@ -37,7 +37,7 @@ export default class MNComp extends Plugin {
           ...DEFAULT_SETTINGS.noteImportOption,
           importMode: NoteImportMode.Merge,
           importStyle: NoteImportStyle.Metadata,
-          updateH1: false
+          updateH1: false,
         }),
     });
 
@@ -52,28 +52,29 @@ export default class MNComp extends Plugin {
       name: "Extract Label From Selection",
       callback: () => {
         if (this.app.workspace.activeLeaf?.view instanceof MarkdownView)
-          extractLabelFromSel(this.app.workspace.activeLeaf.view.sourceMode.cmEditor)
-      }
-    })
+          extractLabelFromSel(
+            this.app.workspace.activeLeaf.view.sourceMode.cmEditor,
+          );
+      },
+    });
 
     // Enable GUI Modification
     addSourceButton(this.app);
     this.registerMarkdownPostProcessor(aliasBelowH1);
 
     // URL Scheme handlers
-    this.registerObsidianProtocolHandler("mncomp",(params) =>{
-      const macroName = params.macro
+    this.registerObsidianProtocolHandler("mncomp", (params) => {
+      const macroName = params.macro;
       if (macroName)
         switch (macroName) {
           case "autodef":
-            SelToAilas(this.app)
+            SelToAilas(this.app);
             break;
           default:
             console.error("unsupported macro");
             break;
         }
-
-    })
+    });
   }
 
   onunload() {
@@ -83,10 +84,10 @@ export default class MNComp extends Plugin {
   }
 
   async loadSettings() {
-  	this.settings = {...this.settings,...(await this.loadData())};
+    this.settings = { ...this.settings, ...(await this.loadData()) };
   }
 
   async saveSettings() {
-  	await this.saveData(this.settings);
+    await this.saveData(this.settings);
   }
 }
