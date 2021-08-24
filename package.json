@@ -14,7 +14,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@alx-plugins/obsidian-bridge": "^2.2.0",
+    "@aidenlx/obsidian-bridge": "^2.2.1",
     "@jsonurl/jsonurl": "^1.1.4",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^3.3.0",
@@ -37,6 +37,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "fast-deep-equal": "^3.1.3",
     "gray-matter": "^4.0.3",
     "jest": "^27.0.6",
     "json2md": "^1.11.0",

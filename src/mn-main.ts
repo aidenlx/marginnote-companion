@@ -5,18 +5,19 @@ import { handleMNData } from "modules/handlers/handler";
 import { extractLabelFromSel } from "modules/macros/extractLabelFromSel";
 import { SelToAilas } from "modules/macros/SelToAilas";
 import { autoPaste } from "modules/receivers/autopaste";
-import ClipboardListener from "modules/receivers/cb-listener";
 import { cmdPastedNoteHandler } from "modules/receivers/cmd";
 import { PastedNoteHandler } from "modules/receivers/paste-hanlder";
 import { MarkdownView, Plugin } from "obsidian";
 import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from "settings";
 
 import "./main.css";
+import MacroHandler from "./modules/macros/macro-handler";
+import InputListener from "./modules/receivers/input-handler";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
-  cbListener = this.app.isMobile ? null : new ClipboardListener();
+  inputListener = new InputListener(this.app);
 
   PastedNoteHandler = PastedNoteHandler.bind(this);
 
@@ -64,16 +65,9 @@ export default class MNComp extends Plugin {
 
     // URL Scheme handlers
     this.registerObsidianProtocolHandler("mncomp", (params) => {
-      const macroName = params.macro;
-      if (macroName)
-        switch (macroName) {
-          case "autodef":
-            SelToAilas(this.app);
-            break;
-          default:
-            console.error("unsupported macro");
-            break;
-        }
+      if (params.macros) MacroHandler.call(this, params);
+      else if (params.version)
+        this.inputListener.trigger("url-recieved", params);
     });
   }
 
