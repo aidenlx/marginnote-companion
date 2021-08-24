@@ -5,9 +5,9 @@ import { handleMNData } from "modules/handlers/handler";
 import { extractLabelFromSel } from "modules/macros/extractLabelFromSel";
 import { SelToAilas } from "modules/macros/SelToAilas";
 import { autoPaste } from "modules/receivers/autopaste";
-import ClipboardListener from "modules/receivers/cbListener";
+import ClipboardListener from "modules/receivers/cb-listener";
 import { cmdPastedNoteHandler } from "modules/receivers/cmd";
-import { PastedNoteHandler } from "modules/receivers/pasteEvt";
+import { PastedNoteHandler } from "modules/receivers/paste-hanlder";
 import { MarkdownView, Plugin } from "obsidian";
 import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from "settings";
 

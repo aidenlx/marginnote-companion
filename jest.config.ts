@@ -9,9 +9,6 @@ const config: Config.InitialOptions = {
   testEnvironment: "jsdom",
   testRegex: "/src/modules/.*\\.test?\\.ts$",
   moduleFileExtensions: ["ts", "js"],
-  moduleDirectories: [
-    "node_modules",
-    "src"
-]
+  moduleDirectories: ["node_modules", "src"],
 };
 export default config;
