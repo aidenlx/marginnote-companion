@@ -1,9 +1,9 @@
 import {
   linkComment,
   linkComment_pic,
-  MbBookNote,
   noteComment,
 } from "@alx-plugins/marginnote";
+import { Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
 import { mdObj } from "modules/note/render";
 import { MDLink } from "../md-tools/MDLink";
@@ -17,9 +17,10 @@ export const tlSeparator = /[;；]/;
 const isLC_pic = (lc: linkComment): lc is linkComment_pic =>
   (lc as linkComment_pic).q_hpic !== undefined;
 
-export function TitlelinkToAlias(
-  srcTitle: string
-): { title: string; aliases: string[] | null } {
+export function TitlelinkToAlias(srcTitle: string): {
+  title: string;
+  aliases: string[] | null;
+} {
   if (!tlSeparator.test(srcTitle)) return { title: srcTitle, aliases: null };
   else {
     const [title, ...aliases] = srcTitle.replace(/,/g, "_").split(tlSeparator);
@@ -34,7 +35,7 @@ export function TitlelinkToAlias(
  */
 export function transformComments(
   comments: noteComment[],
-  full: boolean = false
+  full: boolean = false,
 ): mdObj[] | null {
   if (!comments || comments.length === 0) {
     return null;
@@ -75,7 +76,7 @@ export function transformComments(
 export function transformMNLink(
   type: "notebook" | "note",
   id: string,
-  linktext?: string
+  linktext?: string,
 ): MDLink {
   return new MDLink(mnUrl(type, id), linktext, undefined, id.slice(-6));
 }
@@ -137,20 +138,20 @@ export function toMDObjs(
 }
 
 /** render only main content (title, excrept, text comments) as paragraphs */
-export function transformBasicNote(note: MbBookNote): mdObj[] {
+export function transformBasicNote(note: Note): mdObj[] {
   return toMDObjs(
     transformBasicNote_Title(note),
-    transformBasicNote_Body(note)
+    transformBasicNote_Body(note),
   );
 }
 
 /** render note title as paragraphs */
-export function transformBasicNote_Title(note: MbBookNote): mdObj[] {
+export function transformBasicNote_Title(note: Note): mdObj[] {
   return toMDObjs(note.noteTitle);
 }
 
 /** render excrept and text comments as paragraphs */
-export function transformBasicNote_Body(note: MbBookNote): mdObj[] {
+export function transformBasicNote_Body(note: Note): mdObj[] {
   const { comments, excerptText } = note;
 
   return toMDObjs(excerptText, transformComments(comments));
@@ -158,9 +159,9 @@ export function transformBasicNote_Body(note: MbBookNote): mdObj[] {
 
 /** render full note (linked notes, html comment...) in markdown format */
 export function transformFullNote(
-  note: MbBookNote,
+  note: Note,
   headingLevel: Range<1, 7>,
-  keepAlias: boolean
+  keepAlias: boolean,
 ): mdObj[] {
   const title = transformFullNote_Title(note, headingLevel, keepAlias);
   return toMDObjs(title, transformFullNote_Body(note));
@@ -168,9 +169,9 @@ export function transformFullNote(
 
 /** render full note title */
 export function transformFullNote_Title(
-  note: MbBookNote,
+  note: Note,
   headingLevel: Range<1, 7>,
-  keepAlias: boolean
+  keepAlias: boolean,
 ): mdObj[] | null {
   let { noteTitle: srcTitle } = note;
   let aliasStr = "";
@@ -186,7 +187,7 @@ export function transformFullNote_Title(
 }
 
 /** render full note body (excrept, text comments) */
-export function transformFullNote_Body(src: MbBookNote): mdObj[] {
+export function transformFullNote_Body(src: Note): mdObj[] {
   const note = getSimpleNote(src);
   let obj: mdObj[];
 
@@ -195,7 +196,7 @@ export function transformFullNote_Body(src: MbBookNote): mdObj[] {
       const { excerpt, comments } = note;
       obj = toMDObjs(
         { blockquote: excerpt.text },
-        transformComments(comments, true)
+        transformComments(comments, true),
       );
       break;
     }

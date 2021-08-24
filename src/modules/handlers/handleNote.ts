@@ -1,11 +1,8 @@
 import { Editor } from "obsidian";
-import { ReturnBody_Note } from "@alx-plugins/obsidian-bridge";
+import { Book, ReturnBody_Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
 import { InsertToCursor } from "modules/cm-tools";
-import {
-  transformBasicNote,
-  transformFullNote,
-} from "modules/note/transform";
+import { transformBasicNote, transformFullNote } from "modules/note/transform";
 import { getAnchor, MDLinkType } from "modules/md-tools/MDLink";
 import { importMeta, insertRefSource, json2md, mdObj } from "../note/render";
 import { mnUrl } from "modules/misc";
@@ -16,34 +13,35 @@ export const enum NoteImportStyle {
   /** Import basic note content (title, excrept, text comments) in markdown paragraphs */
   Basic,
   /** Import full note (linked notes, html comments...) */
-  Full
+  Full,
 }
 
 export const enum NoteImportMode {
   /** Insert all content to cursor */
   Insert,
   /** Merge metadata to heading and frontmatter */
-  Merge
+  Merge,
 }
 
 export interface NoteImportOption {
-  importStyle: NoteImportStyle,
-  importMode: NoteImportMode,
-  blanksAroundSingleLine: boolean,
-  /** whether update existing H1 with metadata title, 
+  importStyle: NoteImportStyle;
+  importMode: NoteImportMode;
+  blanksAroundSingleLine: boolean;
+  /** whether update existing H1 with metadata title,
    * Passed to importMeta()
    */
-  updateH1: boolean
+  updateH1: boolean;
 }
 
-export function handleNote(
+const handleNote = (
   obj: ReturnBody_Note,
   cm: CodeMirror.Editor | Editor,
-  options: NoteImportOption
-): boolean {
-  const { data: note, currentBook: book } = obj;
+  options: NoteImportOption,
+): boolean => {
+  const { data: note, bookMap } = obj,
+    book: Book | undefined = note.docMd5 ? bookMap[note.docMd5] : undefined;
   if (!book) {
-    console.error("missing currentBook in %o", obj);
+    console.error(`missing book ${note.docMd5} in bookmap %o`, bookMap, obj);
     return false;
   }
 
@@ -64,66 +62,72 @@ export function handleNote(
   }
 
   switch (options.importMode) {
-    case NoteImportMode.Insert:{
-      const { noteId:id } = note;
-      if (!id) {
-        console.error("missing noteId");
-        return false;
-      }
+    case NoteImportMode.Insert:
+      {
+        const { noteId: id } = note;
+        if (!id) {
+          console.error("missing noteId");
+          return false;
+        }
 
-      const linkType = MDLinkType.Ref;
+        const linkType = MDLinkType.Ref;
 
-      const anchor = getAnchor(linkType, id, id.slice(-6));
+        const anchor = getAnchor(linkType, id, id.slice(-6));
 
-      const insertLinkTo = (index: number, fallback: Function) => {
-        let curIndex = 0;
-        for (const obj of body) {
-          const typeKey = Object.keys(obj)[0] as keyof mdObj;
-          const value = obj[typeKey];
-          if (Array.isArray(value) && value.length>0 && typeof value[0] === "string"){
-            for (let i = 0; i < value.length; i++) {
-              if (curIndex === index){
-                value[i] += anchor;
+        const insertLinkTo = (index: number, fallback: Function) => {
+          let curIndex = 0;
+          for (const obj of body) {
+            const typeKey = Object.keys(obj)[0] as keyof mdObj;
+            const value = obj[typeKey];
+            if (
+              Array.isArray(value) &&
+              value.length > 0 &&
+              typeof value[0] === "string"
+            ) {
+              for (let i = 0; i < value.length; i++) {
+                if (curIndex === index) {
+                  value[i] += anchor;
+                  return;
+                }
+                curIndex++;
+              }
+            } else if (typeof value === "string") {
+              if (curIndex === index) {
+                obj[typeKey] += anchor;
                 return;
               }
-              curIndex++;
-            }
-          } else if (typeof value ==="string"){
-            if (curIndex === index){
-              obj[typeKey] += anchor;
-              return;
-            }
-          } else {
-            if (curIndex === index){
-              fallback();
-              return;
+            } else {
+              if (curIndex === index) {
+                fallback();
+                return;
+              }
             }
           }
+        };
+
+        function getLength(array: mdObj[]): number {
+          let length = 0;
+          for (const obj of array) {
+            if (obj.p && Array.isArray(obj.p)) {
+              length = length + obj.p.length;
+            } else length++;
+          }
+          return length;
         }
-      };
 
-      function getLength(array:mdObj[]):number {
-        let length = 0;
-        for (const obj of array) {
-          if (obj.p && Array.isArray(obj.p)){
-            length = length + obj.p.length;
-          } else length++;
+        const length = getLength(body);
+        if (length === 0) {
+          body.push({ p: anchor });
+        } else if (length === 1) {
+          insertLinkTo(0, () => body.push({ p: anchor }));
+        } else {
+          insertLinkTo(1, () => body.splice(2, 0, { p: anchor }));
         }
-        return length;        
-      }
 
-      const length = getLength(body);
-      if (length === 0) {
-        body.push({ p: anchor });
-      } else if (length === 1) {
-        insertLinkTo(0, () => body.push({ p: anchor }));
-      } else {
-        insertLinkTo(1, () => body.splice(2, 0, { p: anchor }));
+        if (linkType === MDLinkType.Ref)
+          insertRefSource(mnUrl("note", id), id.slice(-6), cm);
       }
-
-      if (linkType===MDLinkType.Ref)
-        insertRefSource(mnUrl("note", id), id.slice(-6), cm);
-    } break;
+      break;
     case NoteImportMode.Merge:
       importMeta(note, book, options.updateH1, cm);
       break;
@@ -133,8 +137,8 @@ export function handleNote(
 
   if (body.length === 0) return true;
 
-  let insert = json2md(body).replace(/\n{3,}/g,"\n\n");
-  
+  let insert = json2md(body).replace(/\n{3,}/g, "\n\n");
+
   if (
     !options.blanksAroundSingleLine &&
     !insert.replace(/^\n+|\n+$/g, "").includes("\n")
@@ -143,6 +147,8 @@ export function handleNote(
   }
 
   InsertToCursor(insert, cm);
-  
+
   return true;
-}
+};
+
+export default handleNote;

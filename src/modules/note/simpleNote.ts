@@ -1,4 +1,5 @@
-import { excerptPic, MbBookNote, noteComment } from "@alx-plugins/marginnote";
+import { excerptPic, noteComment } from "@alx-plugins/marginnote";
+import { Note } from "@aidenlx/obsidian-bridge";
 
 export type excerpt = ePic | eText;
 
@@ -67,7 +68,7 @@ export const isExcerptNote = (n: simpleNote): n is excerptNote =>
  * Get simplified MbBookNote
  * @returns simplified MbBookNote with all text unprocessed
  */
-export function getSimpleNote(src: MbBookNote): simpleNote {
+export function getSimpleNote(src: Note): simpleNote {
   let {
     noteId: id,
     startPage,

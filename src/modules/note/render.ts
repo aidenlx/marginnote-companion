@@ -1,6 +1,6 @@
 import json2md, { DataObject } from "json2md";
 import { MDLink } from "modules/md-tools/MDLink";
-import { MbBook, MbBookNote } from "@alx-plugins/marginnote";
+import { Book, Note } from "@aidenlx/obsidian-bridge";
 import { Editor, htmlToMarkdown } from "obsidian";
 import { InsertTo, FindLine, SetLine } from "modules/cm-tools";
 import { mnUrl } from "modules/misc";
@@ -19,7 +19,7 @@ export interface mdObj extends DataObject {
 const extension = {
   comment: (input: string): string => `%%${input}%%`,
   html: (html: string): string =>
-    htmlToMarkdown(html.replace(/<head>(?:.|\n)+<\/head>/g, ""))
+    htmlToMarkdown(html.replace(/<head>(?:.|\n)+<\/head>/g, "")),
 };
 
 for (const k in extension) {
@@ -31,7 +31,7 @@ export { json2md };
 export function insertRefSource(
   url: string,
   label: string,
-  cm: CodeMirror.Editor | Editor
+  cm: CodeMirror.Editor | Editor,
 ) {
   const cursorLoc = cm.getCursor();
 
@@ -52,10 +52,10 @@ export function insertRefSource(
 }
 
 export function importMeta(
-  srcNote: MbBookNote,
-  book: MbBook,
+  srcNote: Note,
+  book: Book,
   updateH1: boolean,
-  cm: CodeMirror.Editor | Editor
+  cm: CodeMirror.Editor | Editor,
 ): void {
   const note = getSimpleNote(srcNote);
 
@@ -92,10 +92,6 @@ export function importMeta(
       url: mnUrl("note", id),
     };
     if (pageRange) info.page = pageRange;
-    addToFrontmatter(
-      "sources",
-      { [docTitle ?? docPath ?? "null"]: info },
-      cm
-    );
+    addToFrontmatter("sources", { [docTitle ?? docPath ?? "null"]: info }, cm);
   } else console.error("docMd5 missing");
 }
