@@ -1,10 +1,7 @@
 import type { Clipboard } from "electron";
 import { App, EventRef, Events, ObsidianProtocolHandler } from "obsidian";
 import { ObsidianProtocolData } from "obsidian";
-import MNComp from "mn-main";
 import equal from "fast-deep-equal/es6";
-
-import { UrlToObj } from "@aidenlx/obsidian-bridge";
 
 const RECIEVED_FLAG = "<!--MN_LINK_RECIEVED--->";
 

@@ -3,19 +3,19 @@ import { EditorPosition, Editor } from "obsidian";
 export function InsertTo(
   str: string,
   cm: CodeMirror.Editor | Editor,
-  pos: EditorPosition
+  pos: EditorPosition,
 ): void;
 export function InsertTo(
   str: string,
   cm: CodeMirror.Editor | Editor,
   line: number,
-  ch: number
+  ch: number,
 ): void;
 export function InsertTo(
   str: string,
   cm: CodeMirror.Editor | Editor,
   posOrLine: EditorPosition | number,
-  ch?: number
+  ch?: number,
 ): void {
   let pos: EditorPosition;
 
@@ -50,7 +50,7 @@ export const InsertToCursor = (str: string, cm: CodeMirror.Editor | Editor) =>
 export function FindLine(
   cm: CodeMirror.Editor | Editor,
   match: RegExp,
-  start = 0
+  start = 0,
 ): number {
   for (let i = start; i < cm.lineCount(); i++) {
     if (match.test(cm.getLine(i) as string)) return i;
@@ -61,27 +61,41 @@ export function FindLine(
 export function SetLine(
   cm: CodeMirror.Editor | Editor,
   lineNum: number,
-  text: string
+  text: string,
 ) {
   cm.replaceRange(
     text,
     { line: lineNum, ch: 0 },
-    { line: lineNum, ch: Infinity }
+    { line: lineNum, ch: Infinity },
   );
 }
 
-export function getStartIndexOfSel(cm: CodeMirror.Editor): number {
+export function getStartIndexOfSel(cm: CodeMirror.Editor | Editor): number {
   // @ts-ignore
   const from = cm.getCursor(true);
   // @ts-ignore
   const to = cm.getCursor(false);
-  return cm.indexFromPos(getAheadPos(from, to));
+  return posToOffset(getAheadPos(from, to), cm);
 }
 
-function getAheadPos(a: CodeMirror.Position, b: CodeMirror.Position) {
+function getAheadPos(a: EditorPosition, b: EditorPosition) {
   if (a.line !== b.line) {
     return a.line < b.line ? a : b;
   } else {
     return a.ch < b.ch ? a : b;
   }
 }
+
+export const posToOffset = (
+  pos: EditorPosition,
+  cm: CodeMirror.Editor | Editor,
+) => {
+  const func =
+    (cm as Editor).posToOffset ?? (cm as CodeMirror.Editor).indexFromPos;
+  return func(pos);
+};
+export const offsetToPos = (offset: number, cm: CodeMirror.Editor | Editor) => {
+  const func =
+    (cm as Editor).offsetToPos ?? (cm as CodeMirror.Editor).posFromIndex;
+  return func(offset);
+};

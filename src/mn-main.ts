@@ -1,17 +1,16 @@
 import { aliasBelowH1 } from "modules/controls/aliasBelowH1";
 import { addSourceButton } from "modules/controls/sourceButton";
 import { NoteImportMode, NoteImportStyle } from "modules/handlers/handleNote";
-import { handleMNData } from "modules/handlers/handler";
-import { extractLabelFromSel } from "modules/macros/extractLabelFromSel";
-import { SelToAilas } from "modules/macros/SelToAilas";
 import { autoPaste } from "modules/receivers/autopaste";
-import { cmdPastedNoteHandler } from "modules/receivers/cmd";
-import { PastedNoteHandler } from "modules/receivers/paste-hanlder";
-import { MarkdownView, Plugin } from "obsidian";
+import {
+  getPastedHandler,
+  getCmdPasteHandler,
+} from "modules/receivers/paste-hanlder";
+import { Plugin } from "obsidian";
 import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from "settings";
 
 import "./main.css";
-import MacroHandler from "./modules/macros/macro-handler";
+import { MacroHandler, registerMacroCmd } from "./modules/macros/macro-handler";
 import InputListener from "./modules/receivers/input-handler";
 
 export default class MNComp extends Plugin {
@@ -19,7 +18,7 @@ export default class MNComp extends Plugin {
 
   inputListener = new InputListener(this.app);
 
-  PastedNoteHandler = PastedNoteHandler.bind(this);
+  PastedNoteHandler = getPastedHandler(this);
 
   async onload() {
     console.log("loading marginnote-companion");
@@ -33,31 +32,14 @@ export default class MNComp extends Plugin {
     this.addCommand({
       id: "getMeta",
       name: "get Metadata from MarginNote notes",
-      callback: () =>
-        cmdPastedNoteHandler(this, {
-          ...DEFAULT_SETTINGS.noteImportOption,
-          importMode: NoteImportMode.Merge,
-          importStyle: NoteImportStyle.Metadata,
-          updateH1: false,
-        }),
+      editorCallback: getCmdPasteHandler({
+        ...DEFAULT_SETTINGS.noteImportOption,
+        importMode: NoteImportMode.Merge,
+        importStyle: NoteImportStyle.Metadata,
+        updateH1: false,
+      }),
     });
-
-    // register macros
-    this.addCommand({
-      id: "autodef",
-      name: "Selection to Ailases",
-      callback: () => SelToAilas(this.app),
-    });
-    this.addCommand({
-      id: "extractLabelFromSel",
-      name: "Extract Label From Selection",
-      callback: () => {
-        if (this.app.workspace.activeLeaf?.view instanceof MarkdownView)
-          extractLabelFromSel(
-            this.app.workspace.activeLeaf.view.sourceMode.cmEditor,
-          );
-      },
-    });
+    registerMacroCmd.call(this);
 
     // Enable GUI Modification
     addSourceButton(this.app);

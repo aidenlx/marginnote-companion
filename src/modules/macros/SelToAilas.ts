@@ -1,19 +1,13 @@
 import { addToFrontmatter } from "modules/md-tools/frontmatter";
-import { MarkdownView, App } from "obsidian";
+import { Editor } from "obsidian";
 import { ExtractDef } from "./autodef";
 
-export function SelToAilas(app:App) {
-  const view = app.workspace.activeLeaf?.view;
-  if (!(view instanceof MarkdownView)){
-    console.log(`activeLeaf view type ${view?.getViewType()}: not markdown`);
-    return;
+let sel;
+const SelToAilas = (editor: Editor) => {
+  if ((sel = editor.getSelection())) {
+    addToFrontmatter("aliases", ExtractDef(sel), editor);
+    editor.replaceSelection("");
   }
-  const editor = view.editor;
-  
-  const sel = editor.getSelection();
+};
 
-  if (sel) {
-    addToFrontmatter('aliases',ExtractDef(sel),editor)
-    editor.replaceSelection('');
-  }
-}
+export default SelToAilas;
