@@ -1,4 +1,4 @@
-# MNComp
+# MarginNote Companion
 
 ## Intro
 
