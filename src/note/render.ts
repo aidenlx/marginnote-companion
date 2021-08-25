@@ -1,14 +1,14 @@
 import json2md, { DataObject } from "json2md";
-import { MDLink } from "modules/md-tools/MDLink";
+import { MDLink } from "md-tools/MDLink";
 import { Book, Note } from "@aidenlx/obsidian-bridge";
 import { Editor, htmlToMarkdown } from "obsidian";
-import { InsertTo, FindLine, SetLine } from "modules/cm-tools";
-import { mnUrl } from "modules/misc";
+import { InsertTo, FindLine, SetLine } from "../cm-tools";
+import { mnUrl } from "../misc";
 import { excerptNote, getSimpleNote } from "./simpleNote";
 import {
   addToFrontmatter,
   getFrontmatterRange,
-} from "modules/md-tools/frontmatter";
+} from "md-tools/frontmatter";
 import { TitlelinkToAlias } from "./transform";
 
 export interface mdObj extends DataObject {

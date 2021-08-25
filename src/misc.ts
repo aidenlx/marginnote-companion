@@ -1,5 +1,6 @@
 export const mnUrl = (type: "notebook" | "note", id: string) =>
   `marginnote3app://${type}/` + id;
+export const OBBRIDGE_MIN_VERSION = "2.3.2";
 
 export const trimEmpty = (str: string) => str.replace(/^\s+|\s+$/g, "");
 

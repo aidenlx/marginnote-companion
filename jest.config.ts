@@ -7,7 +7,7 @@ const config: Config.InitialOptions = {
     "^.+\\.ts?$": "ts-jest",
   },
   testEnvironment: "jsdom",
-  testRegex: "/src/modules/.*\\.test?\\.ts$",
+  testRegex: "/src/.*\\.test?\\.ts$",
   moduleFileExtensions: ["ts", "js"],
   moduleDirectories: ["node_modules", "src"],
 };

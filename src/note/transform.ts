@@ -5,7 +5,7 @@ import {
 } from "@alx-plugins/marginnote";
 import { Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
-import { mdObj } from "modules/note/render";
+import { mdObj } from "../note/render";
 import { MDLink } from "../md-tools/MDLink";
 import { mnUrl, Range } from "../misc";
 import { getSimpleNote } from "./simpleNote";

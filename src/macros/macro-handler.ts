@@ -1,5 +1,5 @@
 import { ObsidianProtocolData } from "obsidian";
-import MNComp from "mn-main";
+import MNComp from "../mn-main";
 import SelToAilas from "./SelToAilas";
 import extractLabelFromSel from "./extractLabelFromSel";
 

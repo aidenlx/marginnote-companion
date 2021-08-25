@@ -1,4 +1,4 @@
-import { addToFrontmatter } from "modules/md-tools/frontmatter";
+import { addToFrontmatter } from "../md-tools/frontmatter";
 import { Editor } from "obsidian";
 import { ExtractDef } from "./autodef";
 

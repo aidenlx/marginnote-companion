@@ -1,6 +1,6 @@
-import MNComp from "mn-main";
+import MNComp from "../mn-main";
 import { handleMNData } from "../handlers/handler";
-import { InsertTo } from "modules/cm-tools";
+import { InsertTo } from "../cm-tools";
 import { Notice, MarkdownView } from "obsidian";
 
 export function autoPaste(plugin: MNComp) {

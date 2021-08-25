@@ -1,5 +1,5 @@
 import assertNever from "assert-never";
-import { mnUrl } from "modules/misc";
+import { mnUrl } from "../misc";
 
 /**
  *
