@@ -1,7 +1,8 @@
-import { Editor } from "obsidian";
 import marked from "marked";
-import { addToFrontmatter } from "../md-tools/frontmatter";
+import { Editor } from "obsidian";
+
 import { getStartIndexOfSel, offsetToPos } from "../cm-tools";
+import { addToFrontmatter } from "../md-tools/frontmatter";
 
 const Pos = (line: number, ch: number) => ({ line, ch });
 
@@ -11,10 +12,10 @@ const Pos = (line: number, ch: number) => ({ line, ch });
  * @param label
  * @returns the url of label
  */
-function extractSource(
+const extractSource = (
   cm: CodeMirror.Editor | Editor,
   label: string,
-): string | null {
+): string | null => {
   let output: string | null = null;
   for (let i = cm.lineCount() - 1; i >= 0; i--) {
     const line = cm.getLine(i) as string;
@@ -28,7 +29,7 @@ function extractSource(
     }
   }
   return output;
-}
+};
 
 const extractLabelFromSel = (cm: CodeMirror.Editor | Editor) => {
   const sel = cm.getSelection();

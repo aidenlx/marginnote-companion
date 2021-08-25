@@ -1,7 +1,7 @@
 import type { Clipboard } from "electron";
+import equal from "fast-deep-equal/es6";
 import { App, EventRef, Events, ObsidianProtocolHandler } from "obsidian";
 import { ObsidianProtocolData } from "obsidian";
-import equal from "fast-deep-equal/es6";
 
 const RECIEVED_FLAG = "<!--MN_LINK_RECIEVED--->";
 
@@ -83,7 +83,10 @@ export default class InputListener extends Events {
     name: "url-recieved",
     callback: (params: ObsidianProtocolData) => void,
   ): EventRef;
-  on(name: "changed", callback: (val: NonNullable<InputListener["lastValue"]>) => void): EventRef;
+  on(
+    name: "changed",
+    callback: (val: NonNullable<InputListener["lastValue"]>) => void,
+  ): EventRef;
   on(name: string, callback: (...data: any) => any, ctx?: any): EventRef {
     const ref = super.on(name, callback, ctx);
     // this.refs.push(ref);

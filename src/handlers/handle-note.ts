@@ -106,7 +106,7 @@ const handleNote = (
           }
         };
 
-        function getLength(array: mdObj[]): number {
+        const getLength = (array: mdObj[]): number => {
           let length = 0;
           for (const obj of array) {
             if (obj.p && Array.isArray(obj.p)) {
@@ -114,7 +114,7 @@ const handleNote = (
             } else length++;
           }
           return length;
-        }
+        };
 
         const length = getLength(body);
         if (length === 0) {

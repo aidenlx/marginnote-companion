@@ -1,17 +1,18 @@
+import "./main.css";
+
+import { Plugin } from "obsidian";
+import { DEFAULT_SETTINGS, MNCompSettings, MNCompSettingTab } from "settings";
+
 import { aliasBelowH1 } from "./controls/alias-below-h1";
 import { addSourceButton } from "./controls/source-button";
 import { NoteImportMode, NoteImportStyle } from "./handlers/handle-note";
-import { autoPaste } from "./receivers/autopaste";
-import {
-  getPastedHandler,
-  getCmdPasteHandler,
-} from "./receivers/paste-hanlder";
-import { Plugin } from "obsidian";
-import { MNCompSettings, DEFAULT_SETTINGS, MNCompSettingTab } from "settings";
-
-import "./main.css";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
+import { autoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
+import {
+  getCmdPasteHandler,
+  getPastedHandler,
+} from "./receivers/paste-hanlder";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;

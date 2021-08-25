@@ -1,13 +1,14 @@
+import { Note } from "@aidenlx/obsidian-bridge";
 import {
   linkComment,
   linkComment_pic,
   noteComment,
 } from "@alx-plugins/marginnote";
-import { Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
-import { mdObj } from "../note/render";
+
 import { MDLink } from "../md-tools/md-link";
 import { mnUrl, Range } from "../misc";
+import { mdObj } from "../note/render";
 import { getSimpleNote } from "./simple-note";
 
 /** title link separator */
@@ -17,26 +18,28 @@ export const tlSeparator = /[;；]/;
 const isLC_pic = (lc: linkComment): lc is linkComment_pic =>
   (lc as linkComment_pic).q_hpic !== undefined;
 
-export function TitlelinkToAlias(srcTitle: string): {
+export const TitlelinkToAlias = (
+  srcTitle: string,
+): {
   title: string;
   aliases: string[] | null;
-} {
+} => {
   if (!tlSeparator.test(srcTitle)) return { title: srcTitle, aliases: null };
   else {
     const [title, ...aliases] = srcTitle.replace(/,/g, "_").split(tlSeparator);
     return { title, aliases };
   }
-}
+};
 
 /**
  *
  * @param full true to export html and linknote
  * @returns
  */
-export function transformComments(
+export const transformComments = (
   comments: noteComment[],
   full: boolean = false,
-): mdObj[] | null {
+): mdObj[] | null => {
   if (!comments || comments.length === 0) {
     return null;
   } else {
@@ -71,15 +74,15 @@ export function transformComments(
     out.pop();
     return out;
   }
-}
+};
 
-export function transformMNLink(
+export const transformMNLink = (
   type: "notebook" | "note",
   id: string,
   linktext?: string,
-): MDLink {
+): MDLink => {
   return new MDLink(mnUrl(type, id), linktext, undefined, id.slice(-6));
-}
+};
 
 /**
  *
@@ -87,92 +90,91 @@ export function transformMNLink(
  * @param level range between 1 - 6
  * @returns a heading obj
  */
-export function transformTitle(str: string, level: Range<1, 7> = 2): mdObj {
+export const transformTitle = (str: string, level: Range<1, 7> = 2): mdObj => {
   if (Number.isInteger(level) && level >= 1 && level <= 6) {
     const headingType = "h" + level;
     return { [headingType]: str };
   } else throw new TypeError(`level ${level} invalid`);
-}
+};
 
 /**
  * recieve all params and return a merged json2md.DataObject array
  * @param objs string is consider to be "p"
  * @returns
  */
-export function toMDObjs(
+export const toMDObjs = (
   ...params: Array<string | mdObj[] | mdObj | null | undefined>
-): mdObj[] {
-  const objs: Array<string | mdObj | null | undefined> = params.flat(Infinity);
-
-  const mdObjs = objs.reduce(reducer, []);
-
-  function getPara(obj: string | mdObj): string[] | null {
-    if (typeof obj === "string") return [obj];
-    else if (obj.p) return typeof obj.p === "string" ? [obj.p] : obj.p;
-    else return null;
-  }
-  function accPush(cur: string | mdObj, acc: mdObj[]) {
-    if (typeof cur === "string") acc.push({ p: cur });
-    else acc.push(cur);
-  }
-
-  function reducer(acc: mdObj[], cur: typeof objs[0], i: number): mdObj[] {
-    if (cur) {
-      if (acc.length > 0) {
-        const lastIndex = acc.length - 1;
-        const last = acc[lastIndex];
-        const curPara = getPara(cur);
-        if (last.p && curPara) {
-          if (typeof last.p === "string") last.p = [last.p, ...curPara];
-          else last.p.push(...curPara);
+): mdObj[] => {
+  const getPara = (obj: string | mdObj): string[] | null => {
+      if (typeof obj === "string") return [obj];
+      else if (obj.p) return typeof obj.p === "string" ? [obj.p] : obj.p;
+      else return null;
+    },
+    accPush = (cur: string | mdObj, acc: mdObj[]) => {
+      if (typeof cur === "string") acc.push({ p: cur });
+      else acc.push(cur);
+    },
+    reducer = (acc: mdObj[], cur: typeof objs[0], i: number): mdObj[] => {
+      if (cur) {
+        if (acc.length > 0) {
+          const lastIndex = acc.length - 1;
+          const last = acc[lastIndex];
+          const curPara = getPara(cur);
+          if (last.p && curPara) {
+            if (typeof last.p === "string") last.p = [last.p, ...curPara];
+            else last.p.push(...curPara);
+          } else {
+            accPush(cur, acc);
+          }
         } else {
           accPush(cur, acc);
         }
-      } else {
-        accPush(cur, acc);
       }
-    }
-    return acc;
-  }
+      return acc;
+    };
+  const objs = params.flat(Infinity) as Array<
+      string | mdObj | null | undefined
+    >,
+    mdObjs = objs.reduce(reducer, []);
   return mdObjs;
-}
+};
 
 /** render only main content (title, excrept, text comments) as paragraphs */
-export function transformBasicNote(note: Note): mdObj[] {
+export const transformBasicNote = (note: Note): mdObj[] => {
   return toMDObjs(
     transformBasicNote_Title(note),
     transformBasicNote_Body(note),
   );
-}
+};
 
 /** render note title as paragraphs */
-export function transformBasicNote_Title(note: Note): mdObj[] {
+export const transformBasicNote_Title = (note: Note): mdObj[] => {
   return toMDObjs(note.noteTitle);
-}
+};
 
 /** render excrept and text comments as paragraphs */
-export function transformBasicNote_Body(note: Note): mdObj[] {
+export const transformBasicNote_Body = (note: Note): mdObj[] => {
   const { comments, excerptText } = note;
 
   return toMDObjs(excerptText, transformComments(comments));
-}
+};
 
 /** render full note (linked notes, html comment...) in markdown format */
-export function transformFullNote(
+export const transformFullNote = (
   note: Note,
   headingLevel: Range<1, 7>,
   keepAlias: boolean,
-): mdObj[] {
+): mdObj[] => {
   const title = transformFullNote_Title(note, headingLevel, keepAlias);
   return toMDObjs(title, transformFullNote_Body(note));
-}
+};
 
 /** render full note title */
-export function transformFullNote_Title(
+export const transformFullNote_Title = (
   note: Note,
   headingLevel: Range<1, 7>,
   keepAlias: boolean,
-): mdObj[] | null {
+): mdObj[] | null => {
   let { noteTitle: srcTitle } = note;
   let aliasStr = "";
   if (!srcTitle) return null;
@@ -184,10 +186,10 @@ export function transformFullNote_Title(
   const mdObjs = [transformTitle(title, headingLevel)];
   if (aliases) mdObjs.push({ p: aliases });
   return mdObjs;
-}
+};
 
 /** render full note body (excrept, text comments) */
-export function transformFullNote_Body(src: Note): mdObj[] {
+export const transformFullNote_Body = (src: Note): mdObj[] => {
   const note = getSimpleNote(src);
   let obj: mdObj[];
 
@@ -215,4 +217,4 @@ export function transformFullNote_Body(src: Note): mdObj[] {
   }
 
   return obj;
-}
+};

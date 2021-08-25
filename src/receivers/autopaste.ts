@@ -1,9 +1,10 @@
-import MNComp from "../mn-main";
-import { handleMNData } from "../handlers/handler";
-import { InsertTo } from "../cm-tools";
-import { Notice, MarkdownView } from "obsidian";
+import { MarkdownView, Notice } from "obsidian";
 
-export function autoPaste(plugin: MNComp) {
+import { InsertTo } from "../cm-tools";
+import { handleMNData } from "../handlers/handler";
+import MNComp from "../mn-main";
+
+export const autoPaste = (plugin: MNComp) => {
   const onToggleAutoPaste = (setTo: boolean) => {
       plugin.inputListener.autoPaste = setTo;
       new Notice("auto paste " + (setTo ? "started" : "stopped"));
@@ -55,4 +56,4 @@ export function autoPaste(plugin: MNComp) {
       }
     }
   });
-}
+};

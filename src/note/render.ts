@@ -1,14 +1,12 @@
-import json2md, { DataObject } from "json2md";
-import { MDLink } from "md-tools/md-link";
 import { Book, Note } from "@aidenlx/obsidian-bridge";
+import json2md, { DataObject } from "json2md";
+import { addToFrontmatter, getFrontmatterRange } from "md-tools/frontmatter";
+import { MDLink } from "md-tools/md-link";
 import { Editor, htmlToMarkdown } from "obsidian";
-import { InsertTo, FindLine, SetLine } from "../cm-tools";
+
+import { FindLine, InsertTo, SetLine } from "../cm-tools";
 import { mnUrl } from "../misc";
 import { excerptNote, getSimpleNote } from "./simple-note";
-import {
-  addToFrontmatter,
-  getFrontmatterRange,
-} from "md-tools/frontmatter";
 import { TitlelinkToAlias } from "./transform";
 
 export interface mdObj extends DataObject {
@@ -28,11 +26,11 @@ for (const k in extension) {
 
 export { json2md };
 
-export function insertRefSource(
+export const insertRefSource = (
   url: string,
   label: string,
   cm: CodeMirror.Editor | Editor,
-) {
+) => {
   const cursorLoc = cm.getCursor();
 
   let refSource = MDLink.getRefSource(url, label);
@@ -49,14 +47,14 @@ export function insertRefSource(
       break;
     }
   }
-}
+};
 
-export function importMeta(
+export const importMeta = (
   srcNote: Note,
   book: Book,
   updateH1: boolean,
   cm: CodeMirror.Editor | Editor,
-): void {
+): void => {
   const note = getSimpleNote(srcNote);
 
   // import titlelink to alias, add h1 if not exists
@@ -94,4 +92,4 @@ export function importMeta(
     if (pageRange) info.page = pageRange;
     addToFrontmatter("sources", { [docTitle ?? docPath ?? "null"]: info }, cm);
   } else console.error("docMd5 missing");
-}
+};

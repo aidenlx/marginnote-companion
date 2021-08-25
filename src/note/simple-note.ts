@@ -1,5 +1,5 @@
-import { excerptPic, noteComment } from "@alx-plugins/marginnote";
 import { Note } from "@aidenlx/obsidian-bridge";
+import { excerptPic, noteComment } from "@alx-plugins/marginnote";
 
 export type excerpt = ePic | eText;
 
@@ -68,7 +68,7 @@ export const isExcerptNote = (n: simpleNote): n is excerptNote =>
  * Get simplified MbBookNote
  * @returns simplified MbBookNote with all text unprocessed
  */
-export function getSimpleNote(src: Note): simpleNote {
+export const getSimpleNote = (src: Note): simpleNote => {
   let {
     noteId: id,
     startPage,
@@ -95,7 +95,15 @@ export function getSimpleNote(src: Note): simpleNote {
       startPage === endPage ? startPage : [startPage, endPage];
 
     if (title || (comments && comments.length !== 0))
-      return { type: "excerptNote", id, docMd5, excerpt, comments, title, pageRange };
+      return {
+        type: "excerptNote",
+        id,
+        docMd5,
+        excerpt,
+        comments,
+        title,
+        pageRange,
+      };
     else return { type: "excerpt", id, docMd5, excerpt, pageRange };
   } else return { type: "note", comments, id, docMd5, title };
-}
+};

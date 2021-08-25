@@ -5,6 +5,7 @@ import {
   textComment,
 } from "@alx-plugins/marginnote";
 import { DataObject as mdObj } from "json2md";
+
 import {
   toMDObjs,
   transformBasicNote_Body,
@@ -74,8 +75,7 @@ const comment = {
     text: "摘录笔记+思维导图+记忆卡片 三位一体",
     rtf: {},
     type: "HtmlNote",
-    html:
-      '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n<meta http-equiv="Content-Style-Type" content="text/css">\n<title></title>\n<meta name="Generator" content="Cocoa HTML Writer">\n<meta name="CocoaVersion" content="2022.44">\n<style type="text/css">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 16.0px \'PingFang SC\'; color: #1e242b}\nspan.s1 {font: 16.0px \'Avenir Next\'}\n</style>\n</head>\n<body>\n<p class="p1">&#x6458;&#x5F55;&#x7B14;&#x8BB0;<span class="s1"> =<b> </b></span><b>&#x788E;&#x7247;&#x5316;</b><span class="s1"><b><span class="Apple-converted-space">&nbsp;</span></b></span></p>\n</body>\n</html>\n',
+    html: '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n<meta http-equiv="Content-Style-Type" content="text/css">\n<title></title>\n<meta name="Generator" content="Cocoa HTML Writer">\n<meta name="CocoaVersion" content="2022.44">\n<style type="text/css">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 16.0px \'PingFang SC\'; color: #1e242b}\nspan.s1 {font: 16.0px \'Avenir Next\'}\n</style>\n</head>\n<body>\n<p class="p1">&#x6458;&#x5F55;&#x7B14;&#x8BB0;<span class="s1"> =<b> </b></span><b>&#x788E;&#x7247;&#x5316;</b><span class="s1"><b><span class="Apple-converted-space">&nbsp;</span></b></span></p>\n</body>\n</html>\n',
     htmlSize: {},
   } as htmlComment,
   paint: {
@@ -124,8 +124,7 @@ describe("transformComments function", () => {
     expect(transformComments([comment.html], full)).toEqual([
       { comment: "摘录笔记+思维导图+记忆卡片 三位一体" },
       {
-        html:
-          '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n<meta http-equiv="Content-Style-Type" content="text/css">\n<title></title>\n<meta name="Generator" content="Cocoa HTML Writer">\n<meta name="CocoaVersion" content="2022.44">\n<style type="text/css">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 16.0px \'PingFang SC\'; color: #1e242b}\nspan.s1 {font: 16.0px \'Avenir Next\'}\n</style>\n</head>\n<body>\n<p class="p1">&#x6458;&#x5F55;&#x7B14;&#x8BB0;<span class="s1"> =<b> </b></span><b>&#x788E;&#x7247;&#x5316;</b><span class="s1"><b><span class="Apple-converted-space">&nbsp;</span></b></span></p>\n</body>\n</html>\n',
+        html: '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n<meta http-equiv="Content-Style-Type" content="text/css">\n<title></title>\n<meta name="Generator" content="Cocoa HTML Writer">\n<meta name="CocoaVersion" content="2022.44">\n<style type="text/css">\np.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 16.0px \'PingFang SC\'; color: #1e242b}\nspan.s1 {font: 16.0px \'Avenir Next\'}\n</style>\n</head>\n<body>\n<p class="p1">&#x6458;&#x5F55;&#x7B14;&#x8BB0;<span class="s1"> =<b> </b></span><b>&#x788E;&#x7247;&#x5316;</b><span class="s1"><b><span class="Apple-converted-space">&nbsp;</span></b></span></p>\n</body>\n</html>\n',
       },
     ]);
     expect(transformComments([comment.paint], full)).toEqual([

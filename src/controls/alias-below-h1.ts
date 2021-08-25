@@ -3,10 +3,10 @@ import {
   parseFrontMatterAliases,
 } from "obsidian";
 
-export function aliasBelowH1(
+export const aliasBelowH1 = (
   el: HTMLElement,
-  ctx: MarkdownPostProcessorContext
-): void {
+  ctx: MarkdownPostProcessorContext,
+): void => {
   const heading = el.querySelector("h1");
   if (!heading) return;
 
@@ -26,6 +26,6 @@ export function aliasBelowH1(
       for (const alias of aliases) {
         container.appendChild(alias);
       }
-    }
+    },
   );
-}
+};

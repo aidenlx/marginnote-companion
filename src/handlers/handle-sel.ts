@@ -1,7 +1,8 @@
 import { ReturnBody_Sel } from "@aidenlx/obsidian-bridge";
-import { textProcess } from "../misc";
-import { InsertToCursor } from "../cm-tools";
 import { Editor } from "obsidian";
+
+import { InsertToCursor } from "../cm-tools";
+import { textProcess } from "../misc";
 
 const handleSel = (
   obj: ReturnBody_Sel,

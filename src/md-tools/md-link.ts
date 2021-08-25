@@ -1,4 +1,5 @@
 import assertNever from "assert-never";
+
 import { mnUrl } from "../misc";
 
 /**
@@ -7,7 +8,11 @@ import { mnUrl } from "../misc";
  * @param lt \[linktext\](url...)
  * @returns
  */
-export function getAnchor(type: MDLinkType, id: string, lt?: string): string {
+export const getAnchor = (
+  type: MDLinkType,
+  id: string,
+  lt?: string,
+): string => {
   switch (type) {
     case MDLinkType.Bare:
       return `<${mnUrl("note", id)}>`;
@@ -18,7 +23,7 @@ export function getAnchor(type: MDLinkType, id: string, lt?: string): string {
     default:
       assertNever(type);
   }
-}
+};
 
 export class MDLink {
   url: string;
@@ -126,7 +131,7 @@ export enum MDLinkType {
   Ref = "ref",
 }
 
-function makeid(length: number) {
+const makeid = (length: number) => {
   let result = "";
   let characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -135,4 +140,4 @@ function makeid(length: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-}
+};

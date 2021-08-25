@@ -1,7 +1,8 @@
-import MNComp from "../mn-main";
-import { handleMNData } from "../handlers/handler";
-import { NoteImportOption } from "../handlers/handle-note";
 import { Editor } from "obsidian";
+
+import { NoteImportOption } from "../handlers/handle-note";
+import { handleMNData } from "../handlers/handler";
+import MNComp from "../mn-main";
 
 export const getPastedHandler =
   (plugin: MNComp) => (cm: CodeMirror.Editor, e: ClipboardEvent) => {

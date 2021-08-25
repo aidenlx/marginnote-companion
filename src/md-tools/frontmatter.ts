@@ -1,10 +1,11 @@
 import matter from "gray-matter";
 import { Editor, EditorRange } from "obsidian";
+
 import { FindLine, InsertTo } from "../cm-tools";
 
-export function getFrontmatterRange(
-  cm: CodeMirror.Editor | Editor
-): EditorRange | null {
+export const getFrontmatterRange = (
+  cm: CodeMirror.Editor | Editor,
+): EditorRange | null => {
   if (cm.getLine(0) !== "---") return null;
   else {
     let endLineNum;
@@ -15,21 +16,21 @@ export function getFrontmatterRange(
       };
     } else return null;
   }
-}
+};
 
 type keyValue = {
   [key: string]: any;
 };
-export function addToFrontmatter(
+export const addToFrontmatter = (
   entry: string,
   items: keyValue | string[],
-  cm: CodeMirror.Editor | Editor
-) {
+  cm: CodeMirror.Editor | Editor,
+) => {
   const fmRange = getFrontmatterRange(cm);
-  const render = (fmObj: { [k: string]: any }) => 
+  const render = (fmObj: { [k: string]: any }) =>
     // @ts-ignore
     matter.stringify("", fmObj, { flowLevel: 3 }).replace(/^\s+|\s+$/g, "");
-  
+
   if (fmRange) {
     const { from, to } = fmRange;
     const fmObj = matter(cm.getRange(from, to)).data;
@@ -49,4 +50,4 @@ export function addToFrontmatter(
   } else {
     InsertTo(render({ [entry]: items }) + "\n", cm, 0, 0);
   }
-}
+};

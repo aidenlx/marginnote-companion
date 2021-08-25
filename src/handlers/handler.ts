@@ -1,19 +1,20 @@
-import { Editor, ObsidianProtocolData } from "obsidian";
-import assertNever from "assert-never";
-import handleSel from "./handle-sel";
-import handleNote, { NoteImportOption } from "./handle-note";
 import { ReturnBody } from "@aidenlx/obsidian-bridge";
 import { JsonToObj, UrlToObj } from "@aidenlx/obsidian-bridge";
+import assertNever from "assert-never";
+import { Editor, ObsidianProtocolData } from "obsidian";
+
+import handleNote, { NoteImportOption } from "./handle-note";
+import handleSel from "./handle-sel";
 import handleToc from "./handle-toc";
 
 /**
  * @returns if the function completed successfully
  */
-export function handleMNData(
+export const handleMNData = (
   src: string | ObsidianProtocolData,
   cm: CodeMirror.Editor | Editor,
   noteOptions: NoteImportOption,
-): boolean {
+): boolean => {
   const result = getMNData(src);
   if (!result) return false;
 
@@ -28,7 +29,7 @@ export function handleMNData(
     default:
       assertNever(body);
   }
-}
+};
 
 /**
  * @returns null if invaild
