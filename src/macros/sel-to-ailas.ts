@@ -1,5 +1,6 @@
-import { addToFrontmatter } from "../md-tools/frontmatter";
 import { Editor } from "obsidian";
+
+import { addToFrontmatter } from "../md-tools/frontmatter";
 import { ExtractDef } from "./autodef";
 
 let sel;

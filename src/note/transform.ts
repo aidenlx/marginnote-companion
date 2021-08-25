@@ -6,9 +6,9 @@ import {
 import { Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
 import { mdObj } from "../note/render";
-import { MDLink } from "../md-tools/MDLink";
+import { MDLink } from "../md-tools/md-link";
 import { mnUrl, Range } from "../misc";
-import { getSimpleNote } from "./simpleNote";
+import { getSimpleNote } from "./simple-note";
 
 /** title link separator */
 export const tlSeparator = /[;；]/;

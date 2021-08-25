@@ -1,6 +1,6 @@
-import { aliasBelowH1 } from "./controls/aliasBelowH1";
-import { addSourceButton } from "./controls/sourceButton";
-import { NoteImportMode, NoteImportStyle } from "./handlers/handleNote";
+import { aliasBelowH1 } from "./controls/alias-below-h1";
+import { addSourceButton } from "./controls/source-button";
+import { NoteImportMode, NoteImportStyle } from "./handlers/handle-note";
 import { autoPaste } from "./receivers/autopaste";
 import {
   getPastedHandler,

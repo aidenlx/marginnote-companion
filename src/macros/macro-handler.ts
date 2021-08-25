@@ -1,7 +1,7 @@
 import { ObsidianProtocolData } from "obsidian";
 import MNComp from "../mn-main";
-import SelToAilas from "./SelToAilas";
-import extractLabelFromSel from "./extractLabelFromSel";
+import SelToAilas from "./sel-to-ailas";
+import extractLabelFromSel from "./extract-label-from-sel";
 
 export function MacroHandler(this: MNComp, params: ObsidianProtocolData): void {
   const macroName = params.macro;

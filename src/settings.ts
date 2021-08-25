@@ -1,5 +1,5 @@
 import MNComp from "./mn-main";
-import { NoteImportMode, NoteImportOption, NoteImportStyle } from "./handlers/handleNote";
+import { NoteImportMode, NoteImportOption, NoteImportStyle } from "./handlers/handle-note";
 import { PluginSettingTab, App, Setting } from "obsidian";
 
 export interface MNCompSettings {

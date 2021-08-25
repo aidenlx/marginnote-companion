@@ -1,10 +1,10 @@
 import { Editor, ObsidianProtocolData } from "obsidian";
 import assertNever from "assert-never";
-import handleSel from "./handleSel";
-import handleNote, { NoteImportOption } from "./handleNote";
+import handleSel from "./handle-sel";
+import handleNote, { NoteImportOption } from "./handle-note";
 import { ReturnBody } from "@aidenlx/obsidian-bridge";
 import { JsonToObj, UrlToObj } from "@aidenlx/obsidian-bridge";
-import handleToc from "./handleToc";
+import handleToc from "./handle-toc";
 
 /**
  * @returns if the function completed successfully

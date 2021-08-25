@@ -1,6 +1,6 @@
 import MNComp from "../mn-main";
 import { handleMNData } from "../handlers/handler";
-import { NoteImportOption } from "../handlers/handleNote";
+import { NoteImportOption } from "../handlers/handle-note";
 import { Editor } from "obsidian";
 
 export const getPastedHandler =

@@ -1,11 +1,12 @@
-import { Editor } from "obsidian";
 import { Book, ReturnBody_Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
+import { Editor } from "obsidian";
+
 import { InsertToCursor } from "../cm-tools";
-import { transformBasicNote, transformFullNote } from "../note/transform";
-import { getAnchor, MDLinkType } from "../md-tools/MDLink";
-import { importMeta, insertRefSource, json2md, mdObj } from "../note/render";
+import { getAnchor, MDLinkType } from "../md-tools/md-link";
 import { mnUrl } from "../misc";
+import { importMeta, insertRefSource, json2md, mdObj } from "../note/render";
+import { transformBasicNote, transformFullNote } from "../note/transform";
 
 export const enum NoteImportStyle {
   /** Import only metadata (link, alias, source...) */

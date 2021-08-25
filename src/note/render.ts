@@ -1,10 +1,10 @@
 import json2md, { DataObject } from "json2md";
-import { MDLink } from "md-tools/MDLink";
+import { MDLink } from "md-tools/md-link";
 import { Book, Note } from "@aidenlx/obsidian-bridge";
 import { Editor, htmlToMarkdown } from "obsidian";
 import { InsertTo, FindLine, SetLine } from "../cm-tools";
 import { mnUrl } from "../misc";
-import { excerptNote, getSimpleNote } from "./simpleNote";
+import { excerptNote, getSimpleNote } from "./simple-note";
 import {
   addToFrontmatter,
   getFrontmatterRange,
