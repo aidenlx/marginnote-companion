@@ -14,7 +14,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@aidenlx/obsidian-bridge": "^2.3.1",
+    "@aidenlx/obsidian-bridge": "2.3.2",
     "@jsonurl/jsonurl": "^1.1.4",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^3.3.0",
@@ -65,6 +65,7 @@
         "json -I -f manifest.json -e \"this.version='${version}'\"",
         "json -I -f versions.json -e \"this['${version}']='$(cat manifest.json | json minAppVersion)'\"",
         "sed -i '' \"s/available for Obsidian v.*$/available for Obsidian v$(cat manifest.json | json minAppVersion)+./\" README.md",
+        "sed -i '' -E -e \"s#const OBBRIDGE_MIN_VERSION = \\\"[0-9.]+\\\"#const OBBRIDGE_MIN_VERSION = \\\"$(cat package.json | json 'devDependencies.@aidenlx/obsidian-bridge')\\\"#\" src/misc.ts",
         "git add .",
         "npm run build"
       ],
