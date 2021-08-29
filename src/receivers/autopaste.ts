@@ -1,7 +1,6 @@
 import { MarkdownView, Notice } from "obsidian";
 
 import { InsertTo } from "../cm-tools";
-import { handleMNData } from "../handlers/handler";
 import MNComp from "../mn-main";
 
 export const autoPaste = (plugin: MNComp) => {
@@ -46,14 +45,6 @@ export const autoPaste = (plugin: MNComp) => {
   // add clipboard listener callback
   plugin.inputListener.on("changed", (value) => {
     if (!value) return;
-    const activeView = plugin.app.workspace.activeLeaf?.view;
-    if (activeView instanceof MarkdownView) {
-      const cm = activeView.editor;
-
-      // fallback option if fails
-      if (!handleMNData(value, cm, plugin.settings.noteImportOption)) {
-        InsertTo(value + "\n", cm, cm.getCursor());
-      }
-    }
+    plugin.mnHandler.insertToNote();
   });
 };

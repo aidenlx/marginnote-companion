@@ -1,3 +1,4 @@
+import equal from "fast-deep-equal/es6";
 import { Editor, EditorPosition } from "obsidian";
 
 export const InsertTo = (
@@ -26,8 +27,11 @@ const isPos = (obj: any): obj is EditorPosition => {
   } else return false;
 };
 
-export const InsertToCursor = (str: string, cm: CodeMirror.Editor | Editor) =>
-  InsertTo(str, cm, cm.getCursor());
+export const InsertToCursor = (str: string, cm: CodeMirror.Editor | Editor) => {
+  const cursor = cm.getCursor();
+  InsertTo(str, cm, cursor);
+  if (!equal(cursor, cm.getCursor())) cm.setCursor(cursor);
+};
 
 /**
  *

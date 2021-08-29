@@ -1,7 +1,21 @@
+import {
+  checkVersion,
+  JsonToObj,
+  ReturnBody,
+  UrlToObj,
+} from "@aidenlx/obsidian-bridge";
 import type { Clipboard } from "electron";
 import equal from "fast-deep-equal/es6";
-import { App, EventRef, Events, ObsidianProtocolHandler } from "obsidian";
+import {
+  App,
+  EventRef,
+  Events,
+  Notice,
+  ObsidianProtocolHandler,
+} from "obsidian";
 import { ObsidianProtocolData } from "obsidian";
+
+import { OBBRIDGE_MIN_VERSION } from "../misc";
 
 const RECIEVED_FLAG = "<!--MN_LINK_RECIEVED--->";
 
@@ -20,8 +34,9 @@ const isCbInfo = (info: InputListener["info"]): info is CbInfo =>
 export default class InputListener extends Events {
   info?: CbInfo | UrlInfo;
 
-  lastValue: string | ObsidianProtocolData | null = null;
-  init = true;
+  /** only used for auto paste */
+  private lastValue: string | ObsidianProtocolData | null = null;
+  private init = true;
 
   /**
    * @param immediate emit event immediately after calling start()
@@ -34,8 +49,8 @@ export default class InputListener extends Events {
     super();
     if (app.isMobile) {
       this.info = { autoPasteRef: null, paramsCache: null };
-      /** insert recieved flag to clipboard and save val to cache */
 
+      // insert recieved flag to clipboard and save val to cache
       this.on("url-recieved", (params) => {
         if (!this.info || isCbInfo(this.info))
           console.error(
@@ -53,7 +68,39 @@ export default class InputListener extends Events {
         .catch((reason) => console.error(reason));
     }
   }
-
+  /** read from clipboard/cache */
+  async readFromInput(): Promise<ReturnBody | null> {
+    if (this.info === undefined) {
+      console.error("Call InputListener before init");
+      return null;
+    } else if (isCbInfo(this.info)) {
+      return this.parse(this.info.instance.readText());
+    } else {
+      const cbText = await navigator.clipboard.readText();
+      if (cbText === RECIEVED_FLAG) {
+        if (this.info.paramsCache) return this.parse(this.info.paramsCache);
+        else throw new Error("flag in clipboard, no cache in info");
+      } else return null;
+    }
+  }
+  /**
+   * @returns null if invaild
+   */
+  private parse(src: string | ObsidianProtocolData): ReturnBody | null {
+    const result = typeof src === "string" ? JsonToObj(src) : UrlToObj(src);
+    if (!result) return null;
+    const verCompare = checkVersion(result[0], OBBRIDGE_MIN_VERSION);
+    if (!verCompare) {
+      new Notice(`Unable to compare version: ${result[0]}`);
+      console.error("Unable to compare version in %o", result);
+      return null;
+    } else if (verCompare < 0) {
+      new Notice(
+        `Please Upgrade Obsidian Bridge to v${OBBRIDGE_MIN_VERSION} or Higher`,
+      );
+      return null;
+    } else return result[1];
+  }
   private checkInit(
     action: (() => void) | null,
     actionMobile?: (url: UrlInfo) => void,
@@ -88,9 +135,7 @@ export default class InputListener extends Events {
     callback: (val: NonNullable<InputListener["lastValue"]>) => void,
   ): EventRef;
   on(name: string, callback: (...data: any) => any, ctx?: any): EventRef {
-    const ref = super.on(name, callback, ctx);
-    // this.refs.push(ref);
-    return ref;
+    return super.on(name, callback, ctx);
   }
   trigger(name: "url-recieved", params: ObsidianProtocolData): void;
   trigger(name: "changed", val: NonNullable<InputListener["lastValue"]>): void;
@@ -112,11 +157,11 @@ export default class InputListener extends Events {
         );
       },
       mobile = (url: UrlInfo) => {
-        url.autoPasteRef = this.on("url-recieved", this.onRecieve_AutoPaste);
+        url.autoPasteRef = this.on("url-recieved", this.tryTriggerChange);
       };
     this.checkInit(null, mobile, desktop);
   }
-  tryTriggerChange = (value: NonNullable<InputListener["lastValue"]>) => {
+  private tryTriggerChange = (value: string | ObsidianProtocolData) => {
     if (!equal(value, this.lastValue)) {
       this.lastValue = value;
 
@@ -126,8 +171,6 @@ export default class InputListener extends Events {
       if (this.init) this.init = false;
     }
   };
-  onRecieve_AutoPaste: ObsidianProtocolHandler = (params) =>
-    this.tryTriggerChange(params);
 
   /**
    * Stop watching

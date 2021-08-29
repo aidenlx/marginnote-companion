@@ -1,19 +1,35 @@
-import { Editor } from "obsidian";
+import { Notice } from "obsidian";
 
-import { NoteImportOption } from "../handlers/handle-note";
-import { handleMNData } from "../handlers/handler";
+import { InsertNoteResult } from "../handlers/mn-data-handler";
 import MNComp from "../mn-main";
 
 export const getPastedHandler =
-  (plugin: MNComp) => (cm: CodeMirror.Editor, e: ClipboardEvent) => {
-    let text = e.clipboardData?.getData("text");
-    if (text) {
-      let handle = handleMNData(text, cm, plugin.settings.noteImportOption);
-      if (handle) e.preventDefault();
+  (plugin: MNComp) => async (cm: CodeMirror.Editor, e: ClipboardEvent) => {
+    if (e.cancelable && e.target) {
+      e.preventDefault();
+      const result = await plugin.mnHandler.insertToNote();
+      if (result !== InsertNoteResult.NoMNData) {
+        if (result === InsertNoteResult.NoVaildData) {
+          new Notice(
+            "Unable to paste TOC data from MarginNote directly to note",
+          );
+        } else if (result <= 0) {
+          new Notice(
+            "Error while insert data from MarginNote to note, check console for details",
+          );
+        }
+      } else {
+        e.target.dispatchEvent(
+          new ClipboardEvent("paste", {
+            clipboardData: e.clipboardData,
+            cancelable: false,
+          }),
+        );
+      }
     }
   };
 
-export const getCmdPasteHandler =
-  (option: NoteImportOption) =>
-  async (editor: Editor): Promise<boolean> =>
-    handleMNData(await navigator.clipboard.readText(), editor, option);
+// export const getCmdPasteHandler =
+//   (option: NoteImportOption) =>
+//   async (editor: Editor): Promise<boolean> =>
+//     handleMNData(await navigator.clipboard.readText(), editor, option);

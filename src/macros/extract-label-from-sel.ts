@@ -2,7 +2,7 @@ import marked from "marked";
 import { Editor } from "obsidian";
 
 import { getStartIndexOfSel, offsetToPos } from "../cm-tools";
-import { addToFrontmatter } from "../md-tools/frontmatter";
+import { addToFrontmatter } from "../handlers/frontmatter";
 
 const Pos = (line: number, ch: number) => ({ line, ch });
 

@@ -1,4 +1,5 @@
 import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
@@ -27,6 +28,7 @@ export default {
     typescript(),
     nodeResolve({ browser: true, preferBuiltins: false }),
     commonjs(),
+    json(),
     css({
       output: "build/styles.css",
     }),

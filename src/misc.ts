@@ -1,20 +1,6 @@
-export const mnUrl = (type: "notebook" | "note", id: string) =>
-  `marginnote3app://${type}/` + id;
 export const OBBRIDGE_MIN_VERSION = "2.3.2";
 
 export const trimEmpty = (str: string) => str.replace(/^\s+|\s+$/g, "");
-
-export const textProcess = (src: string) =>
-  src
-    .replace(/ {2,}/g, " ")
-    .replace(/(\d+?\.(?![\d]).+?) +?/g, "$1：")
-    .replace(/^[;,. ]+|[;,. ]+$|\B | \B/g, "")
-    .replace(/;/g, "；")
-    .replace(/,/g, "，")
-    .replace(/([A-Za-z0-9])\s{0,}，\s{0,}(?=[A-Za-z0-9])/g, "$1,")
-    .replace(/:/g, "：")
-    .replace(/〜/g, "~")
-    .replace(/[“”„‟〝〞〟＂]/g, '"');
 
 export const ChsRegex = /[\u4e00-\u9fa5]/g;
 
@@ -38,3 +24,19 @@ export type Range<FROM extends number, TO extends number> = Exclude<
   Enumerate<TO>,
   Enumerate<FROM>
 >;
+
+export type WithUndefined<T> = {
+  [K in keyof T]: T[K] | undefined;
+};
+
+export const findLast = <T>(
+  array: Array<T> | undefined,
+  predicate: (value: T, index: number, obj: T[]) => boolean,
+): T | null => {
+  if (!array) return null;
+  let l = array.length;
+  while (l--) {
+    if (predicate(array[l], l, array)) return array[l];
+  }
+  return null;
+};

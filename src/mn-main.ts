@@ -5,19 +5,17 @@ import { DEFAULT_SETTINGS, MNCompSettings, MNCompSettingTab } from "settings";
 
 import { aliasBelowH1 } from "./controls/alias-below-h1";
 import { addSourceButton } from "./controls/source-button";
-import { NoteImportMode, NoteImportStyle } from "./handlers/handle-note";
+import MNDataHandler from "./handlers/mn-data-handler";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { autoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
-import {
-  getCmdPasteHandler,
-  getPastedHandler,
-} from "./receivers/paste-hanlder";
+import { getPastedHandler } from "./receivers/paste-hanlder";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
   inputListener = new InputListener(this.app);
+  mnHandler = new MNDataHandler(this);
 
   PastedNoteHandler = getPastedHandler(this);
 
@@ -29,16 +27,16 @@ export default class MNComp extends Plugin {
 
     // register mn note handlers
     this.registerCodeMirror((cm) => cm.on("paste", this.PastedNoteHandler));
+    this.register(() =>
+      this.registerCodeMirror((cm) => cm.off("paste", this.PastedNoteHandler)),
+    );
     autoPaste(this);
     this.addCommand({
       id: "getMeta",
       name: "get Metadata from MarginNote notes",
-      editorCallback: getCmdPasteHandler({
-        ...DEFAULT_SETTINGS.noteImportOption,
-        importMode: NoteImportMode.Merge,
-        importStyle: NoteImportStyle.Metadata,
-        updateH1: false,
-      }),
+      editorCallback: async (_editor, view) => {
+        this.mnHandler.importMeta(view);
+      },
     });
     registerMacroCmd.call(this);
 
@@ -52,12 +50,6 @@ export default class MNComp extends Plugin {
       else if (params.version)
         this.inputListener.trigger("url-recieved", params);
     });
-  }
-
-  onunload() {
-    console.log("unloading marginnote-companion");
-
-    this.registerCodeMirror((cm) => cm.off("paste", this.PastedNoteHandler));
   }
 
   async loadSettings() {
