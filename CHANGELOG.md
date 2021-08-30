@@ -1,3 +1,19 @@
+# [0.2.0](https://github.com/aidenlx/marginnote-companion/compare/0.1.0...0.2.0) (2021-08-30)
+
+
+### Bug Fixes
+
+* fix issues ([6f55c23](https://github.com/aidenlx/marginnote-companion/commit/6f55c236bb89fb120d0d4269f5fc70c11ec13047))
+* fix turndown import ([e426e09](https://github.com/aidenlx/marginnote-companion/commit/e426e092a3b9b9f4fc2f9d74de5c52b7a2618735))
+* minor fixes ([4126672](https://github.com/aidenlx/marginnote-companion/commit/4126672685d609eaa08abd1f8a0b5b7c0e9de6ae))
+
+
+### Features
+
+* add Comment and Excerpt class; add CmtBreak keyword ([c51bd47](https://github.com/aidenlx/marginnote-companion/commit/c51bd470eb345e2630cf03b6513ebe334bf356af))
+* add support for Mustache template ([bee50cf](https://github.com/aidenlx/marginnote-companion/commit/bee50cfcfc0ecf11affe910b0d46a08d9110b9cf))
+* meta now includes page rage of excerpt ([228a539](https://github.com/aidenlx/marginnote-companion/commit/228a5394fb425a811676982d332cef491750394f))
+
 # 0.1.0 (2021-05-06)
 
 

@@ -1,4 +1,4 @@
-export const OBBRIDGE_MIN_VERSION = "2.3.2";
+export const OBBRIDGE_MIN_VERSION = "^2.4.0";
 
 export const trimEmpty = (str: string) => str.replace(/^\s+|\s+$/g, "");
 
