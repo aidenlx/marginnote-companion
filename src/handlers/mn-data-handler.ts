@@ -164,7 +164,7 @@ export default class MNDataHandler {
           : null;
       let url,
         info: any = { md5: docMd5 };
-      if ((url = getLink({ id: noteId, linkTo: "note" }))) {
+      if ((url = getLink({ id: noteId }))) {
         info.url = url;
       } else console.error("noteId not found in %o", body);
       if (pageRange) info.page = pageRange;

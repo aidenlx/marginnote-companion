@@ -1,3 +1,4 @@
+import { excerptPic, excerptPic_video } from "@alx-plugins/marginnote";
 import { htmlToText } from "html-to-text";
 import { htmlToMarkdown } from "obsidian";
 
@@ -53,7 +54,7 @@ const toParams = ([search, searchFlags, replace]: [
 ];
 
 export const getLink = (
-  urlOrInfo: { id: string | undefined; linkTo: "notebook" | "note" } | string,
+  urlOrInfo: { id: string | undefined; linkTo?: "notebook" | "note" } | string,
   config?: {
     linktext?: string;
     /** false:  use id (default),
@@ -68,8 +69,9 @@ export const getLink = (
     : undefined;
 
 export class Link {
+  private _mnUrl: { id: string; linkTo: "notebook" | "note" } | string;
   constructor(
-    private _mnUrl: { id: string; linkTo: "notebook" | "note" } | string,
+    mnUrl: { id: string; linkTo?: "notebook" | "note" } | string,
     private config?: {
       linktext?: string;
       /** false:  use id (default),
@@ -78,7 +80,10 @@ export class Link {
       label?: boolean | string;
     },
     private refCallback?: (refSource: string) => any,
-  ) {}
+  ) {
+    if (typeof mnUrl !== "string") mnUrl.linkTo = mnUrl.linkTo ?? "note";
+    this._mnUrl = mnUrl as Link["_mnUrl"];
+  }
 
   private get mnUrl(): string {
     return typeof this._mnUrl === "string"
@@ -118,5 +123,73 @@ export class Link {
   static getToInsertLast(target: string, refSource: string) {
     let count = target.match(/\n*$/)?.first()?.length ?? 0;
     return "\n".repeat(count >= 2 ? 0 : 2 - count) + refSource + "\n";
+  }
+}
+
+export class Excerpt {
+  constructor(
+    private textFirst: boolean,
+    public Text: Text | undefined,
+    public Pic: string | undefined,
+  ) {}
+
+  /** use processed text */
+  get Process(): Excerpt {
+    this.Text && this.Text.Process;
+    return this;
+  }
+  get PicFirst(): Excerpt {
+    this.textFirst = false;
+    return this;
+  }
+  /** textFirst = true */
+  get TextFirst(): Excerpt {
+    this.textFirst = true;
+    return this;
+  }
+  toString(): string {
+    if (!this.Text && !this.Pic) return "";
+
+    return (
+      (this.textFirst ? this.Text ?? this.Pic : this.Pic ?? this.Text) as
+        | Text
+        | string
+    ).toString();
+  }
+}
+
+export class Comment {
+  private srcLink: Link | undefined = undefined;
+  constructor(
+    private content: Text | string | Link | undefined,
+    srcNoteId?: string,
+  ) {
+    if (srcNoteId) this.srcLink = getLink({ id: srcNoteId });
+  }
+
+  get isRegular(): true {
+    return true;
+  }
+  get Process() {
+    if (this.content instanceof Text) this.content.Process;
+    return this.content;
+  }
+  get Text(): Text | undefined {
+    return this.content instanceof Text ? this.content : undefined;
+  }
+  get Link(): Link | undefined {
+    return this.content instanceof Link ? this.content : undefined;
+  }
+  get Media(): string | undefined {
+    return typeof this.content === "string" ? this.content : undefined;
+  }
+  get SrcLink(): Link | undefined {
+    return (
+      this.srcLink ?? (this.content instanceof Link ? this.content : undefined)
+    );
+  }
+
+  toString(): string {
+    return this.content?.toString() ?? "";
   }
 }

@@ -10,7 +10,7 @@ export interface MNCompSettings {
     note: {
       body: string;
       comment: string;
-      excerpt: string;
+      cmt_linked: string;
     };
   };
   /** md5->path */
@@ -38,9 +38,9 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
   templates: {
     selection: "{{SELECTION}}",
     note: {
-      body: "\n{{#Title}}## {{.}}\n\n{{/Title}}{{> Excerpt}}{{Link}}\n\n{{> Comments}}",
-      comment: "{{Media}}\n{{Text}}{{Link}}",
-      excerpt: "{{Media}}\n{{Text.Process}}",
+      body: "\n{{#Title}}\n## {{.}}\n\n{{/Title}}{{Excerpt}}{{Link}}{{> CmtBreak}}{{> Comments}}\n",
+      comment: "> - {{.}}\n",
+      cmt_linked: "> - {{Excerpt}}{{Link}}\n",
     },
   },
   videoMap: {},

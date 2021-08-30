@@ -7,24 +7,25 @@ import {
   noteComment,
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
+import { Notice } from "obsidian";
 import replaceAsync from "string-replace-async";
 
 import { WithUndefined } from "../misc";
 import MNComp from "../mn-main";
 import AddNewVideo from "./add-new-video";
-import { getLink, Link, Text } from "./basic";
+import { Comment, Excerpt, getLink, Link, Text } from "./basic";
 import Template from "./template";
 
 type PHValMap<T extends string> = Record<T, string | undefined>;
 
-type Partials = Record<"Excerpt" | "Comments", string>;
+type Partials = Record<"Comments" | "CmtBreak", string>;
 
 /**
  * for comments, use {{> Comments}}; for excerpt, use {{> Excerpt}}; for title with heading level, use {{Title.1}}
  */
 type BodyRec = PHValMap<"Created" | "Modified" | "FilePath" | "DocTitle"> &
   WithUndefined<{
-    Excerpt: ExcerptRec;
+    Excerpt: Excerpt;
     Comments: CommentRec[];
     RawTitle: string;
     Title: string;
@@ -32,8 +33,9 @@ type BodyRec = PHValMap<"Created" | "Modified" | "FilePath" | "DocTitle"> &
     Link: Link;
   }>;
 
-type CommentRec = WithUndefined<{ Media: string; Text: Text; Link: Link }>;
-type ExcerptRec = PHValMap<"Media"> & WithUndefined<{ Text: Text }>;
+type CommentRec =
+  | Comment
+  | { Excerpt: Excerpt | undefined; Link: Link | undefined };
 
 const isVideo = (
   pic: excerptPic | excerptPic_video | undefined,
@@ -50,15 +52,26 @@ export default class NoteTemplate extends Template<"note"> {
     super(plugin, "note");
   }
   private getExcerpt(
-    note: Note,
+    excerpt: {
+      textBak?: string | undefined;
+      picBak?: excerptPic | excerptPic_video | undefined;
+      note: Note | undefined;
+    },
     mediaMap: Record<string, string>,
-  ): ExcerptRec | undefined {
-    const { excerptText, excerptPic, startPos, endPos } = note;
-    if (!excerptText && !excerptPic) return undefined;
-    return {
-      Media: this.getExcerptMediaPH(excerptPic, mediaMap, [startPos, endPos]),
-      Text: this.getText(excerptText),
-    };
+  ): Excerpt {
+    const { textBak, picBak } = excerpt,
+      {
+        startPos,
+        endPos,
+        textFirst,
+        excerptPic: pic,
+        excerptText: text,
+      } = excerpt.note ?? {};
+    return new Excerpt(
+      textFirst ?? false,
+      this.getText(text ?? textBak),
+      this.getExcerptMediaPH(pic ?? picBak, mediaMap, [startPos, endPos]),
+    );
   }
   private getComments(body: ReturnBody_Note): CommentRec[] | undefined {
     const { mediaMap, linkedNotes } = body,
@@ -66,49 +79,42 @@ export default class NoteTemplate extends Template<"note"> {
     if (!comments || comments.length === 0) return undefined;
 
     return comments.map<CommentRec>((c) => {
-      const getObj = (obj: Partial<CommentRec>): CommentRec => ({
-        Media: undefined,
-        Text: undefined,
-        Link: undefined,
-        ...obj,
-      });
       switch (c.type) {
         case "TextNote": // LinkedNote (mnUrl in c.text) or comment
           return c.text?.startsWith("marginnote3app")
-            ? getObj({ Link: getLink(c.text) })
-            : getObj({ Text: this.getText(c.text) });
+            ? new Comment(getLink(c.text), c.noteid)
+            : new Comment(this.getText(c.text), c.noteid);
         case "HtmlNote": // if with noteid: from merged note
-          return getObj({
-            Text: this.getText(c.html, true),
-          });
-        case "PaintNote":
-          return getObj({
-            Media: c.paint ? getPlaceholder("pic", c.paint) : undefined,
-          });
-        case "LinkNote": {
+          return new Comment(this.getText(c.html, true), c.noteid);
+        case "PaintNote": {
+          let placeholder = undefined;
+          if (c.paint) placeholder = getPlaceholder("pic", c.paint);
+          else if (c.strokes) placeholder = "%% Some handwrittings %%";
+
+          return new Comment(placeholder, c.noteid);
+        }
+        case "LinkNote":
           // Merged Note
-          let timeSpan: timeSpan | undefined = undefined;
-          if (isLC_pic(c) && isVideo(c.q_hpic)) {
-            const srcNote = linkedNotes[c.noteid];
-            if (srcNote) timeSpan = [srcNote.startPos, srcNote.endPos];
-            else {
-              console.error(
-                "Cannot find merged note %s in %o while fetching timeSpan for video",
-                c.noteid,
-                linkedNotes,
-                body,
-              );
-            }
+          if (!linkedNotes[c.noteid]) {
+            console.error(
+              "Cannot find merged note %s in %o while fetching timeSpan for video",
+              c.noteid,
+              linkedNotes,
+              body,
+            );
           }
 
-          return getObj({
-            Link: getLink({ id: c.noteid, linkTo: "note" }),
-            Text: this.getText(c.q_htext),
-            Media: isLC_pic(c)
-              ? this.getExcerptMediaPH(c.q_hpic, mediaMap, timeSpan)
-              : undefined,
-          });
-        }
+          return {
+            Excerpt: this.getExcerpt(
+              {
+                note: linkedNotes[c.noteid],
+                picBak: (c as linkComment_pic).q_hpic,
+                textBak: c.q_htext,
+              },
+              mediaMap,
+            ),
+            Link: getLink({ id: c.noteid }),
+          };
         default:
           assertNever(c);
       }
@@ -127,10 +133,10 @@ export default class NoteTemplate extends Template<"note"> {
       ...getTitleAliasesProps(noteTitle),
       Created: this.formatDate(createDate),
       Modified: this.formatDate(modifiedDate),
-      Link: getLink({ id: noteId, linkTo: "note" }, undefined, refCallback),
+      Link: getLink({ id: noteId }, undefined, refCallback),
       FilePath: book?.pathFile,
       DocTitle: book?.docTitle,
-      Excerpt: this.getExcerpt(note, mediaMap),
+      Excerpt: this.getExcerpt({ note }, mediaMap),
     };
   }
 
@@ -149,14 +155,22 @@ export default class NoteTemplate extends Template<"note"> {
         ...this.getBody(body.data, bookMap, mediaMap, refCallback),
         Comments: this.getComments(body),
       },
-      comment = this.template.comment.replace(/{{\s*>\s*Comments\s*}}/g, ""),
-      excerpt = this.template.excerpt.replace(/{{\s*>\s*Excerpt\s*}}/g, ""),
       parital: Partials = {
-        Excerpt: `{{#Excerpt}}${excerpt}{{/Excerpt}}`,
-        Comments: `{{#Comments}}${comment}{{/Comments}}`,
+        Comments:
+          "{{#Comments}}" +
+          `{{#isRegular}}${this.template.comment}{{/isRegular}}` +
+          `{{^isRegular}}${this.template.cmt_linked}{{/isRegular}}` +
+          "{{/Comments}}",
+        CmtBreak: "{{#Comments.length}}\n\n\n{{/Comments.length}}",
       };
-    let rendered = this.renderTemplate(this.template.body, view, parital);
-
+    let rendered: string;
+    try {
+      rendered = this.renderTemplate(this.template.body, view, parital);
+    } catch (error) {
+      error = "Failed to render template: " + error;
+      new Notice(error);
+      throw new Error(error);
+    }
     if (refSource) {
       rendered += Link.getToInsertLast(rendered, refSource);
     }
@@ -175,7 +189,7 @@ export default class NoteTemplate extends Template<"note"> {
     } else if (isVideo(excerptPic)) {
       const { video: videoMd5, paint: SnapshotMd5 } = excerptPic,
         getHash = () => {
-          if (!timeSpan) return "";
+          if (!timeSpan || timeSpan.every((t) => !t)) return "";
           const [start, end] = timeSpan.map(videoPosToSec);
           return `#t=${start}${end ? "," + end : ""}`;
         };
@@ -188,8 +202,13 @@ export default class NoteTemplate extends Template<"note"> {
     body: ReturnBody_Note,
   ): Promise<string> {
     const { mediaMap, bookMap } = body,
-      getPicLink = async (data: string, subpath?: string, alias?: string) => {
-        const file = await this.saveAttachment(data, getAttName(body), "png");
+      getPicLink = async (
+        id: string,
+        data: string,
+        subpath?: string,
+        alias?: string,
+      ) => {
+        const file = await this.saveAttachment(data, id, "png");
         if (!file) return undefined;
         return this.getFileLink(file, true, subpath, alias);
       };
@@ -198,12 +217,10 @@ export default class NoteTemplate extends Template<"note"> {
       let data: string;
       if (typeof type === "string" && typeof paramStr === "string") {
         const params = paramStr.split("|");
-        if (
-          type === "pic" &&
-          params.length === 1 &&
-          (data = mediaMap[params[0]])
-        ) {
-          return (await getPicLink(data)) ?? _match;
+        if (type === "pic" && params.length === 1) {
+          const [picMd5] = params;
+          if ((data = mediaMap[picMd5]))
+            return (await getPicLink(picMd5, data)) ?? _match;
         } else if (type === "video" && params.length === 3) {
           const [videoMd5, hash, SnapshotMd5] = params,
             srcName = getBook(videoMd5, bookMap)?.docTitle ?? "Unknown Video",
@@ -220,7 +237,7 @@ export default class NoteTemplate extends Template<"note"> {
             }
           } else if ((data = mediaMap[SnapshotMd5])) {
             // fallback to snapshot
-            return (await getPicLink(data, hash)) ?? _match;
+            return (await getPicLink(SnapshotMd5, data, hash)) ?? _match;
           }
         }
       }
@@ -267,23 +284,9 @@ const getBook = (
   map: Record<string, Book> | undefined,
 ) => (md5 && map ? map[md5] : undefined);
 
-const getAttName = (body: ReturnBody_Note): string => {
-  const date = "YYYYMMDDHHmmss",
-    { bookMap } = body,
-    { noteTitle, excerptText, excerptPic, createDate, docMd5 } = body.data,
-    getBookCTime = () => {
-      const name = getBook(docMd5, bookMap)?.docTitle,
-        ctime = createDate;
-      if (name && ctime) return `${name} ${window.moment(ctime).format(date)}`;
-      else return null;
-    };
-  return (
-    noteTitle ??
-    excerptText?.substring(10) ??
-    getBookCTime() ??
-    excerptPic?.paint ??
-    "MarginNote " + window.moment().format(date)
-  );
+const getAttName = (id: string | undefined): string => {
+  const date = "YYYYMMDDHHmmss";
+  return id ?? "MarginNote " + window.moment().format(date);
 };
 
 const videoPosToSec = (pos: string | undefined): number | undefined => {
