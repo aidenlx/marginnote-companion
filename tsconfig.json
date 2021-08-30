@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": "src",
     "outDir": "",
+    "jsx": "react",
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
@@ -15,5 +16,5 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["dom", "es5", "scripthost", "es2020"]
   },
-  "include": ["src/**/*.ts", "node_modules/@alx-plugins/**/*.ts"]
+  "include": ["src/**/*"]
 }

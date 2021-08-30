@@ -32,7 +32,7 @@ type UrlInfo = {
 const isCbInfo = (info: InputListener["info"]): info is CbInfo =>
   typeof (info as CbInfo).intervalId === "number";
 export default class InputListener extends Events {
-  info?: CbInfo | UrlInfo;
+  info: CbInfo | UrlInfo;
 
   /** only used for auto paste */
   private lastValue: string | ObsidianProtocolData | null = null;
@@ -41,15 +41,10 @@ export default class InputListener extends Events {
   /**
    * @param immediate emit event immediately after calling start()
    */
-  constructor(
-    private app: App,
-    public timeInterval = 500,
-    public immediate = false,
-  ) {
+  constructor(app: App, public timeInterval = 500, public immediate = false) {
     super();
     if (app.isMobile) {
       this.info = { autoPasteRef: null, paramsCache: null };
-
       // insert recieved flag to clipboard and save val to cache
       this.on("url-recieved", (params) => {
         if (!this.info || isCbInfo(this.info))
@@ -63,9 +58,14 @@ export default class InputListener extends Events {
         }
       });
     } else {
-      import("electron")
-        .then((e) => (this.info = { instance: e.clipboard, intervalId: 0 }))
-        .catch((reason) => console.error(reason));
+      let electron: typeof Electron;
+      try {
+        electron = require("electron");
+      } catch (error) {
+        new Notice("Failed to load electron dependencies on desktop");
+        throw new Error("error");
+      }
+      this.info = { instance: electron.clipboard, intervalId: 0 };
     }
   }
   /** read from clipboard/cache */
@@ -101,28 +101,13 @@ export default class InputListener extends Events {
       return null;
     } else return result[1];
   }
-  private checkInit(
-    action: (() => void) | null,
-    actionMobile?: (url: UrlInfo) => void,
-    actionDesktop?: (clipboard: CbInfo) => void,
-  ): void {
-    if (this.info === undefined) {
-      console.error("Call InputListener before init");
-    } else {
-      action && action();
-      if (isCbInfo(this.info)) actionDesktop && actionDesktop(this.info);
-      else actionMobile && actionMobile(this.info);
-    }
-  }
 
   private _watching = false;
   public get autoPaste(): boolean {
     return this._watching;
   }
   public set autoPaste(v: boolean) {
-    this.checkInit(() => {
-      v ? this.start() : this.stop();
-    });
+    v ? this.start() : this.stop();
   }
 
   // refs: EventRef[] = [];
@@ -148,18 +133,17 @@ export default class InputListener extends Events {
    */
   start(): void {
     this._watching = true;
-    const desktop = (clipboard: CbInfo) => {
-        if (clipboard.intervalId !== 0) return;
-        this.init = true;
-        clipboard.intervalId = window.setInterval(
-          () => this.tryTriggerChange(clipboard.instance.readText()),
-          this.timeInterval,
-        );
-      },
-      mobile = (url: UrlInfo) => {
-        url.autoPasteRef = this.on("url-recieved", this.tryTriggerChange);
-      };
-    this.checkInit(null, mobile, desktop);
+    if (isCbInfo(this.info)) {
+      const info = this.info;
+      if (info.intervalId !== 0) return;
+      this.init = true;
+      info.intervalId = window.setInterval(
+        () => this.tryTriggerChange(info.instance.readText()),
+        this.timeInterval,
+      );
+    } else {
+      this.info.autoPasteRef = this.on("url-recieved", this.tryTriggerChange);
+    }
   }
   private tryTriggerChange = (value: string | ObsidianProtocolData) => {
     if (!equal(value, this.lastValue)) {
@@ -177,18 +161,16 @@ export default class InputListener extends Events {
    */
   stop(): void {
     this._watching = false;
-    const desktop = (clipboard: CbInfo) => {
-        if (clipboard.intervalId !== undefined) {
-          clearInterval(clipboard.intervalId);
-          clipboard.intervalId = 0;
-          // this.refs.forEach((ref) => this.offref(ref));
-          this.lastValue = null;
-        }
-      },
-      mobile = (url: UrlInfo) => {
-        url.autoPasteRef && this.offref(url.autoPasteRef);
-        url.autoPasteRef = null;
-      };
-    this.checkInit(null, mobile, desktop);
+    if (isCbInfo(this.info)) {
+      if (this.info.intervalId !== undefined) {
+        clearInterval(this.info.intervalId);
+        this.info.intervalId = 0;
+        // this.refs.forEach((ref) => this.offref(ref));
+        this.lastValue = null;
+      }
+    } else {
+      this.info.autoPasteRef && this.offref(this.info.autoPasteRef);
+      this.info.autoPasteRef = null;
+    }
   }
 }
