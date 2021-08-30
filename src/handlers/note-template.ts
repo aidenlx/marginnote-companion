@@ -32,9 +32,7 @@ type BodyRec = PHValMap<"Created" | "Modified" | "FilePath" | "DocTitle"> &
     Link: Link;
   }>;
 
-type CommentRec =
-  | Partial<{ Media: string; Text: Text; Link: Link }>
-  | (BodyRec & { Linked: true });
+type CommentRec = WithUndefined<{ Media: string; Text: Text; Link: Link }>;
 type ExcerptRec = PHValMap<"Media"> & WithUndefined<{ Text: Text }>;
 
 const isVideo = (
@@ -46,6 +44,7 @@ const isPic = (
 const isLC_pic = (lc: linkComment): lc is linkComment_pic =>
   (lc as linkComment_pic).q_hpic !== undefined;
 
+type timeSpan = [start: string | undefined, end: string | undefined];
 export default class NoteTemplate extends Template<"note"> {
   constructor(plugin: MNComp) {
     super(plugin, "note");
@@ -62,66 +61,57 @@ export default class NoteTemplate extends Template<"note"> {
     };
   }
   private getComments(body: ReturnBody_Note): CommentRec[] | undefined {
-    const { bookMap, mediaMap, linkedNotes } = body,
-      { comments } = body.data,
-      { linked: linkedTemplate } = this.template;
+    const { mediaMap, linkedNotes } = body,
+      { comments } = body.data;
     if (!comments || comments.length === 0) return undefined;
 
-    const filtered =
-      linkedTemplate === false
-        ? comments
-        : comments.reduce((arr, c) => {
-            if (c.noteid) {
-              if (linkedNotes[c.noteid]) {
-                // only keep noteid in the location of LinkNote, filter the rest
-                c.type === "LinkNote" && arr.push(c.noteid);
-              } else {
-                // may because out of range
-                console.log(
-                  "LinkNote %s not found in %o",
-                  c.noteid,
-                  linkedNotes,
-                );
-                // fallback to regular render
-                arr.push(c);
-              }
-            } else arr.push(c);
-            return arr;
-          }, [] as (noteComment | string)[]);
+    return comments.map<CommentRec>((c) => {
+      const getObj = (obj: Partial<CommentRec>): CommentRec => ({
+        Media: undefined,
+        Text: undefined,
+        Link: undefined,
+        ...obj,
+      });
+      switch (c.type) {
+        case "TextNote": // LinkedNote (mnUrl in c.text) or comment
+          return c.text?.startsWith("marginnote3app")
+            ? getObj({ Link: getLink(c.text) })
+            : getObj({ Text: this.getText(c.text) });
+        case "HtmlNote": // if with noteid: from merged note
+          return getObj({
+            Text: this.getText(c.html, true),
+          });
+        case "PaintNote":
+          return getObj({
+            Media: c.paint ? getPlaceholder("pic", c.paint) : undefined,
+          });
+        case "LinkNote": {
+          // Merged Note
+          let timeSpan: timeSpan | undefined = undefined;
+          if (isLC_pic(c) && isVideo(c.q_hpic)) {
+            const srcNote = linkedNotes[c.noteid];
+            if (srcNote) timeSpan = [srcNote.startPos, srcNote.endPos];
+            else {
+              console.error(
+                "Cannot find merged note %s in %o while fetching timeSpan for video",
+                c.noteid,
+                linkedNotes,
+                body,
+              );
+            }
+          }
 
-    return filtered.map<CommentRec>((c) => {
-      if (typeof c === "string") {
-        //  LinkNote: full render
-        return {
-          Linked: true,
-          ...this.getBody(linkedNotes[c], bookMap, mediaMap),
-          Comments: this.getComments(body),
-        };
-      } else
-        switch (c.type) {
-          case "TextNote": // linked (mnUrl in c.text) or comment
-            return c.text?.startsWith("marginnote3app")
-              ? { Link: getLink(c.text) }
-              : { Text: this.getText(c.text) };
-          case "HtmlNote":
-            return {
-              Text: this.getText(c.html, true),
-            };
-          case "PaintNote":
-            return {
-              Media: c.paint ? getPlaceholder("pic", c.paint) : undefined,
-            };
-          case "LinkNote": // merged, fallback render
-            return {
-              Link: getLink({ id: c.noteid, linkTo: "note" }),
-              Text: this.getText(c.q_htext),
-              Media: isLC_pic(c)
-                ? this.getExcerptMediaPH(c.q_hpic, mediaMap)
-                : undefined,
-            };
-          default:
-            assertNever(c);
+          return getObj({
+            Link: getLink({ id: c.noteid, linkTo: "note" }),
+            Text: this.getText(c.q_htext),
+            Media: isLC_pic(c)
+              ? this.getExcerptMediaPH(c.q_hpic, mediaMap, timeSpan)
+              : undefined,
+          });
         }
+        default:
+          assertNever(c);
+      }
     });
   }
   private getBody(
@@ -156,17 +146,15 @@ export default class NoteTemplate extends Template<"note"> {
     refCallback = refCallback ?? ((ref: string) => (refSource = ref));
 
     const view: BodyRec = {
-      ...this.getBody(body.data, bookMap, mediaMap, refCallback),
-      Comments: this.getComments(body),
-    };
-    const parital: Partials = {
-      Excerpt: `{{#Excerpt}}${this.template.excerpt}{{/Excerpt}}`,
-      Comments:
-        "{{#Comments}}" +
-        `{{#Linked}}${this.linkedTemplate}{{/Linked}}` +
-        `{{^Linked}}${this.template.comment}{{/Linked}}` +
-        "{{/Comments}}",
-    };
+        ...this.getBody(body.data, bookMap, mediaMap, refCallback),
+        Comments: this.getComments(body),
+      },
+      comment = this.template.comment.replace(/{{\s*>\s*Comments\s*}}/g, ""),
+      excerpt = this.template.excerpt.replace(/{{\s*>\s*Excerpt\s*}}/g, ""),
+      parital: Partials = {
+        Excerpt: `{{#Excerpt}}${excerpt}{{/Excerpt}}`,
+        Comments: `{{#Comments}}${comment}{{/Comments}}`,
+      };
     let rendered = this.renderTemplate(this.template.body, view, parital);
 
     if (refSource) {
@@ -174,18 +162,12 @@ export default class NoteTemplate extends Template<"note"> {
     }
     return this.importAttachments(rendered, body);
   }
-  private get linkedTemplate() {
-    const { linked } = this.template;
-    if (linked === false) return "";
-    else if (linked === true) return this.template.body;
-    else return linked;
-  }
 
   /** get placeholder for media in excerpt */
   getExcerptMediaPH(
     excerptPic: excerptPic | excerptPic_video | undefined,
     mediaMap: Record<string, string>,
-    timeSpan?: [start: string | undefined, end: string | undefined],
+    timeSpan?: timeSpan,
   ): string | undefined {
     if (!excerptPic) return undefined;
     else if (isPic(excerptPic) && mediaMap[excerptPic.paint]) {

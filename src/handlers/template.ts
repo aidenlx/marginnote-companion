@@ -11,7 +11,7 @@ export default abstract class Template<
   T extends keyof MNCompSettings["templates"],
 > {
   constructor(protected plugin: MNComp, private templateKey: T) {}
-  get template() {
+  protected get template() {
     return this.plugin.settings.templates[this.templateKey];
   }
 

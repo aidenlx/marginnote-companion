@@ -75,7 +75,6 @@ export default class AddNewVideo extends FuzzySuggestModal<TFile> {
     private md5: string,
   ) {
     super(plugin.app);
-    console.log(this);
     this.setPlaceholder(`Select File/Enter URL designated to ${srcName}`);
     this.setInstructions([
       {

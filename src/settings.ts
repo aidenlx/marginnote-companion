@@ -11,8 +11,6 @@ export interface MNCompSettings {
       body: string;
       comment: string;
       excerpt: string;
-      /** false: use comment(fallback), true: use body, string: use template */
-      linked: boolean | string;
     };
   };
   /** md5->path */
@@ -43,7 +41,6 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
       body: "\n{{#Title}}## {{.}}\n\n{{/Title}}{{> Excerpt}}{{Link}}\n\n{{> Comments}}",
       comment: "{{Media}}\n{{Text}}{{Link}}",
       excerpt: "{{Media}}\n{{Text.Process}}",
-      linked: true,
     },
   },
   videoMap: {},
