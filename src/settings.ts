@@ -11,16 +11,25 @@ export type MNCompSettings = {
     };
     tocItem: string;
   };
-  /** md5->path */
-  videoMap: Record<string, { srcName: string; mapTo: string }>;
 } & {
   [K in keyof PatchJSON]: PatchJSON[K]["src"];
 };
+interface VideoMapInfo {
+  srcName: string;
+  customName?: string;
+  // Path/Url
+  mapTo: string;
+}
 
 interface PatchJSON {
+  [key: string]: { src: any; json: any };
   textPostProcess: {
     src: [search: RegExp, replace: string][];
     json: [pattern: string, searchFlags: string, replace: string][];
+  };
+  videoMap: {
+    src: Map<string, VideoMapInfo>;
+    json: Record<string, VideoMapInfo>;
   };
 }
 
@@ -46,7 +55,7 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     },
     tocItem: `- {{Title}} [{{DocTitle}}]({{Link.Url}} "#{{#Page}}{{.}}&{{/Page}}{{#DocMd5}}md5={{.}}{{/DocMd5}}")`,
   },
-  videoMap: {},
+  videoMap: new Map() as any,
 };
 
 const toJSONPatch = <K extends keyof PatchJSON>(
@@ -89,6 +98,10 @@ const cvtFunc: {
         prev.push([new RegExp(pattern, searchFlags), replace]);
         return prev;
       }, [] as PatchJSON["textPostProcess"]["src"]),
+  },
+  videoMap: {
+    toJSON: (src) => Object.fromEntries(src),
+    fromJSON: (json) => new Map(Object.entries(json)),
   },
 };
 

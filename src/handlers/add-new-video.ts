@@ -19,7 +19,7 @@ export default class AddNewVideo extends FuzzySuggestModal<TFile> {
     return this.plugin.app.vault;
   }
   public async getLink(): Promise<string | TFile | null> {
-    const val = this.videoMap[this.md5];
+    const val = this.videoMap.get(this.md5);
     if (val) {
       let file;
       if (isUrl(val.mapTo)) return val.mapTo;
@@ -39,10 +39,10 @@ export default class AddNewVideo extends FuzzySuggestModal<TFile> {
       return this.open().then(async (val) => {
         // save to videoMap
         if (val) {
-          this.videoMap[this.md5] = {
+          this.videoMap.set(this.md5, {
             srcName: this.srcName,
             mapTo: typeof val === "string" ? val : val.path,
-          };
+          });
           await this.plugin.saveSettings();
         }
         return val;
