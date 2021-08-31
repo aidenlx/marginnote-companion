@@ -7,6 +7,8 @@ import MNComp from "../mn-main";
 import { MNCompSettings } from "../settings";
 import { getText } from "./basic";
 
+export type PHValMap<T extends string> = Record<T, string | undefined>;
+
 export default abstract class Template<
   T extends keyof MNCompSettings["templates"],
 > {
@@ -76,9 +78,9 @@ export default abstract class Template<
     return getText(str, this.plugin, html);
   }
 
-  protected renderTemplate = (
+  protected renderTemplate = <V>(
     template: string,
-    view: any,
+    view: V,
     partials?: Parameters<typeof Mustache.render>[2],
   ) => Mustache.render(template, view, partials, mustacheConfig);
   abstract render(body: ReturnBody): Promise<string> | string;

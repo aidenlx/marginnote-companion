@@ -1,4 +1,4 @@
-import { ReturnBody_Note, ReturnBody_Sel } from "@aidenlx/obsidian-bridge";
+import { ReturnBody, ReturnBody_Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
 import equal from "fast-deep-equal/es6";
 import { EditorPosition, Loc, MarkdownView } from "obsidian";
@@ -9,6 +9,7 @@ import { getLink, Link } from "./basic";
 import { addToFrontmatter, getFrontmatterRange } from "./frontmatter";
 import NoteTemplate, { getTitleAliases } from "./note-template";
 import SelTemplate from "./sel-template";
+import { TocTemplate } from "./toc-template";
 
 export const enum InsertNoteResult {
   NoMDView = -1,
@@ -21,6 +22,8 @@ export const enum InsertNoteResult {
 export default class MNDataHandler {
   private note = new NoteTemplate(this.plugin);
   private sel = new SelTemplate(this.plugin);
+  private toc = new TocTemplate(this.plugin);
+
   constructor(private plugin: MNComp) {}
   private get settings() {
     return this.plugin.settings;
@@ -71,7 +74,7 @@ export default class MNDataHandler {
   };
   async insertToNote(
     view?: MarkdownView,
-    body?: ReturnBody_Sel | ReturnBody_Note,
+    body?: ReturnBody,
     refSourceToBottom = true,
   ): Promise<InsertNoteResult> {
     if (!view) {
@@ -89,9 +92,6 @@ export default class MNDataHandler {
       if (!val) {
         // console.log("no mn data to insert note to, do nothing");
         return InsertNoteResult.NoMNData;
-      } else if (val.type === "toc") {
-        console.log("not vaild data, do nothing");
-        return InsertNoteResult.NoVaildData;
       } else body = val;
     }
     try {
@@ -100,10 +100,12 @@ export default class MNDataHandler {
         case "sel":
           template = this.sel.render(body);
           break;
-        case "note": {
+        case "note":
           template = await this.note.render(body, refCallback);
           break;
-        }
+        case "toc":
+          template = this.toc.render(body);
+          break;
         default:
           assertNever(body);
       }

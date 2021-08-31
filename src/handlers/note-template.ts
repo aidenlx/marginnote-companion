@@ -4,7 +4,6 @@ import {
   excerptPic_video,
   linkComment,
   linkComment_pic,
-  noteComment,
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
 import { Notice } from "obsidian";
@@ -13,10 +12,8 @@ import replaceAsync from "string-replace-async";
 import { WithUndefined } from "../misc";
 import MNComp from "../mn-main";
 import AddNewVideo from "./add-new-video";
-import { Comment, Excerpt, getLink, Link, Text } from "./basic";
-import Template from "./template";
-
-type PHValMap<T extends string> = Record<T, string | undefined>;
+import { Comment, Excerpt, getLink, Link } from "./basic";
+import Template, { PHValMap } from "./template";
 
 type Partials = Record<"Comments" | "CmtBreak", string>;
 

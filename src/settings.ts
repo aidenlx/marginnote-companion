@@ -12,6 +12,7 @@ export interface MNCompSettings {
       comment: string;
       cmt_linked: string;
     };
+    tocItem: string;
   };
   /** md5->path */
   videoMap: Record<string, { srcName: string; mapTo: string }>;
@@ -42,6 +43,7 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
       comment: "> - {{.}}\n",
       cmt_linked: "> - {{Excerpt}}{{Link}}\n",
     },
+    tocItem: `- {{Title}} [{{DocTitle}}]({{Link.Url}} "#{{#Page}}{{.}}&{{/Page}}{{#DocMd5}}md5={{.}}{{/DocMd5}}")`,
   },
   videoMap: {},
 };

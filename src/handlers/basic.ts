@@ -85,26 +85,27 @@ export class Link {
     this._mnUrl = mnUrl as Link["_mnUrl"];
   }
 
-  private get mnUrl(): string {
-    return typeof this._mnUrl === "string"
-      ? this._mnUrl
-      : `marginnote3app://${this._mnUrl.linkTo}/${this._mnUrl.id}`;
-  }
   private get linktext(): string {
     return this.config?.linktext ?? "";
   }
   private get label(): string {
     const label = this.config?.label,
-      fallback = () => this.mnUrl.slice(-6);
+      fallback = () => this.Url.slice(-6);
     // [link_text][] = [link_text][link_text]
     if (label === true) return this.linktext ? "" : fallback();
     else return label ? label : fallback();
   }
+
+  get Url(): string {
+    return typeof this._mnUrl === "string"
+      ? this._mnUrl
+      : Link.getUrl(this._mnUrl.id, this._mnUrl.linkTo);
+  }
   get Bare(): string {
-    return `<${this.mnUrl}>`;
+    return `<${this.Url}>`;
   }
   get Inline(): string {
-    return `[${this.linktext}](${this.mnUrl})`;
+    return `[${this.linktext}](${this.Url})`;
   }
   get Ref(): string {
     return this.RefMark;
@@ -114,7 +115,7 @@ export class Link {
     return `[${this.linktext}][${this.label}]`;
   }
   private get refSource(): string {
-    return `[${this.label}]: ${this.mnUrl}`;
+    return `[${this.label}]: ${this.Url}`;
   }
   toString() {
     return this.Inline;
@@ -123,6 +124,9 @@ export class Link {
   static getToInsertLast(target: string, refSource: string) {
     let count = target.match(/\n*$/)?.first()?.length ?? 0;
     return "\n".repeat(count >= 2 ? 0 : 2 - count) + refSource + "\n";
+  }
+  static getUrl(id: string, linkTo: "notebook" | "note" = "note") {
+    return `marginnote3app://${linkTo}/${id}`;
   }
 }
 
