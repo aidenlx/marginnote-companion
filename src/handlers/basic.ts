@@ -19,7 +19,7 @@ export class Text {
   /** use Plain by default if html */
   get Process(): Text {
     this.str = this.plugin.settings.textPostProcess.reduce(
-      (prev, arr) => prev.replace(...toParams(arr)),
+      (prev, arr) => prev.replace(...arr),
       this.html ? htmlToText(this.str) : this.str,
     );
     return this;
@@ -43,15 +43,6 @@ export class Text {
     else return this.str;
   }
 }
-
-const toParams = ([search, searchFlags, replace]: [
-  search: string,
-  searchFlags: string,
-  replace: string,
-]): [search: RegExp, replace: string] => [
-  new RegExp(search, searchFlags),
-  replace,
-];
 
 export const getLink = (
   urlOrInfo: { id: string | undefined; linkTo?: "notebook" | "note" } | string,

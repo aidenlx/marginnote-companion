@@ -1,9 +1,6 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
-
 import MNComp from "./mn-main";
 
-export interface MNCompSettings {
-  textPostProcess: [search: string, searchFlags: string, replace: string][];
+export type MNCompSettings = {
   defaultDateFormat: string;
   templates: {
     selection: string;
@@ -16,6 +13,15 @@ export interface MNCompSettings {
   };
   /** md5->path */
   videoMap: Record<string, { srcName: string; mapTo: string }>;
+} & {
+  [K in keyof PatchJSON]: PatchJSON[K]["src"];
+};
+
+interface PatchJSON {
+  textPostProcess: {
+    src: [search: RegExp, replace: string][];
+    json: [pattern: string, searchFlags: string, replace: string][];
+  };
 }
 
 export const DEFAULT_SETTINGS: MNCompSettings = {
@@ -30,12 +36,7 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     [/:/g, "："],
     [/〜/g, "~"],
     [/[“”„‟〝〞〟＂]/g, '"'],
-  ].reduce((prev, arr) => {
-    const regex = arr[0] as RegExp,
-      replace = arr[1] as string;
-    prev.push([regex.source, regex.flags, replace]);
-    return prev;
-  }, [] as MNCompSettings["textPostProcess"]),
+  ],
   templates: {
     selection: "{{SELECTION}}",
     note: {
@@ -48,80 +49,64 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
   videoMap: {},
 };
 
-const toStrArr = (
-  search: RegExp,
-  replace: string,
-): [search: string, searchFlags: string, replace: string] => [
-  search.source,
-  search.flags,
-  replace,
-];
+const toJSONPatch = <K extends keyof PatchJSON>(
+  obj: PatchJSON[K]["src"],
+  key: K,
+): PatchJSON[K]["src"] => {
+  let input = obj as typeof obj & {
+    toJSON: {
+      (this: PatchJSON[K]["src"]): PatchJSON[K]["json"];
+      manual_patch?: true;
+    };
+  };
 
-export class MNCompSettingTab extends PluginSettingTab {
-  plugin: MNComp;
-
-  constructor(app: App, plugin: MNComp) {
-    super(app, plugin);
-    this.plugin = plugin;
+  if (!input.toJSON || input.toJSON.manual_patch !== true) {
+    input.toJSON = function (this: PatchJSON[K]["src"]) {
+      return cvtFunc[key].toJSON(this);
+    };
+    input.toJSON.manual_patch = true;
   }
 
-  display(): void {
-    this.containerEl.empty();
+  return obj;
+};
 
-    // new Setting(this.containerEl)
-    //   .setName("NoteImportMode")
-    //   .addDropdown((dropdown) => {
-    //     const options: Record<NoteImportMode, string> = {
-    //       0: "Insert",
-    //       1: "Merge",
-    //     };
+const cvtFunc: {
+  [K in keyof PatchJSON]: {
+    fromJSON: (json: PatchJSON[K]["json"]) => PatchJSON[K]["src"];
+    toJSON: (src: PatchJSON[K]["src"]) => PatchJSON[K]["json"];
+  };
+} = {
+  textPostProcess: {
+    toJSON: (src) =>
+      src.reduce((prev, arr) => {
+        const [regex, replace] = arr;
+        prev.push([regex.source, regex.flags, replace]);
+        return prev;
+      }, [] as PatchJSON["textPostProcess"]["json"]),
+    fromJSON: (json) =>
+      json.reduce((prev, arr) => {
+        const [pattern, searchFlags, replace] = arr;
+        prev.push([new RegExp(pattern, searchFlags), replace]);
+        return prev;
+      }, [] as PatchJSON["textPostProcess"]["src"]),
+  },
+};
 
-    //     dropdown
-    //       .addOptions(options)
-    //       .setValue(noteImportOption.importMode.toString())
-    //       .onChange(async (value) => {
-    //         noteImportOption.importMode = +value;
-    //         await this.plugin.saveSettings();
-    //         this.display();
-    //       });
-    //   });
-
-    // new Setting(this.containerEl)
-    //   .setName("NoteImportStyle")
-    //   .addDropdown((dropdown) => {
-    //     const options: Record<NoteImportStyle, string> = {
-    //       0: "Metadata",
-    //       1: "Basic",
-    //       2: "Full",
-    //     };
-
-    //     dropdown
-    //       .addOptions(options)
-    //       .setValue(noteImportOption.importStyle.toString())
-    //       .onChange(async (value) => {
-    //         noteImportOption.importStyle = +value;
-    //         await this.plugin.saveSettings();
-    //         this.display();
-    //       });
-    //   });
-
-    // new Setting(this.containerEl)
-    //   .setName("blanksAroundSingleLine")
-    //   .addToggle((toggle) =>
-    //     toggle
-    //       .setValue(noteImportOption.blanksAroundSingleLine)
-    //       .onChange(async (value) => {
-    //         noteImportOption.blanksAroundSingleLine = value;
-    //         await this.plugin.saveSettings();
-    //         this.display();
-    //       }),
-    //   );
-    // new Setting(this.containerEl).setName("updateH1").addToggle((toggle) =>
-    //   toggle.setValue(noteImportOption.updateH1).onChange(async (value) => {
-    //     noteImportOption.updateH1 = value;
-    //     await this.plugin.saveSettings();
-    //     this.display();
-    //   }),
-    // );
+export async function loadSettings(this: MNComp) {
+  let json = await this.loadData();
+  for (const k in cvtFunc) {
+    const key = k as keyof typeof cvtFunc,
+      { fromJSON } = cvtFunc[key];
+    if (json[key]) json[key] = fromJSON(json[key]);
   }
+  this.settings = { ...this.settings, ...json };
+}
+
+export async function saveSettings(this: MNComp) {
+  let src = this.settings;
+  for (const k in cvtFunc) {
+    const key = k as keyof typeof cvtFunc;
+    if (src[key]) src[key] = toJSONPatch(src[key], key);
+  }
+  await this.saveData(this.settings);
 }

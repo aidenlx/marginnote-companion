@@ -1,7 +1,13 @@
 import "./main.css";
 
 import { Plugin } from "obsidian";
-import { DEFAULT_SETTINGS, MNCompSettings, MNCompSettingTab } from "settings";
+import { MNCompSettingTab } from "setting-tab";
+import {
+  DEFAULT_SETTINGS,
+  loadSettings,
+  MNCompSettings,
+  saveSettings,
+} from "settings";
 
 import { aliasBelowH1 } from "./controls/alias-below-h1";
 import { addSourceButton } from "./controls/source-button";
@@ -18,6 +24,9 @@ export default class MNComp extends Plugin {
   mnHandler = new MNDataHandler(this);
 
   PastedNoteHandler = getPastedHandler(this);
+
+  loadSettings = loadSettings.bind(this);
+  saveSettings = saveSettings.bind(this);
 
   async onload() {
     console.log("loading marginnote-companion");
@@ -50,13 +59,5 @@ export default class MNComp extends Plugin {
       else if (params.version)
         this.inputListener.trigger("url-recieved", params);
     });
-  }
-
-  async loadSettings() {
-    this.settings = { ...this.settings, ...(await this.loadData()) };
-  }
-
-  async saveSettings() {
-    await this.saveData(this.settings);
   }
 }
