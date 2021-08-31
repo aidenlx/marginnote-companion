@@ -83,7 +83,7 @@
         "json -I -f manifest.json -e \"this.version='${version}'\"",
         "json -I -f versions.json -e \"this['${version}']='$(cat manifest.json | json minAppVersion)'\"",
         "sed -i '' \"s/available for Obsidian v.*$/available for Obsidian v$(cat manifest.json | json minAppVersion)+./\" README.md",
-        "sed -i '' -E -e \"s#const OBBRIDGE_MIN_VERSION = \\\"[0-9.]+\\\"#const OBBRIDGE_MIN_VERSION = \\\"$(cat package.json | json 'devDependencies.@aidenlx/obsidian-bridge')\\\"#\" src/misc.ts",
+        "sed -i '' -E -e \"s#const OBBRIDGE_MIN_VERSION = \\\"[0-9.]+\\\"#const OBBRIDGE_MIN_VERSION = \\\"$(cat package.json | json 'devDependencies.@aidenlx/obsidian-bridge' | cut -d'^' -f2)\\\"#\" src/misc.ts",
         "git add .",
         "npm run build"
       ],
