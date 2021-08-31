@@ -88,6 +88,7 @@ export default abstract class Template<
     partials?: Parameters<typeof Mustache.render>[2],
   ) => Mustache.render(template, view, partials, mustacheConfig);
   abstract render(body: ReturnBody, tplName: string): Promise<string> | string;
+  abstract prerender(body: ReturnBody, tplName: string): string;
 }
 
 const mustacheConfig = { escape: (text: string) => text };

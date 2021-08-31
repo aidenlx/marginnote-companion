@@ -1,33 +1,43 @@
+import { DataType } from "@aidenlx/obsidian-bridge";
+
 interface TemplateCfg<T extends string> {
-  templates: Record<T, string>;
+  templates: Record<T, TplValue>;
   pin: boolean;
 }
-interface KeyTplParamsMap {
+interface TypeTplParamsMap {
   sel: "sel";
   note: "body" | "comment" | "cmt_linked";
   toc: "item";
 }
-interface KeyExtParamsMap {
+export type TplParam<K extends TplCfgTypes> = Record<
+  TypeTplParamsMap[K],
+  TplValue
+>;
+export type TplValue = string;
+
+interface TypeExtParamsMap {
   sel: {};
   note: {};
   toc: {};
 }
+export type ExtParams<K extends TplCfgTypes> = TypeExtParamsMap[K] &
+  Omit<TemplateCfg<string>, "templates">;
 
-export type TplKeys = keyof KeyTplParamsMap;
-type TplRec<K extends TplKeys> = TemplateCfg<KeyTplParamsMap[K]> &
-  KeyExtParamsMap[K];
-type toExport<K extends TplKeys> = {
+export type TplCfgTypes = DataType;
+type TplCfgRec<K extends TplCfgTypes> = TemplateCfg<TypeTplParamsMap[K]> &
+  TypeExtParamsMap[K];
+export type TplCfgRecs =
+  | TplCfgRec<"toc">
+  | TplCfgRec<"sel">
+  | TplCfgRec<"note">;
+type toExport<K extends TplCfgTypes> = {
   src: {
-    [Key in K]: Map<string, TplRec<K>>;
+    [Key in K]: Map<string, TplCfgRec<K>>;
   };
   json: {
-    [Key in K]: Record<string, TplRec<K>>;
+    [Key in K]: Record<string, TplCfgRec<K>>;
   };
 };
 
-export type TplParam<K extends TplKeys> = Record<KeyTplParamsMap[K], string>;
-export type ExtParam<K extends TplKeys> = KeyExtParamsMap[K] &
-  Omit<TemplateCfg<string>, "templates">;
-export type TemplateSettings = toExport<"sel"> &
-  toExport<"note"> &
-  toExport<"toc">;
+type TemplateSettings = toExport<"sel"> & toExport<"note"> & toExport<"toc">;
+export default TemplateSettings;

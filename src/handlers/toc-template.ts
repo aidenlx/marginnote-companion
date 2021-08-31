@@ -16,7 +16,7 @@ export class TocTemplate extends Template<"toc"> {
   constructor(plugin: MNComp) {
     super(plugin, "toc");
   }
-  render(body: ReturnBody_Toc, tplName: string): string {
+  prerender(body: ReturnBody_Toc, tplName: string): string {
     const templates = this.getTemplate(tplName);
     if (!templates) throw new Error("No template found for key " + tplName);
 
@@ -48,6 +48,9 @@ export class TocTemplate extends Template<"toc"> {
     };
 
     return iterate(toc);
+  }
+  render(...args: Parameters<TocTemplate["prerender"]>): string {
+    return this.prerender(...args);
   }
 }
 

@@ -1,10 +1,11 @@
 import { ReturnBody, ReturnBody_Note } from "@aidenlx/obsidian-bridge";
 import assertNever from "assert-never";
 import equal from "fast-deep-equal/es6";
-import { EditorPosition, Loc, MarkdownView } from "obsidian";
+import { EditorPosition, Loc, MarkdownView, Notice } from "obsidian";
 
 import { FindLine, InsertToCursor } from "../cm-tools";
 import MNComp from "../mn-main";
+import { TplCfgTypes } from "../typings/tpl-cfg";
 import { getLink, Link } from "./basic";
 import { addToFrontmatter, getFrontmatterRange } from "./frontmatter";
 import NoteTemplate, { getTitleAliases } from "./note-template";
@@ -72,6 +73,47 @@ export default class MNDataHandler {
     // resume cursor
     if (!equal(cursor, editor.getCursor)) editor.setCursor(cursor);
   };
+
+  async previewWith(
+    type: TplCfgTypes,
+    tplName: string,
+    body?: ReturnBody,
+  ): Promise<string | null> {
+    if (!body) {
+      const val = await this.readFromInput();
+      if (!val) {
+        new Notice("No MNData available for preview");
+        return null;
+      } else {
+        body = val;
+      }
+    }
+    try {
+      let rendered: string;
+      if (type !== body.type) {
+        new Notice(`${type} cannot be used on ${body.type} MNData`);
+        return null;
+      }
+      switch (body.type) {
+        case "sel":
+          rendered = this.sel.prerender(body, tplName);
+          break;
+        case "note":
+          rendered = this.note.prerender(body, tplName);
+          break;
+        case "toc":
+          rendered = this.toc.prerender(body, tplName);
+          break;
+        default:
+          assertNever(body);
+      }
+      return rendered;
+    } catch (error) {
+      new Notice(error);
+      return null;
+    }
+  }
+
   async insertToNote(
     view?: MarkdownView,
     body?: ReturnBody,

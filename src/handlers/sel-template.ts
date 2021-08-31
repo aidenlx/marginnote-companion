@@ -13,7 +13,7 @@ export default class SelTemplate extends Template<"sel"> {
   constructor(plugin: MNComp) {
     super(plugin, "sel");
   }
-  render(body: ReturnBody_Sel, tplName: string): string {
+  prerender(body: ReturnBody_Sel, tplName: string): string {
     const templates = this.getTemplate(tplName);
     if (!templates) throw new Error("No template found for key " + tplName);
 
@@ -24,5 +24,8 @@ export default class SelTemplate extends Template<"sel"> {
         DocTitle: book?.docTitle,
       };
     return this.renderTemplate(templates.sel, view);
+  }
+  render(...args: Parameters<SelTemplate["prerender"]>): string {
+    return this.prerender(...args);
   }
 }

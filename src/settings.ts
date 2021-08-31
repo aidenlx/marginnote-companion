@@ -1,8 +1,7 @@
 import MNComp from "./mn-main";
-import {
-  ExtParam,
-  TemplateSettings,
-  TplKeys,
+import TemplateSettings, {
+  ExtParams,
+  TplCfgTypes,
   TplParam,
 } from "./typings/tpl-cfg";
 
@@ -31,9 +30,9 @@ interface PatchJSON {
   templates: TemplateSettings;
 }
 
-const getDefault = <T extends TplKeys>(
+const getDefault = <T extends TplCfgTypes>(
   templates: TplParam<T>,
-  extra: ExtParam<T>,
+  extra: ExtParams<T>,
 ) => new Map([["default", { templates, ...extra }]]);
 
 export const DEFAULT_SETTINGS: MNCompSettings = {
@@ -50,7 +49,7 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     [/[“”„‟〝〞〟＂]/g, '"'],
   ],
   templates: {
-    sel: getDefault<"sel">({ sel: "{{SELECTION}}" }, { pin: false }),
+    sel: getDefault<"sel">({ sel: "{{Selection}}" }, { pin: false }),
     note: getDefault<"note">(
       {
         body: "\n{{#Title}}\n## {{.}}\n\n{{/Title}}{{Excerpt}}{{Link}}{{> CmtBreak}}{{> Comments}}\n",

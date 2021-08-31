@@ -137,14 +137,11 @@ export default class NoteTemplate extends Template<"note"> {
     };
   }
 
-  /**
-   * @param refCallback if not given, insert refSource to bottom of rendered text
-   */
-  async render(
+  prerender(
     body: ReturnBody_Note,
     tplName: string,
     refCallback?: (refSource: string) => any,
-  ): Promise<string> {
+  ): string {
     const templates = this.getTemplate(tplName);
     if (!templates) throw new Error("No template found for key " + tplName);
 
@@ -175,7 +172,13 @@ export default class NoteTemplate extends Template<"note"> {
     if (refSource) {
       rendered += Link.getToInsertLast(rendered, refSource);
     }
-    return this.importAttachments(rendered, body);
+    return rendered;
+  }
+  /**
+   * @param refCallback if not given, insert refSource to bottom of rendered text
+   */
+  render(...args: Parameters<NoteTemplate["prerender"]>): Promise<string> {
+    return this.importAttachments(this.prerender(...args), args[0]);
   }
 
   /** get placeholder for media in excerpt */

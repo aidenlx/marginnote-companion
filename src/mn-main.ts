@@ -32,7 +32,7 @@ export default class MNComp extends Plugin {
     console.log("loading marginnote-companion");
 
     await this.loadSettings();
-    this.addSettingTab(new MNCompSettingTab(this.app, this));
+    this.addSettingTab(new MNCompSettingTab(this));
 
     // register mn note handlers
     this.registerCodeMirror((cm) => cm.on("paste", this.PastedNoteHandler));
