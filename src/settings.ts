@@ -1,16 +1,13 @@
 import MNComp from "./mn-main";
+import {
+  ExtParam,
+  TemplateSettings,
+  TplKeys,
+  TplParam,
+} from "./typings/tpl-cfg";
 
 export type MNCompSettings = {
   defaultDateFormat: string;
-  templates: {
-    selection: string;
-    note: {
-      body: string;
-      comment: string;
-      cmt_linked: string;
-    };
-    tocItem: string;
-  };
 } & {
   [K in keyof PatchJSON]: PatchJSON[K]["src"];
 };
@@ -31,7 +28,13 @@ interface PatchJSON {
     src: Map<string, VideoMapInfo>;
     json: Record<string, VideoMapInfo>;
   };
+  templates: TemplateSettings;
 }
+
+const getDefault = <T extends TplKeys>(
+  templates: TplParam<T>,
+  extra: ExtParam<T>,
+) => new Map([["default", { templates, ...extra }]]);
 
 export const DEFAULT_SETTINGS: MNCompSettings = {
   defaultDateFormat: "YY-MM-DD HH:mm",
@@ -47,13 +50,21 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     [/[“”„‟〝〞〟＂]/g, '"'],
   ],
   templates: {
-    selection: "{{SELECTION}}",
-    note: {
-      body: "\n{{#Title}}\n## {{.}}\n\n{{/Title}}{{Excerpt}}{{Link}}{{> CmtBreak}}{{> Comments}}\n",
-      comment: "> - {{.}}\n",
-      cmt_linked: "> - {{Excerpt}}{{Link}}\n",
-    },
-    tocItem: `- {{Title}} [{{DocTitle}}]({{Link.Url}} "#{{#Page}}{{.}}&{{/Page}}{{#DocMd5}}md5={{.}}{{/DocMd5}}")`,
+    sel: getDefault<"sel">({ sel: "{{SELECTION}}" }, { pin: false }),
+    note: getDefault<"note">(
+      {
+        body: "\n{{#Title}}\n## {{.}}\n\n{{/Title}}{{Excerpt}}{{Link}}{{> CmtBreak}}{{> Comments}}\n",
+        comment: "> - {{.}}\n",
+        cmt_linked: "> - {{Excerpt}}{{Link}}\n",
+      },
+      { pin: false },
+    ),
+    toc: getDefault<"toc">(
+      {
+        item: `- {{Title}} [{{DocTitle}}]({{Link.Url}} "#{{#Page}}{{.}}&{{/Page}}{{#DocMd5}}md5={{.}}{{/DocMd5}}")`,
+      },
+      { pin: false },
+    ),
   },
   videoMap: new Map() as any,
 };
@@ -103,14 +114,36 @@ const cvtFunc: {
     toJSON: (src) => Object.fromEntries(src),
     fromJSON: (json) => new Map(Object.entries(json)),
   },
+  templates: {
+    toJSON: (src) => {
+      let newObj = {} as any;
+      for (const k of Object.keys(src)) {
+        const key = k as keyof typeof src;
+        if (src[key] instanceof Map) {
+          newObj[key] = Object.fromEntries(src[key]);
+        }
+      }
+      return newObj;
+    },
+    fromJSON: (json) => {
+      let newObj = {} as any;
+      for (const k of Object.keys(json)) {
+        const key = k as keyof typeof json;
+        newObj[key] = new Map(Object.entries(json[key]));
+      }
+      return newObj;
+    },
+  },
 };
 
 export async function loadSettings(this: MNComp) {
   let json = await this.loadData();
-  for (const k in cvtFunc) {
-    const key = k as keyof typeof cvtFunc,
-      { fromJSON } = cvtFunc[key];
-    if (json[key]) json[key] = fromJSON(json[key]);
+  if (json) {
+    for (const k in cvtFunc) {
+      const key = k as keyof typeof cvtFunc,
+        { fromJSON } = cvtFunc[key];
+      if (json[key]) json[key] = fromJSON(json[key]);
+    }
   }
   this.settings = { ...this.settings, ...json };
 }

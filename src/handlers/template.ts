@@ -5,6 +5,7 @@ import { MarkdownView, TFile } from "obsidian";
 
 import MNComp from "../mn-main";
 import { MNCompSettings } from "../settings";
+import { TplParam } from "../typings/tpl-cfg";
 import { getText } from "./basic";
 
 export type PHValMap<T extends string> = Record<T, string | undefined>;
@@ -13,8 +14,11 @@ export default abstract class Template<
   T extends keyof MNCompSettings["templates"],
 > {
   constructor(protected plugin: MNComp, private templateKey: T) {}
-  protected get template() {
+  protected get tplCfg() {
     return this.plugin.settings.templates[this.templateKey];
+  }
+  protected getTemplate(name: string) {
+    return this.tplCfg.get(name)?.templates as TplParam<T> | undefined;
   }
 
   protected get settings() {
@@ -83,7 +87,7 @@ export default abstract class Template<
     view: V,
     partials?: Parameters<typeof Mustache.render>[2],
   ) => Mustache.render(template, view, partials, mustacheConfig);
-  abstract render(body: ReturnBody): Promise<string> | string;
+  abstract render(body: ReturnBody, tplName: string): Promise<string> | string;
 }
 
 const mustacheConfig = { escape: (text: string) => text };

@@ -142,8 +142,12 @@ export default class NoteTemplate extends Template<"note"> {
    */
   async render(
     body: ReturnBody_Note,
+    tplName: string,
     refCallback?: (refSource: string) => any,
   ): Promise<string> {
+    const templates = this.getTemplate(tplName);
+    if (!templates) throw new Error("No template found for key " + tplName);
+
     const { bookMap, mediaMap } = body;
     let refSource = "";
     refCallback = refCallback ?? ((ref: string) => (refSource = ref));
@@ -155,14 +159,14 @@ export default class NoteTemplate extends Template<"note"> {
       parital: Partials = {
         Comments:
           "{{#Comments}}" +
-          `{{#isRegular}}${this.template.comment}{{/isRegular}}` +
-          `{{^isRegular}}${this.template.cmt_linked}{{/isRegular}}` +
+          `{{#isRegular}}${templates.comment}{{/isRegular}}` +
+          `{{^isRegular}}${templates.cmt_linked}{{/isRegular}}` +
           "{{/Comments}}",
         CmtBreak: "{{#Comments.length}}\n\n\n{{/Comments.length}}",
       };
     let rendered: string;
     try {
-      rendered = this.renderTemplate(this.template.body, view, parital);
+      rendered = this.renderTemplate(templates.body, view, parital);
     } catch (error) {
       error = "Failed to render template: " + error;
       new Notice(error);

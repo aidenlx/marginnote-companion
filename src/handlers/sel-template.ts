@@ -9,17 +9,20 @@ import Template, { PHValMap } from "./template";
 type SelRec = PHValMap<"FilePath" | "DocTitle"> &
   WithUndefined<{ Selection: Text }>;
 
-export default class SelTemplate extends Template<"selection"> {
+export default class SelTemplate extends Template<"sel"> {
   constructor(plugin: MNComp) {
-    super(plugin, "selection");
+    super(plugin, "sel");
   }
-  render(body: ReturnBody_Sel): string {
+  render(body: ReturnBody_Sel, tplName: string): string {
+    const templates = this.getTemplate(tplName);
+    if (!templates) throw new Error("No template found for key " + tplName);
+
     const { sel, book } = body.data,
       view: SelRec = {
         Selection: this.getText(sel),
         FilePath: book?.pathFile,
         DocTitle: book?.docTitle,
       };
-    return this.renderTemplate(this.template, view);
+    return this.renderTemplate(templates.sel, view);
   }
 }

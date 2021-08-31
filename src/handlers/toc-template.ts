@@ -8,15 +8,18 @@ import Template, { PHValMap } from "./template";
 type TocRec = PHValMap<"Title" | "FilePath" | "DocTitle" | "DocMd5" | "Page"> &
   WithUndefined<{ Link: Link }>;
 
-export class TocTemplate extends Template<"tocItem"> {
+export class TocTemplate extends Template<"toc"> {
   private get indent(): string {
     const indentChar = this.vault.getConfig("useTab") ? "\t" : " ";
     return indentChar.repeat(this.vault.getConfig("tabSize"));
   }
   constructor(plugin: MNComp) {
-    super(plugin, "tocItem");
+    super(plugin, "toc");
   }
-  render(body: ReturnBody_Toc): string {
+  render(body: ReturnBody_Toc, tplName: string): string {
+    const templates = this.getTemplate(tplName);
+    if (!templates) throw new Error("No template found for key " + tplName);
+
     const indent = this.indent,
       val = localStorage.language,
       lang =
@@ -29,7 +32,7 @@ export class TocTemplate extends Template<"tocItem"> {
         { noteId: id, noteTitle: Title, childNotes } = toc,
         DocMd5 = Page ? toc.docMd5 : undefined,
         docInfo = DocMd5 ? bookMap[DocMd5] : null;
-      const rendered = this.renderTemplate<TocRec>(this.template, {
+      const rendered = this.renderTemplate<TocRec>(templates.item, {
           Title,
           DocMd5,
           DocTitle: docInfo?.docTitle,

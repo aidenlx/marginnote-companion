@@ -98,13 +98,13 @@ export default class MNDataHandler {
       let template: string;
       switch (body.type) {
         case "sel":
-          template = this.sel.render(body);
+          template = this.sel.render(body, "default");
           break;
         case "note":
-          template = await this.note.render(body, refCallback);
+          template = await this.note.render(body, "default", refCallback);
           break;
         case "toc":
-          template = this.toc.render(body);
+          template = this.toc.render(body, "default");
           break;
         default:
           assertNever(body);
