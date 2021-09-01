@@ -1,5 +1,6 @@
 import "obsidian";
 
+import { i18n } from "i18next";
 declare module "obsidian" {
   interface App {
     isMobile: boolean;
@@ -14,4 +15,8 @@ declare module "obsidian" {
     getConfig(key: "tabSize"): number;
     getConfig(key: string): any;
   }
+}
+
+declare global {
+  const i18next: i18n;
 }
