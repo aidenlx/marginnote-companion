@@ -9,9 +9,9 @@ import assertNever from "assert-never";
 import { Notice } from "obsidian";
 import replaceAsync from "string-replace-async";
 
+import AddNewVideo from "../handlers/add-new-video";
 import { WithUndefined } from "../misc";
 import MNComp from "../mn-main";
-import AddNewVideo from "./add-new-video";
 import { Comment, Excerpt, getLink, Link } from "./basic";
 import Template, { PHValMap } from "./template";
 

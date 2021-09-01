@@ -8,7 +8,7 @@ import Template, { PHValMap } from "./template";
 type TocRec = PHValMap<"Title" | "FilePath" | "DocTitle" | "DocMd5" | "Page"> &
   WithUndefined<{ Link: Link }>;
 
-export class TocTemplate extends Template<"toc"> {
+export default class TocTemplate extends Template<"toc"> {
   private get indent(): string {
     const indentChar = this.vault.getConfig("useTab") ? "\t" : " ";
     return indentChar.repeat(this.vault.getConfig("tabSize"));

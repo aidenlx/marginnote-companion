@@ -5,12 +5,12 @@ import { EditorPosition, Loc, MarkdownView, Notice } from "obsidian";
 
 import { FindLine, InsertToCursor } from "../cm-tools";
 import MNComp from "../mn-main";
+import { getLink, Link } from "../template/basic";
+import NoteTemplate, { getTitleAliases } from "../template/note-template";
+import SelTemplate from "../template/sel-template";
+import TocTemplate from "../template/toc-template";
 import { TplCfgTypes } from "../typings/tpl-cfg";
-import { getLink, Link } from "./basic";
 import { addToFrontmatter, getFrontmatterRange } from "./frontmatter";
-import NoteTemplate, { getTitleAliases } from "./note-template";
-import SelTemplate from "./sel-template";
-import { TocTemplate } from "./toc-template";
 
 export const enum InsertNoteResult {
   NoMDView = -1,
