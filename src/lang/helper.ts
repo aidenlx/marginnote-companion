@@ -41,7 +41,42 @@ export type TFunction = <
 >(
   p: DeepKeys<DictConst, S>,
   options?: I,
-) => Keys<Return> extends never ? ReturnRaw : ReturnIP;
+) => Interpolate<Return, I> extends never ? ReturnRaw : ReturnIP;
+
+export type TFunctionFull = <
+  P extends DeepKeysFull<DictConst>,
+  ReturnRaw extends GetDictValueFull<P, DictConst>,
+  Return extends ReturnRaw extends string ? ReturnRaw : "",
+  I extends Record<Keys<Return>[number], string>,
+  ReturnIP extends Interpolate<Return, I>,
+>(
+  p: P,
+  options?: I,
+) => Interpolate<Return, I> extends never ? ReturnRaw : ReturnIP;
+
+type GetDictValueFull<T extends string, O> = T extends `${infer A}.${infer B}`
+  ? A extends keyof O
+    ? GetDictValueFull<B, O[A]>
+    : never
+  : T extends keyof O
+  ? O[T]
+  : never;
+
+type DeepKeysFull<T> = T extends object
+  ? {
+      [K in keyof T]-?:
+        | `${K & string}`
+        | Concat<K & string, DeepKeysFull<T[K]>>;
+    }[keyof T]
+  : "";
+
+type DeepLeafKeys<T> = T extends object
+  ? { [K in keyof T]-?: Concat<K & string, DeepKeysFull<T[K]>> }[keyof T]
+  : "";
+
+type Concat<K extends string, P extends string> = `${K}${"" extends P
+  ? ""
+  : "."}${P}`;
 
 type GetDictValue<T extends string, O> = T extends `${infer A}.${infer B}`
   ? A extends keyof O
@@ -68,7 +103,7 @@ type Keys<S extends string> = S extends ""
   ? []
   : S extends `${infer _}{{${infer B}}}${infer C}`
   ? [B, ...Keys<C>]
-  : never;
+  : [];
 
 // substitutes placeholder variables with input values
 type Interpolate<
@@ -78,7 +113,7 @@ type Interpolate<
   ? ""
   : S extends `${infer A}{{${infer B}}}${infer C}`
   ? `${A}${I[Extract<B, keyof I>]}${Interpolate<C, I>}`
-  : never;
+  : S;
 
 // Example
 // type Dict = { key: "yeah, {{what}} is {{how}}" };
