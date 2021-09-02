@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "cross-env BUILD=dev node esbuild.js",
     "build": "cross-env BUILD=production node esbuild.js",
+    "check": "tsc --noEmit",
     "prettier": "prettier --write 'src/**/*.+(ts|tsx|json|html|css)'",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "release": "release-it"
@@ -14,7 +15,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@aidenlx/obsidian-bridge": "^2.4.0",
+    "@aidenlx/obsidian-bridge": "^3.0.0",
     "@jsonurl/jsonurl": "^1.1.4",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^3.3.0",
@@ -43,7 +44,6 @@
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
     "esbuild": "^0.12.24",
-    "esbuild-plugin-path-alias": "^1.0.3",
     "escape-string-regexp": "^5.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",

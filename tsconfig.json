@@ -14,10 +14,10 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "lib": ["dom", "es5", "scripthost", "es2020"]
+    "lib": ["dom", "es5", "scripthost", "es2020"],
+    "paths": {
+      "assets/*": ["../assets/*"]
+    }
   },
   "include": ["src/**/*"],
-  "paths": {
-    "assets": ["assets/**/*"]
-  }
 }
