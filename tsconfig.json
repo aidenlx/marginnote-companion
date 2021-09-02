@@ -16,5 +16,8 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["dom", "es5", "scripthost", "es2020"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "paths": {
+    "assets": ["assets/**/*"]
+  }
 }

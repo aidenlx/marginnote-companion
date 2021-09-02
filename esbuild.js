@@ -44,6 +44,7 @@ const isProd = process.env.BUILD === "production";
       format: "cjs",
       mainFields: ["browser", "module", "main"],
       banner: { js: banner },
+      loader: { ".svg": "text" },
       sourcemap: isProd ? false : "inline",
       minify: isProd,
       define: {

@@ -1,6 +1,6 @@
 import "./main.css";
 
-import { Plugin } from "obsidian";
+import { addIcon, Plugin } from "obsidian";
 import { MNCompSettingTab } from "setting-tab";
 import {
   DEFAULT_SETTINGS,
@@ -17,6 +17,7 @@ import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { autoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
 import { getPastedHandler } from "./receivers/paste-hanlder";
+import icons from "./icons";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
@@ -33,6 +34,7 @@ export default class MNComp extends Plugin {
 
   async onload() {
     console.log("loading marginnote-companion");
+    icons.forEach((params) => addIcon(...params));
 
     await this.loadSettings();
     this.addSettingTab(new MNCompSettingTab(this));

@@ -9,7 +9,7 @@ module.exports = {
     "prettier",
     "plugin:prettier/recommended",
     "plugin:react-hooks/recommended",
-  ],
+    "plugin:import/typescript",
   env: {
     browser: true,
     node: true,
