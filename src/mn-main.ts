@@ -1,6 +1,6 @@
 import "./main.css";
 
-import { addIcon, Plugin } from "obsidian";
+import { addIcon, MarkdownView, Menu, Plugin } from "obsidian";
 import { MNCompSettingTab } from "setting-tab";
 import {
   DEFAULT_SETTINGS,
@@ -44,6 +44,7 @@ export default class MNComp extends Plugin {
     this.register(() =>
       this.registerCodeMirror((cm) => cm.off("paste", this.PastedNoteHandler)),
     );
+    this.registerEditorMenu();
     autoPaste(this);
     this.addCommand({
       id: "getMeta",
@@ -64,5 +65,46 @@ export default class MNComp extends Plugin {
       else if (params.version)
         this.inputListener.trigger("url-recieved", params);
     });
+  }
+
+  registerEditorMenu() {
+    const onEditorMenu = async (
+      menu: Menu,
+      _editor: any,
+      view: MarkdownView,
+    ) => {
+      const data = await this.inputListener.readFromInput();
+
+      if (!data) return;
+      const templates = this.settings.templates[data.type],
+        getOnClick = (tpl: string) => () =>
+          this.mnHandler.insertToNote(view, data, tpl);
+      let subMenu = new Menu(this.app),
+        hasSub = false;
+      for (const [name, tpl] of templates) {
+        if (tpl.pin) {
+          menu.addItem((item) =>
+            item
+              .setTitle(`${data.type}: ${name}`)
+              .setIcon("mn-fill")
+              .onClick(getOnClick(name)),
+          );
+        } else {
+          hasSub || (hasSub = true);
+          subMenu.addItem((item) => {
+            item.setTitle(`${name}`).onClick(getOnClick(name));
+            item.iconEl.parentElement?.removeChild(item.iconEl);
+          });
+        }
+      }
+      if (hasSub)
+        menu.addItem((item) =>
+          item
+            .setTitle(`${data.type}: ...`)
+            .setIcon("mn-fill")
+            .onClick((evt) => subMenu.showAtMouseEvent(evt)),
+        );
+    };
+    this.registerEvent(this.app.workspace.on("editor-menu", onEditorMenu));
   }
 }

@@ -117,6 +117,7 @@ export default class MNDataHandler {
   async insertToNote(
     view?: MarkdownView,
     body?: ReturnBody,
+    tplName = "default",
     refSourceToBottom = true,
   ): Promise<InsertNoteResult> {
     if (!view) {
@@ -140,13 +141,13 @@ export default class MNDataHandler {
       let template: string;
       switch (body.type) {
         case "sel":
-          template = this.sel.render(body, "default");
+          template = this.sel.render(body, tplName);
           break;
         case "note":
-          template = await this.note.render(body, "default", refCallback);
+          template = await this.note.render(body, tplName, refCallback);
           break;
         case "toc":
-          template = this.toc.render(body, "default");
+          template = this.toc.render(body, tplName);
           break;
         default:
           assertNever(body);

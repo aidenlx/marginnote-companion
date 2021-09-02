@@ -2,6 +2,9 @@ import "obsidian";
 
 import { i18n } from "i18next";
 declare module "obsidian" {
+  interface MenuItem {
+    iconEl: HTMLDivElement;
+  }
   interface App {
     isMobile: boolean;
   }
