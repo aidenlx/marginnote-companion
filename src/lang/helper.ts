@@ -14,7 +14,7 @@ export default i18next.createInstance(
     fallbackLng: "en",
     ns: ["default"],
     defaultNS: "default",
-    interpolation: { escapeValue: true },
+    interpolation: { escapeValue: true, skipOnVariables: true },
     // debug: true,
     resources,
   },

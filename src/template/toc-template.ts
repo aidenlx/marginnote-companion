@@ -3,10 +3,19 @@ import { ReturnBody_Toc, Toc } from "@aidenlx/obsidian-bridge";
 import { WithUndefined } from "../misc";
 import MNComp from "../mn-main";
 import { getLink, Link } from "./basic";
-import Template, { PHValMap } from "./template";
+import Template, { getViewKeys, PHValMap } from "./template";
 
 type TocRec = PHValMap<"Title" | "FilePath" | "DocTitle" | "DocMd5" | "Page"> &
   WithUndefined<{ Link: Link }>;
+
+export const TocViewKeys = getViewKeys<keyof TocRec>({
+  Title: null,
+  FilePath: null,
+  DocTitle: null,
+  DocMd5: null,
+  Page: null,
+  Link: null,
+});
 
 export default class TocTemplate extends Template<"toc"> {
   private get indent(): string {

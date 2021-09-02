@@ -1,7 +1,7 @@
+import { unescape } from "html-escaper";
+
 export const OBBRIDGE_MIN_VERSION = "2.4.0";
-
 export const trimEmpty = (str: string) => str.replace(/^\s+|\s+$/g, "");
-
 export const ChsRegex = /[\u4e00-\u9fa5]/g;
 
 // Range as Number type <https://github.com/microsoft/TypeScript/issues/15480>
@@ -25,9 +25,18 @@ export type Range<FROM extends number, TO extends number> = Exclude<
   Enumerate<FROM>
 >;
 
+export type filterKeyWithType<O, F> = {
+  [K in keyof O]: O[K] extends F ? K : never;
+}[keyof O];
+
 export type WithUndefined<T> = {
   [K in keyof T]: T[K] | undefined;
 };
+
+type NonTypePropNames<T, Target> = {
+  [K in NonNullable<keyof T>]: T[K] extends Target ? never : K;
+}[NonNullable<keyof T>];
+export type NonTypeProps<T, Target> = Pick<T, NonTypePropNames<T, Target>>;
 
 export const findLast = <T>(
   array: Array<T> | undefined,
@@ -40,3 +49,11 @@ export const findLast = <T>(
   }
   return null;
 };
+
+export const strToFragment = (str: string) =>
+  createFragment((el) =>
+    str.split("\n").forEach((line, i, arr) => {
+      el.appendText(unescape(line));
+      if (i < arr.length - 1) el.createEl("br");
+    }),
+  );

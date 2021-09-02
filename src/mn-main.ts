@@ -12,12 +12,12 @@ import {
 import { aliasBelowH1 } from "./controls/alias-below-h1";
 import { addSourceButton } from "./controls/source-button";
 import MNDataHandler from "./handlers/mn-data-handler";
+import icons from "./icons";
 import i18n from "./lang/helper";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { autoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
 import { getPastedHandler } from "./receivers/paste-hanlder";
-import icons from "./icons";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
@@ -77,22 +77,22 @@ export default class MNComp extends Plugin {
 
       if (!data) return;
       const templates = this.settings.templates[data.type],
-        getOnClick = (tpl: string) => () =>
+        getClickHandler = (tpl: string) => () =>
           this.mnHandler.insertToNote(view, data, tpl);
       let subMenu = new Menu(this.app),
         hasSub = false;
-      for (const [name, tpl] of templates) {
+      for (const [name, tpl] of templates.cfgs) {
         if (tpl.pin) {
           menu.addItem((item) =>
             item
               .setTitle(`${data.type}: ${name}`)
               .setIcon("mn-fill")
-              .onClick(getOnClick(name)),
+              .onClick(getClickHandler(name)),
           );
         } else {
           hasSub || (hasSub = true);
           subMenu.addItem((item) => {
-            item.setTitle(`${name}`).onClick(getOnClick(name));
+            item.setTitle(`${name}`).onClick(getClickHandler(name));
             item.iconEl.parentElement?.removeChild(item.iconEl);
           });
         }

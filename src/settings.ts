@@ -1,8 +1,10 @@
+import { cloneDeep } from "lodash-es";
+
 import MNComp from "./mn-main";
 import TemplateSettings, {
   ExtParams,
+  Templates,
   TplCfgTypes,
-  TplParam,
 } from "./typings/tpl-cfg";
 
 export type MNCompSettings = {
@@ -31,9 +33,12 @@ interface PatchJSON {
 }
 
 const getDefault = <T extends TplCfgTypes>(
-  templates: TplParam<T>,
+  templates: Templates<T>,
   extra: ExtParams<T>,
-) => new Map([["default", { templates, ...extra }]]);
+) => ({
+  cfgs: new Map([["default", { templates, ...extra }]]),
+  defaultTpl: "default",
+});
 
 export const DEFAULT_SETTINGS: MNCompSettings = {
   defaultDateFormat: "YY-MM-DD HH:mm",
@@ -49,20 +54,20 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     [/[“”„‟〝〞〟＂]/g, '"'],
   ],
   templates: {
-    sel: getDefault<"sel">({ sel: "{{Selection}}" }, { pin: false }),
+    sel: getDefault<"sel">({ sel: "{{Selection}}" }, { pin: true }),
     note: getDefault<"note">(
       {
         body: "\n{{#Title}}\n## {{.}}\n\n{{/Title}}{{Excerpt}}{{Link}}{{> CmtBreak}}{{> Comments}}\n",
         comment: "> - {{.}}\n",
         cmt_linked: "> - {{Excerpt}}{{Link}}\n",
       },
-      { pin: false },
+      { pin: true },
     ),
     toc: getDefault<"toc">(
       {
         item: `- {{Title}} [{{DocTitle}}]({{Link.Url}} "#{{#Page}}{{.}}&{{/Page}}{{#DocMd5}}md5={{.}}{{/DocMd5}}")`,
       },
-      { pin: false },
+      { pin: true },
     ),
   },
   videoMap: new Map() as any,
@@ -115,22 +120,33 @@ const cvtFunc: {
   },
   templates: {
     toJSON: (src) => {
-      let newObj = {} as any;
-      for (const k of Object.keys(src)) {
-        const key = k as keyof typeof src;
-        if (src[key] instanceof Map) {
-          newObj[key] = Object.fromEntries(src[key]);
+      let newObj = cloneDeep(src) as typeof src;
+      for (const t of Object.keys(src)) {
+        const cfgType = t as keyof typeof src;
+        for (const k of Object.keys(src[cfgType])) {
+          const entry = src[cfgType],
+            key = k as keyof typeof entry;
+          if (key === "cfgs") {
+            newObj[cfgType].cfgs = Object.fromEntries(src[cfgType].cfgs);
+          }
         }
       }
-      return newObj;
+      return newObj as any;
     },
     fromJSON: (json) => {
-      let newObj = {} as any;
-      for (const k of Object.keys(json)) {
-        const key = k as keyof typeof json;
-        newObj[key] = new Map(Object.entries(json[key]));
+      for (const t of Object.keys(json)) {
+        const cfgType = t as keyof typeof json;
+        for (const k of Object.keys(json[cfgType])) {
+          const entry = json[cfgType],
+            key = k as keyof typeof entry;
+          if (key === "cfgs") {
+            json[cfgType].cfgs = new Map(
+              Object.entries(json[cfgType].cfgs),
+            ) as any;
+          }
+        }
       }
-      return newObj;
+      return json as any;
     },
   },
 };

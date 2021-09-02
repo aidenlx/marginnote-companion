@@ -10,10 +10,10 @@ import { Notice } from "obsidian";
 import replaceAsync from "string-replace-async";
 
 import AddNewVideo from "../handlers/add-new-video";
-import { WithUndefined } from "../misc";
+import { NonTypeProps, WithUndefined } from "../misc";
 import MNComp from "../mn-main";
 import { Comment, Excerpt, getLink, Link } from "./basic";
-import Template, { PHValMap } from "./template";
+import Template, { getViewKeys, PHValMap } from "./template";
 
 type Partials = Record<"Comments" | "CmtBreak", string>;
 
@@ -34,14 +34,41 @@ type CommentRec =
   | Comment
   | { Excerpt: Excerpt | undefined; Link: Link | undefined };
 
+export const NoteViewKeys = {
+  partial: getViewKeys<keyof Partials>({
+    CmtBreak: null,
+    Comments: null,
+  }),
+  body: getViewKeys<Exclude<keyof BodyRec, "Comments">>({
+    Created: null,
+    Modified: null,
+    FilePath: null,
+    DocTitle: null,
+    RawTitle: null,
+    Title: null,
+    Aliases: null,
+    Link: null,
+    Excerpt: null,
+  }),
+  comment: getViewKeys<keyof Exclude<CommentRec, Comment>>({
+    Excerpt: null,
+    Link: null,
+  }),
+  cmt_linked: getViewKeys<keyof NonTypeProps<Comment, Function | boolean>>({
+    Process: null,
+    Text: null,
+    Media: null,
+    SrcLink: null,
+    Link: null,
+  }),
+};
+
 const isVideo = (
   pic: excerptPic | excerptPic_video | undefined,
 ): pic is excerptPic_video => !!(pic as excerptPic_video)?.video;
 const isPic = (
   pic: excerptPic | excerptPic_video | undefined,
 ): pic is excerptPic => !!pic && !(pic as excerptPic_video).video;
-const isLC_pic = (lc: linkComment): lc is linkComment_pic =>
-  (lc as linkComment_pic).q_hpic !== undefined;
 
 type timeSpan = [start: string | undefined, end: string | undefined];
 export default class NoteTemplate extends Template<"note"> {

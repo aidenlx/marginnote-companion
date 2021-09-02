@@ -5,20 +5,24 @@ import { MarkdownView, TFile } from "obsidian";
 
 import MNComp from "../mn-main";
 import { MNCompSettings } from "../settings";
-import { TplParam } from "../typings/tpl-cfg";
+import { Templates } from "../typings/tpl-cfg";
 import { getText } from "./basic";
 
 export type PHValMap<T extends string> = Record<T, string | undefined>;
+
+export const getViewKeys = <K extends string>(obj: Record<K, null>) => [
+  ...Object.keys(obj),
+];
 
 export default abstract class Template<
   T extends keyof MNCompSettings["templates"],
 > {
   constructor(protected plugin: MNComp, private templateKey: T) {}
   protected get tplCfg() {
-    return this.plugin.settings.templates[this.templateKey];
+    return this.plugin.settings.templates[this.templateKey].cfgs;
   }
   protected getTemplate(name: string) {
-    return this.tplCfg.get(name)?.templates as TplParam<T> | undefined;
+    return this.tplCfg.get(name)?.templates as Templates<T> | undefined;
   }
 
   protected get settings() {

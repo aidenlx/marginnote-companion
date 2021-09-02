@@ -117,7 +117,7 @@ export default class MNDataHandler {
   async insertToNote(
     view?: MarkdownView,
     body?: ReturnBody,
-    tplName = "default",
+    tplName?: string,
     refSourceToBottom = true,
   ): Promise<InsertNoteResult> {
     if (!view) {
@@ -139,6 +139,11 @@ export default class MNDataHandler {
     }
     try {
       let template: string;
+      if (!tplName) {
+        const { defaultTpl, cfgs } = this.settings.templates[body.type];
+        if (cfgs.has(defaultTpl)) tplName = defaultTpl;
+        else tplName = "default";
+      }
       switch (body.type) {
         case "sel":
           template = this.sel.render(body, tplName);

@@ -1,0 +1,29 @@
+.mn-settings .canwarp {
+  flex-wrap: wrap;
+}
+
+.mn-settings .tpl-entry {
+  border-radius: 5px;
+  border-bottom: 3px solid;
+  border-top: 3px solid;
+  padding-top: 20px;
+  margin: 10px 0;
+  padding-bottom: 6px;
+}
+
+.mn-settings summary.tpl-name > .setting-item {
+  display: inline-flex;
+  width: calc(100% - 20px);
+}
+
+.mn-settings .setting-item-name {
+  width: fit-content;
+}
+
+.mn-settings ul.horizontal-list {
+  padding: 0;
+}
+.mn-settings ul.horizontal-list li {
+  display: inline;
+  margin-right: 1em;
+}

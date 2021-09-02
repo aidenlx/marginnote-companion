@@ -3,11 +3,17 @@ import { ReturnBody_Sel } from "@aidenlx/obsidian-bridge";
 import { WithUndefined } from "../misc";
 import MNComp from "../mn-main";
 import { Text } from "./basic";
-import Template, { PHValMap } from "./template";
+import Template, { getViewKeys, PHValMap } from "./template";
 
 /** accepted placeholders */
 type SelRec = PHValMap<"FilePath" | "DocTitle"> &
   WithUndefined<{ Selection: Text }>;
+
+export const SelViewKeys = getViewKeys<keyof SelRec>({
+  FilePath: null,
+  DocTitle: null,
+  Selection: null,
+});
 
 export default class SelTemplate extends Template<"sel"> {
   constructor(plugin: MNComp) {
