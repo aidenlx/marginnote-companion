@@ -33,6 +33,8 @@ const copyManifest = {
 
 const isProd = process.env.BUILD === "production";
 
+const path = require('path');
+const aliasPlugin = require('esbuild-plugin-path-alias');
 (async () => {
   try {
     await build({
@@ -55,6 +57,10 @@ const isProd = process.env.BUILD === "production";
         // lessLoader({
         //   javascriptEnabled: true,
         // }),
+        aliasPlugin({
+          // must be absolute path
+          'assets': path.resolve(__dirname, './assets')
+        }),
         renamePlugin,
         copyManifest,
       ],
