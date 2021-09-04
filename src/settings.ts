@@ -65,7 +65,7 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     ),
     toc: getDefault<"toc">(
       {
-        item: `- {{Title}} [{{DocTitle}}]({{Link.Url}} "#{{#Page}}{{.}}&{{/Page}}{{#DocMd5}}md5={{.}}{{/DocMd5}}")`,
+        item: `- {{Summary}} {{Link}}`,
       },
       { pin: true },
     ),

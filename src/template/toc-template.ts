@@ -1,22 +1,27 @@
 import { ReturnBody_Toc, Toc } from "@aidenlx/obsidian-bridge";
+import { stringify } from "query-string";
 
-import { WithUndefined } from "../misc";
+import { AddForEachProp } from "../misc";
 import MNComp from "../mn-main";
 import { getLink, Link } from "./basic";
 import Template, { getViewKeys, PHValMap } from "./template";
 
-type TocRec = PHValMap<"Title" | "FilePath" | "DocTitle" | "DocMd5" | "Page"> &
-  WithUndefined<{ Link: Link }>;
+type TocRec = PHValMap<"FilePath" | "DocTitle" | "DocMd5"> &
+  AddForEachProp<{ Link: Link; Summary: TocItemSummary; Query: TocQuery }>;
 
 export const TocViewKeys = getViewKeys<keyof TocRec>({
-  Title: null,
   FilePath: null,
   DocTitle: null,
   DocMd5: null,
-  Page: null,
   Link: null,
+  Summary: null,
+  Query: null,
 });
 
+const val = localStorage.language,
+  lang =
+    typeof val === "string" && val.length >= 2 ? val.substring(0, 2) : "en",
+  comparator = new Intl.Collator(lang, { numeric: true }).compare;
 export default class TocTemplate extends Template<"toc"> {
   private get indent(): string {
     const indentChar = this.vault.getConfig("useTab") ? "\t" : " ";
@@ -30,32 +35,39 @@ export default class TocTemplate extends Template<"toc"> {
     if (!templates) throw new Error("No template found for key " + tplName);
 
     const indent = this.indent,
-      val = localStorage.language,
-      lang =
-        typeof val === "string" && val.length >= 2 ? val.substring(0, 2) : "en",
-      comparator = new Intl.Collator(lang, { numeric: true }).compare,
       { bookMap, data: toc } = body;
 
     const iterate = (toc: Toc, depth = 0): string => {
       const Page = toPage(toc),
-        { noteId: id, noteTitle: Title, childNotes } = toc,
+        {
+          noteId: id,
+          noteTitle: Title,
+          childNotes,
+          excerptText: Excerpt,
+          notesText: AllText,
+        } = toc,
         DocMd5 = Page ? toc.docMd5 : undefined,
-        docInfo = DocMd5 ? bookMap[DocMd5] : null;
+        { docTitle: DocTitle, pathFile: FilePath } =
+          bookMap[DocMd5 ?? ""] ?? {};
       const rendered = this.renderTemplate<TocRec>(templates.item, {
-          Title,
           DocMd5,
-          DocTitle: docInfo?.docTitle,
-          FilePath: docInfo?.pathFile,
+          DocTitle,
+          FilePath,
           Link: getLink({ id }),
-          Page,
+          Summary: new TocItemSummary(Title, Excerpt, AllText),
+          Query: new TocQuery({ Page, DocMd5, DocTitle, FilePath }),
         }),
         lines = childNotes
-          .sort((a, b) => comparator(a.noteTitle, b.noteTitle))
+          .sort((a, b) =>
+            comparator(
+              TocItemSummary.getSummary(a),
+              TocItemSummary.getSummary(b),
+            ),
+          )
           .map((t) => iterate(t, depth + 1));
       lines.unshift(indent.repeat(depth) + rendered);
       return lines.join("\n");
     };
-
     return iterate(toc);
   }
   render(...args: Parameters<TocTemplate["prerender"]>): string {
@@ -63,12 +75,86 @@ export default class TocTemplate extends Template<"toc"> {
   }
 }
 
-const toPage = (toc: Toc): string | undefined => {
+const toPage = (toc: Toc): number[] | undefined => {
   const { startPage: start, endPage: end } = toc;
-  if (start && end) return `page=${start}${start !== end ? "," + end : ""}`;
-  else if (start || end) return `page=${start ? start : end}`;
+  if (start && end) return [start, end];
+
+  const toExport = start ? start : end;
+  if (toExport) return [toExport];
   else return undefined;
 };
+
+export class TocItemSummary {
+  constructor(
+    public Title: string | undefined,
+    public Excerpt: string | undefined,
+    public AllText: string | undefined,
+  ) {}
+
+  toString(): string {
+    return this.Title ?? this.Excerpt ?? this.AllText ?? "";
+  }
+  static getSummary(toc: Toc) {
+    return toc.noteTitle ?? toc.excerptText ?? toc.notesText ?? "";
+  }
+}
+
+const QueryKeys = ["Page", "DocMd5", "DocTitle", "FilePath"] as const;
+type QueryObjRaw = AddForEachProp<
+  {
+    Page: number[];
+    DocMd5: string;
+    DocTitle: string;
+    FilePath: string;
+  },
+  undefined
+>;
+type QueryObj = Map<
+  keyof QueryObjRaw,
+  Exclude<QueryObjRaw[keyof QueryObjRaw], undefined>
+>;
+const qsConfig = { arrayFormat: "comma", sort: false } as const;
+
+export class TocQuery {
+  constructor(private raw: QueryObjRaw) {}
+  private queryObj: QueryObj = new Map();
+
+  private addToQuery(key: keyof QueryObjRaw) {
+    let rawVal;
+    (rawVal = this.raw[key]) && this.queryObj.set(key, rawVal);
+  }
+
+  get isEmpty(): boolean {
+    for (const v of Object.values(this.raw)) {
+      if (v !== undefined) return false;
+    }
+    return true;
+  }
+
+  get Page(): TocQuery {
+    this.addToQuery("Page");
+    return this;
+  }
+  get DocMd5(): TocQuery {
+    this.addToQuery("DocMd5");
+    return this;
+  }
+  get DocTitle(): TocQuery {
+    this.addToQuery("DocTitle");
+    return this;
+  }
+  get FilePath(): TocQuery {
+    this.addToQuery("FilePath");
+    return this;
+  }
+
+  toString(): string {
+    if (this.queryObj.size === 0) {
+      QueryKeys.forEach((k) => this.addToQuery(k));
+    }
+    return stringify(Object.fromEntries(this.queryObj), qsConfig);
+  }
+}
 
 // async function cmdOutlineHandler(plugin: MNComp): Promise<void> {
 //   console.log("called");

@@ -10,7 +10,7 @@ import { Notice } from "obsidian";
 import replaceAsync from "string-replace-async";
 
 import AddNewVideo from "../handlers/add-new-video";
-import { NonTypeProps, WithUndefined } from "../misc";
+import { AddForEachProp, NonTypeProps } from "../misc";
 import MNComp from "../mn-main";
 import { Comment, Excerpt, getLink, Link } from "./basic";
 import Template, { getViewKeys, PHValMap } from "./template";
@@ -21,7 +21,7 @@ type Partials = Record<"Comments" | "CmtBreak", string>;
  * for comments, use {{> Comments}}; for excerpt, use {{> Excerpt}}; for title with heading level, use {{Title.1}}
  */
 type BodyRec = PHValMap<"Created" | "Modified" | "FilePath" | "DocTitle"> &
-  WithUndefined<{
+  AddForEachProp<{
     Excerpt: Excerpt;
     Comments: CommentRec[];
     RawTitle: string;
@@ -192,9 +192,10 @@ export default class NoteTemplate extends Template<"note"> {
     try {
       rendered = this.renderTemplate(templates.body, view, parital);
     } catch (error) {
-      error = "Failed to render template: " + error;
-      new Notice(error);
-      throw new Error(error);
+      const message = JSON.stringify(error);
+      error = "Failed to render template: " + message;
+      new Notice(message);
+      throw new Error(message);
     }
     if (refSource) {
       rendered += Link.getToInsertLast(rendered, refSource);

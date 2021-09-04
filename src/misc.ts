@@ -29,8 +29,8 @@ export type filterKeyWithType<O, F> = {
   [K in keyof O]: O[K] extends F ? K : never;
 }[keyof O];
 
-export type WithUndefined<T> = {
-  [K in keyof T]: T[K] | undefined;
+export type AddForEachProp<T, A = undefined> = {
+  [K in keyof T]: T[K] | A;
 };
 
 type NonTypePropNames<T, Target> = {

@@ -43,7 +43,6 @@ export class MNCompSettingTab extends PluginSettingTab {
           el.appendChild(createEl("a", { href: "#" + id, text: heading })),
         );
       });
-    console.log(anchors);
     tplHeading.insertAdjacentElement(
       "afterend",
       createEl("ul", { cls: "horizontal-list" }, (el) =>

@@ -1,13 +1,13 @@
 import { ReturnBody_Sel } from "@aidenlx/obsidian-bridge";
 
-import { WithUndefined } from "../misc";
+import { AddForEachProp } from "../misc";
 import MNComp from "../mn-main";
 import { Text } from "./basic";
 import Template, { getViewKeys, PHValMap } from "./template";
 
 /** accepted placeholders */
 type SelRec = PHValMap<"FilePath" | "DocTitle"> &
-  WithUndefined<{ Selection: Text }>;
+  AddForEachProp<{ Selection: Text }>;
 
 export const SelViewKeys = getViewKeys<keyof SelRec>({
   FilePath: null,
