@@ -1,5 +1,12 @@
 const dict = {
   settings: {
+    general: {
+      heading: "General",
+      date_format_name: "Date-Time format",
+      date_format_desc:
+        "All time-related varibale in the template file will be rendered in this format",
+      check_details: "Check here for more details",
+    },
     tpl_cfg: {
       heading: "Templates",
       headings: {

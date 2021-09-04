@@ -32,17 +32,41 @@ export class MNCompSettingTab extends PluginSettingTab {
     containerEl.empty();
     this.containerEl.toggleClass("mn-settings", true);
 
+    containerEl.createEl("h2", {
+      text: this.t("settings.general.heading"),
+    });
+    new Setting(containerEl)
+      .setName(this.t("settings.general.date_format_name"))
+      .setDesc(
+        createFragment((el) => {
+          el.appendText(this.t("settings.general.date_format_desc"));
+          el.createEl("br");
+          el.createEl("a", {
+            text: this.t("settings.general.check_details"),
+            href: "https://momentjs.com/docs/#/displaying/format/",
+          });
+        }),
+      )
+      .addText((t) => t.setValue(this.plugin.settings.defaultDateFormat));
+    this.templates();
+  }
+
+  templates() {
+    const { containerEl } = this;
+
     const tplHeading = containerEl.createEl("h2", {
       text: this.t("settings.tpl_cfg.heading"),
     });
 
     const types = ["sel", "note", "toc"] as const,
       anchors = types.map((t) => {
-        const [id, heading] = this.TplSettings(t);
+        // display each section for different template types
+        const [id, heading] = this.tplCfg(t);
         return createEl("li", {}, (el) =>
           el.appendChild(createEl("a", { href: "#" + id, text: heading })),
         );
       });
+    // insert links to each section
     tplHeading.insertAdjacentElement(
       "afterend",
       createEl("ul", { cls: "horizontal-list" }, (el) =>
@@ -51,7 +75,7 @@ export class MNCompSettingTab extends PluginSettingTab {
     );
   }
 
-  TplSettings(type: TplCfgTypes): [id: string, heading: string] {
+  tplCfg(type: TplCfgTypes): [id: string, heading: string] {
     const { containerEl } = this,
       { cfgs: nameTplMap } = this.plugin.settings.templates[type],
       defaultVal = DEFAULT_SETTINGS.templates[type].cfgs.get("default"),

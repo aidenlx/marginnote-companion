@@ -2,6 +2,12 @@ import { Dict } from "./helper";
 
 const dict: Dict = {
   settings: {
+    general: {
+      heading: "一般设置",
+      date_format_name: "日期时间格式",
+      date_format_desc: "所有时间相关的变量都会使用该格式渲染日期时间",
+      check_details: "点此查阅更多",
+    },
     tpl_cfg: {
       heading: "模板配置",
       headings: {
