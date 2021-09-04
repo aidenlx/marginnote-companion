@@ -1,3 +1,5 @@
+import "./heading-alias.less";
+
 import {
   MarkdownPostProcessorContext,
   parseFrontMatterAliases,
@@ -11,7 +13,7 @@ export const aliasBelowH1 = (
   if (!heading) return;
 
   const aliases = parseFrontMatterAliases(ctx.frontmatter)?.map((v) => {
-    return createSpan({ cls: "heading-alias", text: v });
+    return createSpan({ text: v });
   });
   if (!aliases) return;
 
@@ -20,12 +22,9 @@ export const aliasBelowH1 = (
   // @ts-ignore
   heading.style = "border-bottom: 0;margin-bottom: 0;";
 
-  heading.parentElement.createDiv(
-    { cls: "heading-alias-container" },
-    (container) => {
-      for (const alias of aliases) {
-        container.appendChild(alias);
-      }
-    },
-  );
+  heading.parentElement.createDiv({ cls: "heading-alias" }, (container) => {
+    for (const alias of aliases) {
+      container.appendChild(alias);
+    }
+  });
 };

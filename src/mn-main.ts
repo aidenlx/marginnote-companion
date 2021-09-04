@@ -1,5 +1,3 @@
-import "./main.css";
-
 import { addIcon, MarkdownView, Menu, Plugin } from "obsidian";
 import { MNCompSettingTab } from "setting-tab";
 import {
@@ -9,7 +7,7 @@ import {
   saveSettings,
 } from "settings";
 
-import { aliasBelowH1 } from "./controls/alias-below-h1";
+import { aliasBelowH1 } from "./controls/heading-alias";
 import { addSourceButton } from "./controls/source-button";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";

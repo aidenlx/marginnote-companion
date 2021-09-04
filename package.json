@@ -44,6 +44,7 @@
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
     "esbuild": "^0.12.24",
+    "esbuild-plugin-less": "^1.1.0",
     "escape-string-regexp": "^5.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",

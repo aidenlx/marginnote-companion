@@ -1,6 +1,7 @@
-import { MarkdownView, Notice } from "obsidian";
+import "./rec-indicator.less";
 
-import { InsertTo } from "../cm-tools";
+import { Notice } from "obsidian";
+
 import MNComp from "../mn-main";
 
 export const autoPaste = (plugin: MNComp) => {
@@ -10,10 +11,7 @@ export const autoPaste = (plugin: MNComp) => {
     },
     rec = createEl(
       "input",
-      {
-        type: "checkbox",
-        cls: "rec status-bar-item",
-      },
+      { type: "checkbox", cls: "status-bar-item" },
       (el) =>
         el.addEventListener("input", (event) => {
           const input = event.target as HTMLInputElement,
@@ -39,7 +37,7 @@ export const autoPaste = (plugin: MNComp) => {
 
   // add button to status bar
   const container = plugin.addStatusBarItem();
-  container.addClass("rec-container");
+  container.addClass("rec");
   container.appendChild(rec);
 
   // add clipboard listener callback

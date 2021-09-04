@@ -1,4 +1,4 @@
-import "setting-tab.css";
+import "setting-tab.less";
 
 import assertNever from "assert-never";
 import { cloneDeep } from "lodash-es";
