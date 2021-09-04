@@ -90,7 +90,7 @@ export default class InputListener extends Events {
     const result = typeof src === "string" ? JsonToObj(src) : UrlToObj(src);
     if (!result) return null;
     const verCompare = checkVersion(result[0], OBBRIDGE_MIN_VERSION);
-    if (!verCompare) {
+    if (verCompare === null) {
       new Notice(`Unable to compare version: ${result[0]}`);
       console.error("Unable to compare version in %o", result);
       return null;
