@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/aidenlx/marginnote-companion/compare/0.3.0...0.3.1) (2021-09-04)
+
+
+### Bug Fixes
+
+* **input-handler:** fix version failed to compare when they are the same ([a2f9a5b](https://github.com/aidenlx/marginnote-companion/commit/a2f9a5b64524d525f2a21c2dc2467ee86d8934ed))
+
 # [0.3.0](https://github.com/aidenlx/marginnote-companion/compare/0.2.0...0.3.0) (2021-09-04)
 
 
