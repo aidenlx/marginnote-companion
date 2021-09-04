@@ -298,7 +298,7 @@ const setNote: setNameDescFunc<"note"> = (key, t) => {
       return [
         t("settings.tpl_cfg.templates_name.note_comment"),
         t("settings.tpl_cfg.templates_desc.note_comment", {
-          phs: getPlaceholders(key),
+          phs: "{{.}}, " + getPlaceholders(key),
         }),
       ];
     case "cmt_linked":

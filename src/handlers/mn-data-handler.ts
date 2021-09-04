@@ -46,7 +46,7 @@ export default class MNDataHandler {
 
   private callback = (view: MarkdownView) => (refSource: string) => {
     const { editor, file } = view,
-      cache = this.metadataCache.getFileCache(file),
+      // cache = this.metadataCache.getFileCache(file),
       cursor = editor.getCursor();
     let def;
     if (
@@ -54,6 +54,7 @@ export default class MNDataHandler {
       /* cache &&
       (def = findLast(cache.sections, (v) => v.type === "definition"))*/
     ) {
+      // TODO
       const { start, end } = def.position,
         cvt = (a: Loc): EditorPosition => ({ line: a.line, ch: a.col }),
         from = cvt(start),

@@ -50,11 +50,11 @@ export const NoteViewKeys = {
     Link: null,
     Excerpt: null,
   }),
-  comment: getViewKeys<keyof Exclude<CommentRec, Comment>>({
+  cmt_linked: getViewKeys<keyof Exclude<CommentRec, Comment>>({
     Excerpt: null,
     Link: null,
   }),
-  cmt_linked: getViewKeys<keyof NonTypeProps<Comment, Function | boolean>>({
+  comment: getViewKeys<keyof NonTypeProps<Comment, Function | boolean>>({
     Process: null,
     Text: null,
     Media: null,
