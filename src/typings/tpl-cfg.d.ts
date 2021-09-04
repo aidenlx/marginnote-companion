@@ -33,10 +33,10 @@ export type TplCfgRecs =
   | TplCfgRec<"note">;
 type toExport<K extends TplCfgTypes> = {
   src: {
-    [Key in K]: { defaultTpl: string; cfgs: Map<string, TplCfgRec<K>> };
+    [Key in K]: { cfgs: Map<string, TplCfgRec<K>> };
   };
   json: {
-    [Key in K]: { defaultTpl: string; cfgs: Record<string, TplCfgRec<K>> };
+    [Key in K]: { cfgs: Record<string, TplCfgRec<K>> };
   };
 };
 

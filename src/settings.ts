@@ -32,12 +32,13 @@ interface PatchJSON {
   templates: TemplateSettings;
 }
 
+export const DEFAULT_TPL_NAME = "default";
+
 const getDefault = <T extends TplCfgTypes>(
   templates: Templates<T>,
   extra: ExtParams<T>,
 ) => ({
-  cfgs: new Map([["default", { templates, ...extra }]]),
-  defaultTpl: "default",
+  cfgs: new Map([[DEFAULT_TPL_NAME, { templates, ...extra }]]),
 });
 
 export const DEFAULT_SETTINGS: MNCompSettings = {
@@ -136,13 +137,28 @@ const cvtFunc: {
     fromJSON: (json) => {
       for (const t of Object.keys(json)) {
         const cfgType = t as keyof typeof json;
+        if (!DEFAULT_SETTINGS.templates[cfgType]) {
+          console.log(
+            "Unexpected template config type %s found, skipping",
+            cfgType,
+          );
+          delete json[cfgType];
+          continue;
+        }
         for (const k of Object.keys(json[cfgType])) {
           const entry = json[cfgType],
             key = k as keyof typeof entry;
           if (key === "cfgs") {
-            json[cfgType].cfgs = new Map(
-              Object.entries(json[cfgType].cfgs),
-            ) as any;
+            const map = new Map(Object.entries(json[cfgType].cfgs));
+            // Add default template to json if not specified in config file
+            if (!map.has(DEFAULT_TPL_NAME)) {
+              const { templates } = DEFAULT_SETTINGS;
+              map.set(
+                DEFAULT_TPL_NAME,
+                templates[cfgType].cfgs.get(DEFAULT_TPL_NAME),
+              );
+            }
+            json[cfgType].cfgs = map as any;
           }
         }
       }

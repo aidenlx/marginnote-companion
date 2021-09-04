@@ -21,9 +21,6 @@ const dict: Dict = {
       toggles_desc: {
         pin: "启用此选项可直接在编辑器菜单中选用此模板",
       },
-      default_tpl_name: "默认模板",
-      default_tpl_desc:
-        "选择一个默认模板，在复制粘贴MarginNote数据到笔记时将使用此模板",
       templates_name: {
         note_body: "笔记正文",
         note_comment: "注释",

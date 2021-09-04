@@ -19,9 +19,6 @@ const dict = {
       toggles_desc: {
         pin: "Enable this option to show this template in editor menu directly",
       },
-      default_tpl_name: "Default Template",
-      default_tpl_desc:
-        "Choose one template that will be used as default when copy-pasting to note",
       templates_name: {
         note_body: "Note Body",
         note_comment: "Comments",

@@ -5,6 +5,7 @@ import { EditorPosition, Loc, MarkdownView, Notice } from "obsidian";
 
 import { FindLine, InsertToCursor } from "../cm-tools";
 import MNComp from "../mn-main";
+import { DEFAULT_TPL_NAME } from "../settings";
 import { getLink, Link } from "../template/basic";
 import NoteTemplate, { getTitleAliases } from "../template/note-template";
 import SelTemplate from "../template/sel-template";
@@ -109,7 +110,7 @@ export default class MNDataHandler {
       }
       return rendered;
     } catch (error) {
-      new Notice(error);
+      new Notice(JSON.stringify(error));
       return null;
     }
   }
@@ -137,13 +138,11 @@ export default class MNDataHandler {
         return InsertNoteResult.NoMNData;
       } else body = val;
     }
+    if (!tplName) {
+      tplName = DEFAULT_TPL_NAME;
+    }
     try {
       let template: string;
-      if (!tplName) {
-        const { defaultTpl, cfgs } = this.settings.templates[body.type];
-        if (cfgs.has(defaultTpl)) tplName = defaultTpl;
-        else tplName = "default";
-      }
       switch (body.type) {
         case "sel":
           template = this.sel.render(body, tplName);

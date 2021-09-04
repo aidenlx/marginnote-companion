@@ -84,24 +84,6 @@ export class MNCompSettingTab extends PluginSettingTab {
       )
       .then((s) => s.nameEl.createEl("h3", { text: heading }));
 
-    // Select Default Template
-    new Setting(sectionEl)
-      .setName(this.t("settings.tpl_cfg.default_tpl_name"))
-      .setDesc(this.t("settings.tpl_cfg.default_tpl_desc"))
-      .addDropdown((dropdown) => {
-        const options = [...nameTplMap.keys()].reduce(
-          (obj, name) => ((obj[name] = name), obj),
-          {} as Record<string, string>,
-        );
-        dropdown
-          .addOptions(options)
-          .setValue(this.plugin.settings.templates[type].defaultTpl)
-          .onChange(async (value) => {
-            this.plugin.settings.templates[type].defaultTpl = value;
-            await this.plugin.saveSettings();
-          });
-      });
-
     // Template Configs
     const render = (cfg: TplCfgRecs, name: string): HTMLElement => {
       let entryEl = sectionEl.createEl(
