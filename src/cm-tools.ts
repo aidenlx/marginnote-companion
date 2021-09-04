@@ -2,8 +2,8 @@ import { Editor, EditorPosition } from "obsidian";
 
 export const InsertTo = (
   ...args:
-    | [str: string, cm: CodeMirror.Editor | Editor, pos: EditorPosition]
-    | [str: string, cm: CodeMirror.Editor | Editor, line: number, ch: number]
+    | [str: string, cm: Editor, pos: EditorPosition]
+    | [str: string, cm: Editor, line: number, ch: number]
 ): void => {
   const [str, cm, posOrLine, ch] = args;
   let pos: EditorPosition;
@@ -26,11 +26,7 @@ const isPos = (obj: any): obj is EditorPosition => {
   } else return false;
 };
 
-export const InsertToCursor = (
-  str: string,
-  cm: CodeMirror.Editor | Editor,
-  before = false,
-) => {
+export const InsertToCursor = (str: string, cm: Editor, before = false) => {
   const cursor = cm.getCursor();
   InsertTo(str, cm, cursor);
   if (before) cm.setCursor(cursor);
@@ -43,22 +39,14 @@ export const InsertToCursor = (
  * @param start
  * @returns -1 if no line matches
  */
-export const FindLine = (
-  cm: CodeMirror.Editor | Editor,
-  match: RegExp,
-  start = 0,
-): number => {
+export const FindLine = (cm: Editor, match: RegExp, start = 0): number => {
   for (let i = start; i < cm.lineCount(); i++) {
     if (match.test(cm.getLine(i) as string)) return i;
   }
   return -1;
 };
 
-export const SetLine = (
-  cm: CodeMirror.Editor | Editor,
-  lineNum: number,
-  text: string,
-) => {
+export const SetLine = (cm: Editor, lineNum: number, text: string) => {
   cm.replaceRange(
     text,
     { line: lineNum, ch: 0 },
@@ -66,12 +54,12 @@ export const SetLine = (
   );
 };
 
-export const getStartIndexOfSel = (cm: CodeMirror.Editor | Editor): number => {
+export const getStartIndexOfSel = (cm: Editor): number => {
   // @ts-ignore
   const from = cm.getCursor(true);
   // @ts-ignore
   const to = cm.getCursor(false);
-  return posToOffset(getAheadPos(from, to), cm);
+  return cm.posToOffset(getAheadPos(from, to));
 };
 
 const getAheadPos = (a: EditorPosition, b: EditorPosition) => {
@@ -80,18 +68,4 @@ const getAheadPos = (a: EditorPosition, b: EditorPosition) => {
   } else {
     return a.ch < b.ch ? a : b;
   }
-};
-
-export const posToOffset = (
-  pos: EditorPosition,
-  cm: CodeMirror.Editor | Editor,
-) => {
-  const func =
-    (cm as Editor).posToOffset ?? (cm as CodeMirror.Editor).indexFromPos;
-  return func(pos);
-};
-export const offsetToPos = (offset: number, cm: CodeMirror.Editor | Editor) => {
-  const func =
-    (cm as Editor).offsetToPos ?? (cm as CodeMirror.Editor).posFromIndex;
-  return func(offset);
 };

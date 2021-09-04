@@ -3,9 +3,7 @@ import { Editor, EditorRange } from "obsidian";
 
 import { FindLine, InsertTo } from "../cm-tools";
 
-export const getFrontmatterRange = (
-  cm: CodeMirror.Editor | Editor,
-): EditorRange | null => {
+export const getFrontmatterRange = (cm: Editor): EditorRange | null => {
   if (cm.getLine(0) !== "---") return null;
   else {
     let endLineNum;
@@ -24,7 +22,7 @@ type keyValue = {
 export const addToFrontmatter = (
   entry: string,
   items: keyValue | string[],
-  cm: CodeMirror.Editor | Editor,
+  cm: Editor,
 ) => {
   const fmRange = getFrontmatterRange(cm);
   const render = (fmObj: { [k: string]: any }) =>

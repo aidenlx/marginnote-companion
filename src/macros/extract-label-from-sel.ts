@@ -1,7 +1,7 @@
 import marked from "marked";
 import { Editor } from "obsidian";
 
-import { getStartIndexOfSel, offsetToPos } from "../cm-tools";
+import { getStartIndexOfSel } from "../cm-tools";
 import { addToFrontmatter } from "../handlers/frontmatter";
 
 const Pos = (line: number, ch: number) => ({ line, ch });
@@ -12,10 +12,7 @@ const Pos = (line: number, ch: number) => ({ line, ch });
  * @param label
  * @returns the url of label
  */
-const extractSource = (
-  cm: CodeMirror.Editor | Editor,
-  label: string,
-): string | null => {
+const extractSource = (cm: Editor, label: string): string | null => {
   let output: string | null = null;
   for (let i = cm.lineCount() - 1; i >= 0; i--) {
     const line = cm.getLine(i) as string;
@@ -31,7 +28,7 @@ const extractSource = (
   return output;
 };
 
-const extractLabelFromSel = (cm: CodeMirror.Editor | Editor) => {
+const extractLabelFromSel = (cm: Editor) => {
   const sel = cm.getSelection();
   const start = getStartIndexOfSel(cm);
 
@@ -47,8 +44,8 @@ const extractLabelFromSel = (cm: CodeMirror.Editor | Editor) => {
       const { linktext, label } = m.groups;
 
       // remove ref
-      const replaceFrom = offsetToPos(start + m.index, cm);
-      const replaceTo = offsetToPos(start + m.index + m[0].length, cm);
+      const replaceFrom = cm.offsetToPos(start + m.index);
+      const replaceTo = cm.offsetToPos(start + m.index + m[0].length);
       cm.replaceRange("", replaceFrom, replaceTo);
 
       // insert to frontmatter

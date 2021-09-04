@@ -38,10 +38,16 @@ export default class MNComp extends Plugin {
     this.addSettingTab(new MNCompSettingTab(this));
 
     // register mn note handlers
-    this.registerCodeMirror((cm) => cm.on("paste", this.PastedNoteHandler));
-    this.register(() =>
-      this.registerCodeMirror((cm) => cm.off("paste", this.PastedNoteHandler)),
-    );
+    this.registerCodeMirror((cm) => {
+      if (cm.on) {
+        cm.on("paste", this.PastedNoteHandler);
+        this.register(() => cm.off("paste", this.PastedNoteHandler));
+      } else {
+        // reserved for cm6 implementations
+        // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395
+      }
+    });
+
     this.registerEditorMenu();
     autoPaste(this);
     this.addCommand({
