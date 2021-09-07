@@ -1,3 +1,4 @@
+import equal from "fast-deep-equal/es6";
 import { Notice } from "obsidian";
 
 import { InsertNoteResult } from "../handlers/mn-data-handler";
@@ -5,7 +6,12 @@ import MNComp from "../mn-main";
 
 export const getPastedHandler =
   (plugin: MNComp) => async (cm: CodeMirror.Editor, e: ClipboardEvent) => {
-    if (e.cancelable && e.target) {
+    if (
+      e.cancelable &&
+      e.target &&
+      // plain text only to avoid breaking html->md
+      equal(e.clipboardData?.types, ["text/plain"])
+    ) {
       e.preventDefault();
       const result = await plugin.mnHandler.insertToNote();
       if (result !== InsertNoteResult.NoMNData) {
