@@ -1,3 +1,15 @@
+## [0.3.2](https://github.com/aidenlx/marginnote-companion/compare/0.3.1...0.3.2) (2021-09-07)
+
+
+### Bug Fixes
+
+* **paste-handler:** fix html being pasted three times with html->md enabled ([73888e3](https://github.com/aidenlx/marginnote-companion/commit/73888e36f89f60142bcc14a4d2d1b17dfbaf66de))
+
+
+### Features
+
+* **icons:** add icon for marginnote link in preview mode ([e393b44](https://github.com/aidenlx/marginnote-companion/commit/e393b441362e4da2cbcbeb52772993595422e64e))
+
 ## [0.3.1](https://github.com/aidenlx/marginnote-companion/compare/0.3.0...0.3.1) (2021-09-04)
 
 
