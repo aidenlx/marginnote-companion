@@ -1,3 +1,5 @@
+import "icon.less";
+
 import mnFill from "assets/mn-fill.svg";
 import mnFillColor from "assets/mn-fill-color.svg";
 import mnOutline from "assets/mn-outline.svg";
