@@ -215,7 +215,7 @@ export default class MNDataHandler {
       let url,
         info: any = { md5: docMd5 };
       if ((url = getLink({ id: noteId }))) {
-        info.url = url;
+        info.url = url.Url;
       } else console.error("noteId not found in %o", body);
       if (pageRange) info.page = pageRange;
       addToFrontmatter(
