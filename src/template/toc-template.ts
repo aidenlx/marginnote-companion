@@ -24,8 +24,8 @@ const val = localStorage.language,
   comparator = new Intl.Collator(lang, { numeric: true }).compare;
 export default class TocTemplate extends Template<"toc"> {
   private get indent(): string {
-    const indentChar = this.vault.getConfig("useTab") ? "\t" : " ";
-    return indentChar.repeat(this.vault.getConfig("tabSize"));
+    if (this.vault.getConfig("useTab")) return "\t";
+    else return " ".repeat(this.vault.getConfig("tabSize"));
   }
   constructor(plugin: MNComp) {
     super(plugin, "toc");
