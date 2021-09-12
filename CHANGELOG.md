@@ -1,3 +1,10 @@
+## [0.3.4](https://github.com/aidenlx/marginnote-companion/compare/0.3.3...0.3.4) (2021-09-12)
+
+
+### Bug Fixes
+
+* **toc-template:** fix tab indent ([516f70a](https://github.com/aidenlx/marginnote-companion/commit/516f70a0287ac017672a240669e0106274331393))
+
 ## [0.3.3](https://github.com/aidenlx/marginnote-companion/compare/0.3.2...0.3.3) (2021-09-12)
 
 
