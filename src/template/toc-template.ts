@@ -58,12 +58,12 @@ export default class TocTemplate extends Template<"toc"> {
           Query: new TocQuery({ Page, DocMd5, DocTitle, FilePath }),
         }),
         lines = childNotes
-          .sort((a, b) =>
-            comparator(
-              TocItemSummary.getSummary(a),
-              TocItemSummary.getSummary(b),
-            ),
-          )
+          // .sort((a, b) =>
+          //   comparator(
+          //     TocItemSummary.getSummary(a),
+          //     TocItemSummary.getSummary(b),
+          //   ),
+          // )
           .map((t) => iterate(t, depth + 1));
       lines.unshift(indent.repeat(depth) + rendered);
       return lines.join("\n");
