@@ -1,3 +1,11 @@
+## [0.3.3](https://github.com/aidenlx/marginnote-companion/compare/0.3.2...0.3.3) (2021-09-12)
+
+
+### Bug Fixes
+
+* **mn-data-handler:** fix fail to import meta ([531ed94](https://github.com/aidenlx/marginnote-companion/commit/531ed942b964f10bd74b9208963fab74afbe0b99))
+* **toc-template:** disable sort ([214d067](https://github.com/aidenlx/marginnote-companion/commit/214d06763cb53e57c30331e9006845d4bcd9badb))
+
 ## [0.3.2](https://github.com/aidenlx/marginnote-companion/compare/0.3.1...0.3.2) (2021-09-07)
 
 
