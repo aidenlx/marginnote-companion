@@ -118,6 +118,7 @@ const qsConfig = { arrayFormat: "comma", sort: false } as const;
 export class TocQuery {
   constructor(private raw: QueryObjRaw) {}
   private queryObj: QueryObj = new Map();
+  private encode = false;
 
   private addToQuery(key: keyof QueryObjRaw) {
     let rawVal;
@@ -129,6 +130,11 @@ export class TocQuery {
       if (v !== undefined) return false;
     }
     return true;
+  }
+
+  get Encode(): TocQuery {
+    this.encode = true;
+    return this;
   }
 
   get Page(): TocQuery {
@@ -152,9 +158,31 @@ export class TocQuery {
     if (this.queryObj.size === 0) {
       QueryKeys.forEach((k) => this.addToQuery(k));
     }
-    return stringify(Object.fromEntries(this.queryObj), qsConfig);
+    return stringify(CamelKeyToDash(this.queryObj), {
+      ...qsConfig,
+      encode: this.encode,
+    });
   }
 }
+
+const CamelKeyToDash = (items: QueryObj) => {
+  const entries = items.entries(),
+    convertIterator: typeof entries = {
+      next: () => {
+        let result = entries.next();
+        if (result.value && typeof result.value[0] === "string")
+          result.value[0] = (result.value[0] as string).replace(
+            /[A-Z]/g,
+            (m, offset) => (offset === 0 ? "" : "-") + m.toLowerCase(),
+          );
+        return result;
+      },
+      [Symbol.iterator]: function () {
+        return this;
+      },
+    };
+  return Object.fromEntries(convertIterator);
+};
 
 // async function cmdOutlineHandler(plugin: MNComp): Promise<void> {
 //   console.log("called");
