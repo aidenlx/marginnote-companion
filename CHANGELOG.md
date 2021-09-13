@@ -1,3 +1,15 @@
+# [0.4.0](https://github.com/aidenlx/marginnote-companion/compare/0.3.4...0.4.0) (2021-09-13)
+
+
+### Bug Fixes
+
+* **toc-template:** query now returns dashed name in favor of camel; add Encode for Query ([0359532](https://github.com/aidenlx/marginnote-companion/commit/035953241d5723452d127140fc59d009b7194272))
+
+
+### Features
+
+* **toc-template:** add option for indent character ([91b5594](https://github.com/aidenlx/marginnote-companion/commit/91b55944e508d0285d93f43b154f55f74bad46c6))
+
 ## [0.3.4](https://github.com/aidenlx/marginnote-companion/compare/0.3.3...0.3.4) (2021-09-12)
 
 
