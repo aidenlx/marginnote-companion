@@ -31,10 +31,10 @@ export default class TocTemplate extends Template<"toc"> {
     super(plugin, "toc");
   }
   prerender(body: ReturnBody_Toc, tplName: string): string {
-    const templates = this.getTemplate(tplName);
-    if (!templates) throw new Error("No template found for key " + tplName);
-
-    const indent = this.indent,
+    const tplCfg = this.tplCfg.get(tplName);
+    if (!tplCfg) throw new Error("No template found for key " + tplName);
+    const { templates } = tplCfg,
+      indent = tplCfg.indentChar === true ? this.indent : tplCfg.indentChar,
       { bookMap, data: toc } = body;
 
     const iterate = (toc: Toc, depth = 0): string => {

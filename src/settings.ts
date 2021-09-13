@@ -68,7 +68,7 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
       {
         item: `- {{Summary}} {{Link}}`,
       },
-      { pin: true },
+      { pin: true, indentChar: true },
     ),
   },
   videoMap: new Map() as any,
@@ -149,14 +149,16 @@ const cvtFunc: {
           const entry = json[cfgType],
             key = k as keyof typeof entry;
           if (key === "cfgs") {
-            const map = new Map(Object.entries(json[cfgType].cfgs));
+            const map = new Map(Object.entries(json[cfgType].cfgs)),
+              { templates } = DEFAULT_SETTINGS,
+              defaultTpl = templates[cfgType].cfgs.get(DEFAULT_TPL_NAME);
+
+            map.forEach((val, key) => {
+              map.set(key, { ...defaultTpl, ...(val as any) });
+            });
             // Add default template to json if not specified in config file
             if (!map.has(DEFAULT_TPL_NAME)) {
-              const { templates } = DEFAULT_SETTINGS;
-              map.set(
-                DEFAULT_TPL_NAME,
-                templates[cfgType].cfgs.get(DEFAULT_TPL_NAME),
-              );
+              map.set(DEFAULT_TPL_NAME, defaultTpl);
             }
             json[cfgType].cfgs = map as any;
           }

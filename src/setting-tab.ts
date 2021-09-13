@@ -9,6 +9,7 @@ import {
   Notice,
   PluginSettingTab,
   Setting,
+  TextComponent,
 } from "obsidian";
 
 import t from "./lang/helper";
@@ -18,7 +19,12 @@ import { DEFAULT_SETTINGS } from "./settings";
 import { NoteViewKeys } from "./template/note-template";
 import { SelViewKeys } from "./template/sel-template";
 import { TocViewKeys } from "./template/toc-template";
-import { Templates, TplCfgRecs, TplCfgTypes } from "./typings/tpl-cfg";
+import {
+  Templates,
+  TplCfgRec,
+  TplCfgRecs,
+  TplCfgTypes,
+} from "./typings/tpl-cfg";
 
 export class MNCompSettingTab extends PluginSettingTab {
   constructor(public plugin: MNComp) {
@@ -202,6 +208,31 @@ export class MNCompSettingTab extends PluginSettingTab {
             default:
               assertNever(type);
           }
+        } else if ((cfgKey as keyof TplCfgRec<"toc">) === "indentChar") {
+          const cfgToc = cfg as TplCfgRec<"toc">,
+            keyToc = cfgKey as "indentChar";
+
+          let input: null | TextComponent = null;
+          new Setting(entryEl)
+            .setName(t("settings.tpl_cfg.indent_char_name"))
+            .setDesc(t("settings.tpl_cfg.indent_char_desc"))
+            .addToggle((toggle) =>
+              toggle.setValue(cfgVal === true).onChange(async (val) => {
+                cfgToc[keyToc] = val ? true : "";
+                input?.setDisabled(val);
+                await this.plugin.saveSettings();
+              }),
+            )
+            .addText((text) => {
+              const onChange = async (value: string) => {
+                cfgToc[keyToc] = value;
+                await this.plugin.saveSettings();
+              };
+              input = text
+                .setValue(cfgVal)
+                .onChange(debounce(onChange, 500, true))
+                .setDisabled(cfgVal === true);
+            });
         } else if (typeof cfgVal === "boolean") {
           toggleKeys.push(cfgK);
         } else {

@@ -21,12 +21,16 @@ export type TplValue = string;
 interface TypeExtParamsMap {
   sel: {};
   note: {};
-  toc: {};
+  toc: {
+    /** true: use tab/space based on setting, false: no indent */
+    indentChar: string | true;
+  };
 }
 export type ExtParams<K extends TplCfgTypes> = TypeExtParamsMap[K] &
   Omit<TemplateCfg<K>, "templates">;
 
-type TplCfgRec<K extends TplCfgTypes> = TemplateCfg<K> & TypeExtParamsMap[K];
+export type TplCfgRec<K extends TplCfgTypes> = TemplateCfg<K> &
+  TypeExtParamsMap[K];
 export type TplCfgRecs =
   | TplCfgRec<"toc">
   | TplCfgRec<"sel">

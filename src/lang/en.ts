@@ -20,6 +20,9 @@ const dict = {
         preview: "Preview with input",
         tpl_name: "Template Name (ID)",
       },
+      indent_char_name: "Indent Character",
+      indent_char_desc:
+        "Toggle on to use built-in indent (tab/space) based on setting, off to use custom character",
       toggles_name: {
         pin: "Pin to Editor Menu",
       },

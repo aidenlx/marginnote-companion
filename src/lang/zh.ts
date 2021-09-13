@@ -21,6 +21,9 @@ const dict: Dict = {
         preview: "读取MarginNote数据预览模板",
         tpl_name: "模板名称(ID)",
       },
+      indent_char_name: "缩进符号",
+      indent_char_desc:
+        "打开开关使用内置缩进符(tab/空格)，关闭使用自定义缩进符",
       toggles_name: {
         pin: "固定到编辑器的右键菜单",
       },
