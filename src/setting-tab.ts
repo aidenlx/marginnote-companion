@@ -11,7 +11,7 @@ import {
   Setting,
 } from "obsidian";
 
-import { TFunction } from "./lang/helper";
+import t from "./lang/helper";
 import { filterKeyWithType, strToFragment } from "./misc";
 import MNComp from "./mn-main";
 import { DEFAULT_SETTINGS } from "./settings";
@@ -25,24 +25,22 @@ export class MNCompSettingTab extends PluginSettingTab {
     super(plugin.app, plugin);
   }
 
-  t = this.plugin.t;
-
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
     this.containerEl.toggleClass("mn-settings", true);
 
     containerEl.createEl("h2", {
-      text: this.t("settings.general.heading"),
+      text: t("settings.general.heading"),
     });
     new Setting(containerEl)
-      .setName(this.t("settings.general.date_format_name"))
+      .setName(t("settings.general.date_format_name"))
       .setDesc(
         createFragment((el) => {
-          el.appendText(this.t("settings.general.date_format_desc"));
+          el.appendText(t("settings.general.date_format_desc"));
           el.createEl("br");
           el.createEl("a", {
-            text: this.t("settings.general.check_details"),
+            text: t("settings.general.check_details"),
             href: "https://momentjs.com/docs/#/displaying/format/",
           });
         }),
@@ -55,7 +53,7 @@ export class MNCompSettingTab extends PluginSettingTab {
     const { containerEl } = this;
 
     const tplHeading = containerEl.createEl("h2", {
-      text: this.t("settings.tpl_cfg.heading"),
+      text: t("settings.tpl_cfg.heading"),
     });
 
     const types = ["sel", "note", "toc"] as const,
@@ -88,7 +86,7 @@ export class MNCompSettingTab extends PluginSettingTab {
     const heading = ((type: TplCfgTypes) => {
       const base = "settings.tpl_cfg.headings." as const,
         path = (base + type) as `${typeof base}${typeof type}`;
-      return this.t(path);
+      return t(path);
     })(type);
 
     // Heading
@@ -97,7 +95,7 @@ export class MNCompSettingTab extends PluginSettingTab {
         // add new button
         b
           .setIcon("plus-with-circle")
-          .setTooltip(this.t("settings.tpl_cfg.tooltips.add_new"))
+          .setTooltip(t("settings.tpl_cfg.tooltips.add_new"))
           .onClick(async () => {
             const name = Date.now().toString(),
               cfg = cloneDeep(defaultVal) as any;
@@ -132,7 +130,7 @@ export class MNCompSettingTab extends PluginSettingTab {
             b
               .setClass("mod-warning")
               .setIcon("trash")
-              .setTooltip(this.t("settings.tpl_cfg.tooltips.remove"))
+              .setTooltip(t("settings.tpl_cfg.tooltips.remove"))
               .onClick(handleClick),
           );
         },
@@ -148,7 +146,7 @@ export class MNCompSettingTab extends PluginSettingTab {
             // remove button
             b
               .setIcon("popup-open")
-              .setTooltip(this.t("settings.tpl_cfg.tooltips.preview"))
+              .setTooltip(t("settings.tpl_cfg.tooltips.preview"))
               .onClick(handleClick),
           );
         },
@@ -157,7 +155,7 @@ export class MNCompSettingTab extends PluginSettingTab {
       // Name El
       new Setting(entryEl.createEl("summary", { cls: "tpl-name" })).then(
         (s) => {
-          const tooltip = this.t("settings.tpl_cfg.tooltips.tpl_name");
+          const tooltip = t("settings.tpl_cfg.tooltips.tpl_name");
           if (isDefault) {
             s.setName(name);
             s.setTooltip(tooltip);
@@ -219,12 +217,12 @@ export class MNCompSettingTab extends PluginSettingTab {
           const getName = () => {
             const base = `settings.tpl_cfg.toggles_name.` as const,
               path = (base + key) as `${typeof base}${typeof key}`;
-            return this.t(path);
+            return t(path);
           };
           const getDesc = () => {
             const base = `settings.tpl_cfg.toggles_desc.` as const,
               path = (base + key) as `${typeof base}${typeof key}`;
-            return strToFragment(this.t(path));
+            return strToFragment(t(path));
           };
           new Setting(entryEl)
             .setName(getName())
@@ -257,7 +255,6 @@ class PreviewTpl extends Modal {
 
 type setNameDescFunc<T extends TplCfgTypes> = (
   key: keyof Templates<T>,
-  t: TFunction,
 ) => [name: string, desc: string];
 const setTemplates = <T extends TplCfgTypes>(
   templates: Templates<T>,
@@ -276,12 +273,12 @@ const setTemplates = <T extends TplCfgTypes>(
       text.inputEl.cols = 30;
       text.inputEl.rows = 5;
     });
-    const [name, desc] = setNameDesc(key, st.plugin.t);
+    const [name, desc] = setNameDesc(key);
     setting.setName(name).setDesc(strToFragment(desc));
   }
 };
 
-const setNote: setNameDescFunc<"note"> = (key, t) => {
+const setNote: setNameDescFunc<"note"> = (key) => {
   const getPlaceholders = (t: typeof key) =>
     NoteViewKeys[t].map((v) => `{{${v}}}`).join(", ");
 
@@ -313,7 +310,7 @@ const setNote: setNameDescFunc<"note"> = (key, t) => {
   }
 };
 
-const setSel: setNameDescFunc<"sel"> = (key, t) => {
+const setSel: setNameDescFunc<"sel"> = (key) => {
   switch (key) {
     case "sel":
       return [
@@ -327,7 +324,7 @@ const setSel: setNameDescFunc<"sel"> = (key, t) => {
   }
 };
 
-const setToc: setNameDescFunc<"toc"> = (key, t) => {
+const setToc: setNameDescFunc<"toc"> = (key) => {
   switch (key) {
     case "item":
       return [

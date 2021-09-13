@@ -11,7 +11,6 @@ import { aliasBelowH1 } from "./controls/heading-alias";
 import { addSourceButton } from "./controls/source-button";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";
-import i18n from "./lang/helper";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { autoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
@@ -27,8 +26,6 @@ export default class MNComp extends Plugin {
 
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
-
-  t = i18n.t.bind(i18n);
 
   async onload() {
     console.log("loading marginnote-companion");

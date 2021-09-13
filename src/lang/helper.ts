@@ -8,7 +8,7 @@ const resources: Record<"en" | "zh", { default: Dict }> = {
   zh: { default: zh },
 };
 
-export default i18next.createInstance(
+const instance = i18next.createInstance(
   {
     lng: localStorage.language,
     fallbackLng: "en",
@@ -22,6 +22,8 @@ export default i18next.createInstance(
     if (err) return console.log(err);
   },
 ) as Omit<i18n, "t"> & { t: TFunction };
+const t = instance.t.bind(instance);
+export default t;
 
 export type Dict = UnConst<typeof en>;
 type DictConst = typeof en;
