@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/aidenlx/marginnote-companion/compare/0.5.0...0.5.1) (2021-09-14)
+
+
+### Bug Fixes
+
+* fix version ([966f044](https://github.com/aidenlx/marginnote-companion/commit/966f044f86602fdff8dad83c693e09e88c6936b3))
+
 # [0.5.0](https://github.com/aidenlx/marginnote-companion/compare/0.4.0...0.5.0) (2021-09-14)
 
 

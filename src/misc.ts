@@ -1,6 +1,6 @@
 import { unescape } from "html-escaper";
 
-export const OBBRIDGE_MIN_VERSION = "3.0.1";
+export const OBBRIDGE_MIN_VERSION = "3.0.0";
 export const trimEmpty = (str: string) => str.replace(/^\s+|\s+$/g, "");
 export const ChsRegex = /[\u4e00-\u9fa5]/g;
 
