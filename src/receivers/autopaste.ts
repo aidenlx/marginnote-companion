@@ -21,7 +21,7 @@ export const autoPaste = (plugin: MNComp) => {
     );
   plugin.addCommand({
     id: "rec",
-    name: "Auto Paste to Active Editor",
+    name: "Auto Insert MarginNote Data to Active Note",
     callback: () => {
       const setTo = !rec.checked;
       onToggleAutoPaste(setTo);

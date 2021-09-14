@@ -15,8 +15,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@aidenlx/obsidian-bridge": "^3.0.0",
-    "@jsonurl/jsonurl": "^1.1.4",
+    "@aidenlx/obsidian-bridge": "^3.0.1",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^3.3.0",
     "@rollup/plugin-commonjs": "^20.0.0",

@@ -1,4 +1,4 @@
-import { addIcon, MarkdownView, Menu, Plugin } from "obsidian";
+import { addIcon, MarkdownView, Menu, Notice, Plugin } from "obsidian";
 import { MNCompSettingTab } from "setting-tab";
 import {
   DEFAULT_SETTINGS,
@@ -14,7 +14,7 @@ import icons from "./icons";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { autoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
-import { getPastedHandler } from "./receivers/paste-hanlder";
+import { getInsertCommand, getPastedHandler } from "./receivers/paste-hanlder";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
@@ -44,6 +44,7 @@ export default class MNComp extends Plugin {
         // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395
       }
     });
+    this.addCommand(getInsertCommand(this));
 
     this.registerEditorMenu();
     autoPaste(this);

@@ -54,7 +54,7 @@ export default class InputListener extends Events {
           );
         else {
           this.info.paramsCache = params;
-          navigator.clipboard.writeText(RECIEVED_FLAG);
+          // navigator.clipboard.writeText(RECIEVED_FLAG);
         }
       });
     } else {
@@ -76,11 +76,12 @@ export default class InputListener extends Events {
     } else if (isCbInfo(this.info)) {
       return this.parse(this.info.instance.readText());
     } else {
-      const cbText = await navigator.clipboard.readText();
-      if (cbText === RECIEVED_FLAG) {
-        if (this.info.paramsCache) return this.parse(this.info.paramsCache);
-        else throw new Error("flag in clipboard, no cache in info");
-      } else return null;
+      // const cbText = await navigator.clipboard.readText();
+      // if (cbText === RECIEVED_FLAG) {
+      //   if (this.info.paramsCache) return this.parse(this.info.paramsCache);
+      //   else throw new Error("flag in clipboard, no cache in info");
+      // } else return null;
+      return this.info.paramsCache ? this.parse(this.info.paramsCache) : null;
     }
   }
   /**
@@ -143,6 +144,7 @@ export default class InputListener extends Events {
       );
     } else {
       this.info.autoPasteRef = this.on("url-recieved", this.tryTriggerChange);
+      this.init = false;
     }
   }
   private tryTriggerChange = (value: string | ObsidianProtocolData) => {

@@ -100,8 +100,8 @@ export default class NoteTemplate extends Template<"note"> {
   private getComments(body: ReturnBody_Note): CommentRec[] | undefined {
     const { mediaMap, linkedNotes } = body,
       { comments } = body.data;
-    if (!comments || comments.length === 0) return undefined;
-
+    if (!comments || !Array.isArray(comments) || comments.length === 0)
+      return undefined;
     return comments.map<CommentRec>((c) => {
       switch (c.type) {
         case "TextNote": // LinkedNote (mnUrl in c.text) or comment
