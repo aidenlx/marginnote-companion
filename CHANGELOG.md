@@ -1,3 +1,15 @@
+# [0.5.0](https://github.com/aidenlx/marginnote-companion/compare/0.4.0...0.5.0) (2021-09-14)
+
+
+### Bug Fixes
+
+* **cm-tools:** fix cursor unchanged when insert new string on mobile ([6227901](https://github.com/aidenlx/marginnote-companion/commit/6227901ae5c847264ae94a62009d275cfeabf891))
+
+
+### Features
+
+* add command to insert mn data; initial mobile support ([435b33d](https://github.com/aidenlx/marginnote-companion/commit/435b33d5ea25659a42ca2d818111a88b2b6599ff))
+
 # [0.4.0](https://github.com/aidenlx/marginnote-companion/compare/0.3.4...0.4.0) (2021-09-13)
 
 
