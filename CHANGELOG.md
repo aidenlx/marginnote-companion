@@ -1,3 +1,11 @@
+# [0.6.0](https://github.com/aidenlx/marginnote-companion/compare/0.5.1...0.6.0) (2021-09-15)
+
+
+### Features
+
+* allow templates to be added to command ([2740ee3](https://github.com/aidenlx/marginnote-companion/commit/2740ee337a8d97d1300f9483281fb2166eb682d7))
+* **setting-tab:** hide indent char input box when set to true ([f6c8e76](https://github.com/aidenlx/marginnote-companion/commit/f6c8e76475ecb6605bad6b6426580977c5776684))
+
 ## [0.5.1](https://github.com/aidenlx/marginnote-companion/compare/0.5.0...0.5.1) (2021-09-14)
 
 
