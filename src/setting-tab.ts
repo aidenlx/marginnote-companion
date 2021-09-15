@@ -219,7 +219,10 @@ export class MNCompSettingTab extends PluginSettingTab {
             .addToggle((toggle) =>
               toggle.setValue(cfgVal === true).onChange(async (val) => {
                 cfgToc[keyToc] = val ? true : "";
-                input?.setDisabled(val);
+                if (input) {
+                  input.setDisabled(val);
+                  input.inputEl.hidden = val;
+                }
                 await this.plugin.saveSettings();
               }),
             )
@@ -232,6 +235,9 @@ export class MNCompSettingTab extends PluginSettingTab {
                 .setValue(cfgVal)
                 .onChange(debounce(onChange, 500, true))
                 .setDisabled(cfgVal === true);
+              text.inputEl.hidden = cfgVal === true;
+              text.inputEl.size = 4;
+              text.inputEl.addClass("indent-char");
             });
         } else if (typeof cfgVal === "boolean") {
           toggleKeys.push(cfgK);
