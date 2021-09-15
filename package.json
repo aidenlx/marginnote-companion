@@ -94,7 +94,7 @@
         "git add .",
         "npm run build"
       ],
-      "after:git:release": "echo After git push, before github release",
+      "before:release": "zip -r build/marginnote-companion.zip build/main.js build/styles.css build/manifest.json",
       "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
     },
     "git": {
@@ -110,7 +110,8 @@
       "assets": [
         "build/main.js",
         "build/manifest.json",
-        "build/styles.json"
+        "build/styles.css",
+        "build/marginnote-companion.zip"
       ],
       "proxy": "http://127.0.0.1:7890",
       "releaseName": "${version}"
