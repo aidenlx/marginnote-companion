@@ -12,6 +12,7 @@ import {
   Events,
   Notice,
   ObsidianProtocolHandler,
+  Platform,
 } from "obsidian";
 import { ObsidianProtocolData } from "obsidian";
 
@@ -41,9 +42,18 @@ export default class InputListener extends Events {
   /**
    * @param immediate emit event immediately after calling start()
    */
-  constructor(app: App, public timeInterval = 500, public immediate = false) {
+  constructor(public timeInterval = 500, public immediate = false) {
     super();
-    if (app.isMobile) {
+    if (Platform.isDesktopApp) {
+      let electron: typeof Electron;
+      try {
+        electron = require("electron");
+      } catch (error) {
+        new Notice("Failed to load electron dependencies on desktop");
+        throw error;
+      }
+      this.info = { instance: electron.clipboard, intervalId: 0 };
+    } else {
       this.info = { autoPasteRef: null, paramsCache: null };
       // insert recieved flag to clipboard and save val to cache
       this.on("url-recieved", (params) => {
@@ -57,15 +67,6 @@ export default class InputListener extends Events {
           // navigator.clipboard.writeText(RECIEVED_FLAG);
         }
       });
-    } else {
-      let electron: typeof Electron;
-      try {
-        electron = require("electron");
-      } catch (error) {
-        new Notice("Failed to load electron dependencies on desktop");
-        throw new Error("error");
-      }
-      this.info = { instance: electron.clipboard, intervalId: 0 };
     }
   }
   /** read from clipboard/cache */

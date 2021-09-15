@@ -170,7 +170,6 @@ export default class NoteTemplate extends Template<"note"> {
     refCallback?: (refSource: string) => any,
   ): string {
     const templates = this.getTemplate(tplName);
-    if (!templates) throw new Error("No template found for key " + tplName);
 
     const { bookMap, mediaMap } = body;
     let refSource = "";
@@ -192,10 +191,7 @@ export default class NoteTemplate extends Template<"note"> {
     try {
       rendered = this.renderTemplate(templates.body, view, parital);
     } catch (error) {
-      const message = JSON.stringify(error);
-      error = "Failed to render template: " + message;
-      new Notice(message);
-      throw new Error(message);
+      throw this.RenderError(error, tplName);
     }
     if (refSource) {
       rendered += Link.getToInsertLast(rendered, refSource);
@@ -206,7 +202,12 @@ export default class NoteTemplate extends Template<"note"> {
    * @param refCallback if not given, insert refSource to bottom of rendered text
    */
   render(...args: Parameters<NoteTemplate["prerender"]>): Promise<string> {
-    return this.importAttachments(this.prerender(...args), args[0]);
+    let prerender = this.prerender(...args);
+    try {
+      return this.importAttachments(prerender, args[0]);
+    } catch (error) {
+      throw this.RenderError(error, args[1]);
+    }
   }
 
   /** get placeholder for media in excerpt */

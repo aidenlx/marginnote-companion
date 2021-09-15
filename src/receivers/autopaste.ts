@@ -1,10 +1,11 @@
 import "./rec-indicator.less";
 
-import { Notice } from "obsidian";
+import { Notice, Platform } from "obsidian";
 
+import t from "../lang/helper";
 import MNComp from "../mn-main";
 
-export const autoPaste = (plugin: MNComp) => {
+export const setAutoPaste = (plugin: MNComp) => {
   const onToggleAutoPaste = (setTo: boolean) => {
       plugin.inputListener.autoPaste = setTo;
       new Notice("auto paste " + (setTo ? "started" : "stopped"));
@@ -20,8 +21,8 @@ export const autoPaste = (plugin: MNComp) => {
         }),
     );
   plugin.addCommand({
-    id: "rec",
-    name: "Auto Insert MarginNote Data to Active Note",
+    id: "mn-autopaste",
+    name: t("cmd.auto_paste"),
     callback: () => {
       const setTo = !rec.checked;
       onToggleAutoPaste(setTo);
@@ -35,14 +36,16 @@ export const autoPaste = (plugin: MNComp) => {
     ],
   });
 
-  // add button to status bar
-  const container = plugin.addStatusBarItem();
-  container.addClass("rec");
-  container.appendChild(rec);
-
   // add clipboard listener callback
   plugin.inputListener.on("changed", (value) => {
     if (!value) return;
     plugin.mnHandler.insertToNote();
   });
+
+  // add button to status bar
+  if (Platform.isDesktop) {
+    const container = plugin.addStatusBarItem();
+    container.addClass("rec");
+    container.appendChild(rec);
+  }
 };

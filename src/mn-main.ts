@@ -1,4 +1,4 @@
-import { addIcon, MarkdownView, Menu, Notice, Plugin } from "obsidian";
+import { addIcon, MarkdownView, Menu, Plugin } from "obsidian";
 import { MNCompSettingTab } from "setting-tab";
 import {
   DEFAULT_SETTINGS,
@@ -12,14 +12,14 @@ import { addSourceButton } from "./controls/source-button";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
-import { autoPaste } from "./receivers/autopaste";
+import { setAutoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
-import { getInsertCommand, getPastedHandler } from "./receivers/paste-hanlder";
+import { getPastedHandler, setInsertCommands } from "./receivers/insert";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
-  inputListener = new InputListener(this.app);
+  inputListener = new InputListener();
   mnHandler = new MNDataHandler(this);
 
   PastedNoteHandler = getPastedHandler(this);
@@ -44,10 +44,10 @@ export default class MNComp extends Plugin {
         // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395
       }
     });
-    this.addCommand(getInsertCommand(this));
+    setInsertCommands(this);
 
     this.registerEditorMenu();
-    autoPaste(this);
+    setAutoPaste(this);
     this.addCommand({
       id: "getMeta",
       name: "get Metadata from MarginNote notes",
@@ -80,7 +80,7 @@ export default class MNComp extends Plugin {
       if (!data) return;
       const templates = this.settings.templates[data.type],
         getClickHandler = (tpl: string) => () =>
-          this.mnHandler.insertToNote(view, data, tpl);
+          this.mnHandler.insertToNote(view, { target: data, tplName: tpl });
       let subMenu = new Menu(this.app),
         hasSub = false;
       for (const [name, tpl] of templates.cfgs) {

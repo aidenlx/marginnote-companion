@@ -1,11 +1,11 @@
 import { ReturnBody } from "@aidenlx/obsidian-bridge";
 import { decode } from "base64-arraybuffer";
 import Mustache from "mustache";
-import { MarkdownView, TFile } from "obsidian";
+import { Constructor, MarkdownView, TFile } from "obsidian";
 
 import MNComp from "../mn-main";
 import { MNCompSettings } from "../settings";
-import { Templates, TplCfgRec } from "../typings/tpl-cfg";
+import { Templates, TplCfgRec, TplCfgTypes } from "../typings/tpl-cfg";
 import { getText } from "./basic";
 
 export type PHValMap<T extends string> = Record<T, string | undefined>;
@@ -14,18 +14,15 @@ export const getViewKeys = <K extends string>(obj: Record<K, null>) => [
   ...Object.keys(obj),
 ];
 
-export default abstract class Template<
-  T extends keyof MNCompSettings["templates"],
-> {
+export default abstract class Template<T extends TplCfgTypes> {
   constructor(protected plugin: MNComp, private templateKey: T) {}
-  protected get tplCfg() {
-    return this.plugin.settings.templates[this.templateKey].cfgs as Map<
-      string,
-      TplCfgRec<T>
-    >;
+  protected getTplCfg(name: string) {
+    let cfg = this.plugin.settings.templates[this.templateKey].cfgs.get(name);
+    if (!cfg) throw this.NoTemplateFoundError(name);
+    else return cfg as TplCfgRec<T>;
   }
   protected getTemplate(name: string) {
-    return this.tplCfg.get(name)?.templates as Templates<T> | undefined;
+    return this.getTplCfg(name).templates;
   }
 
   protected get settings() {
@@ -96,6 +93,33 @@ export default abstract class Template<
   ) => Mustache.render(template, view, partials, mustacheConfig);
   abstract render(body: ReturnBody, tplName: string): Promise<string> | string;
   abstract prerender(body: ReturnBody, tplName: string): string;
+
+  protected NoTemplateFoundError(name: string) {
+    return new NoTplFoundError(name, this.templateKey);
+  }
+  protected RenderError(internalErr: unknown, tplName: string) {
+    return new RenderError(internalErr, tplName, this.templateKey);
+  }
+}
+export class RenderError extends Error {
+  constructor(
+    internalErr: unknown,
+    public tplName: string,
+    public type: TplCfgTypes,
+  ) {
+    super(
+      internalErr instanceof Error
+        ? `${internalErr.name}: ${internalErr.message}`
+        : JSON.stringify(internalErr),
+    );
+    this.name = `RenderError(${type}-${tplName})`;
+  }
+}
+export class NoTplFoundError extends Error {
+  constructor(public tplName: string, public type: TplCfgTypes) {
+    super(`No template named ${tplName} found in type ${type}}`);
+    this.tplName = "NoTemplateFoundError";
+  }
 }
 
 const mustacheConfig = { escape: (text: string) => text };

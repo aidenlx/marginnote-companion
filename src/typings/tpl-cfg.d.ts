@@ -8,7 +8,10 @@ export type Templates<K extends TplCfgTypes> = Record<
 >;
 interface TemplateCfg<K extends TplCfgTypes> {
   templates: Templates<K>;
+  /** Pin to editor context menu */
   pin: boolean;
+  /** Add to command */
+  cmd: boolean;
 }
 interface TypeTplParamsMap {
   sel: "sel";

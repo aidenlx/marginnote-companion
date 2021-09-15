@@ -57,3 +57,17 @@ export const strToFragment = (str: string) =>
       if (i < arr.length - 1) el.createEl("br");
     }),
   );
+
+const isPosInteger = (num: any): num is number =>
+  Number.isInteger(num) && num > 0;
+/** page info from mn data to page tuple */
+export const toPage = (
+  toc: Partial<Record<"startPage" | "endPage", number>>,
+): [start: number, end: number] | undefined => {
+  const { startPage: start, endPage: end } = toc;
+  if (isPosInteger(start) && isPosInteger(end)) return [start, end];
+
+  const toExport = start ? start : end;
+  if (isPosInteger(toExport)) return [toExport, toExport];
+  else return undefined;
+};

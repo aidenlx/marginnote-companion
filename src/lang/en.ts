@@ -1,4 +1,24 @@
 const dict = {
+  cmd: {
+    insert2doc: "Insert MarginNote Data to Active Note",
+    insert2doc_tpl:
+      "{{data_type}}({{tplName}} Template): Insert to Active Note",
+    auto_paste:
+      "Toggle Auto Paste (Insert Recieved MarginNote Data to Active Note Automatically)",
+  },
+  notice: {
+    error: {
+      general: "Error while {{action}}, check console for details",
+      no_target_data: "Recieved {{type}} data cannot use this template",
+      no_md_view: "No Note is currently active",
+      no_mn_data: "No MarginNote data recieved",
+      no_tpl_found: "No template named {{tpl}} found for {{type}}",
+      render_error:
+        "Failed to render template named {{tpl}} for {{type}} data, internal error: {{error}}",
+      body_missing_prop:
+        "Missing {{prop}} in data sent in {{time}}, check console for more details",
+    },
+  },
   settings: {
     general: {
       heading: "General",
@@ -25,9 +45,11 @@ const dict = {
         "Toggle on to use built-in indent (tab/space) based on setting, off to use custom character",
       toggles_name: {
         pin: "Pin to Editor Menu",
+        cmd: "Add to Command",
       },
       toggles_desc: {
         pin: "Enable this option to show this template in editor menu directly",
+        cmd: "Enable this option to add command to insert MarginNote data to active note with this template (restart app to take effect)",
       },
       templates_name: {
         note_body: "Note Body",

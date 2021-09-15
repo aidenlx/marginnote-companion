@@ -1,7 +1,7 @@
 import { ReturnBody_Toc, Toc } from "@aidenlx/obsidian-bridge";
 import { stringify } from "query-string";
 
-import { AddForEachProp } from "../misc";
+import { AddForEachProp, toPage } from "../misc";
 import MNComp from "../mn-main";
 import { getLink, Link } from "./basic";
 import Template, { getViewKeys, PHValMap } from "./template";
@@ -31,58 +31,51 @@ export default class TocTemplate extends Template<"toc"> {
     super(plugin, "toc");
   }
   prerender(body: ReturnBody_Toc, tplName: string): string {
-    const tplCfg = this.tplCfg.get(tplName);
-    if (!tplCfg) throw new Error("No template found for key " + tplName);
-    const { templates } = tplCfg,
-      indent = tplCfg.indentChar === true ? this.indent : tplCfg.indentChar,
+    const { templates, indentChar } = this.getTplCfg(tplName),
+      indent = indentChar === true ? this.indent : indentChar,
       { bookMap, data: toc } = body;
 
-    const iterate = (toc: Toc, depth = 0): string => {
-      const Page = toPage(toc),
-        {
-          noteId: id,
-          noteTitle: Title,
-          childNotes,
-          excerptText: Excerpt,
-          notesText: AllText,
-        } = toc,
-        DocMd5 = Page ? toc.docMd5 : undefined,
-        { docTitle: DocTitle, pathFile: FilePath } =
-          bookMap[DocMd5 ?? ""] ?? {};
-      const rendered = this.renderTemplate<TocRec>(templates.item, {
-          DocMd5,
-          DocTitle,
-          FilePath,
-          Link: getLink({ id }),
-          Summary: new TocItemSummary(Title, Excerpt, AllText),
-          Query: new TocQuery({ Page, DocMd5, DocTitle, FilePath }),
-        }),
-        lines = childNotes
-          // .sort((a, b) =>
-          //   comparator(
-          //     TocItemSummary.getSummary(a),
-          //     TocItemSummary.getSummary(b),
-          //   ),
-          // )
-          .map((t) => iterate(t, depth + 1));
-      lines.unshift(indent.repeat(depth) + rendered);
-      return lines.join("\n");
-    };
-    return iterate(toc);
+    try {
+      const iterate = (toc: Toc, depth = 0): string => {
+        const Page = toPage(toc),
+          {
+            noteId: id,
+            noteTitle: Title,
+            childNotes,
+            excerptText: Excerpt,
+            notesText: AllText,
+          } = toc,
+          DocMd5 = Page ? toc.docMd5 : undefined,
+          { docTitle: DocTitle, pathFile: FilePath } =
+            bookMap[DocMd5 ?? ""] ?? {};
+        const rendered = this.renderTemplate<TocRec>(templates.item, {
+            DocMd5,
+            DocTitle,
+            FilePath,
+            Link: getLink({ id }),
+            Summary: new TocItemSummary(Title, Excerpt, AllText),
+            Query: new TocQuery({ Page, DocMd5, DocTitle, FilePath }),
+          }),
+          lines = childNotes
+            // .sort((a, b) =>
+            //   comparator(
+            //     TocItemSummary.getSummary(a),
+            //     TocItemSummary.getSummary(b),
+            //   ),
+            // )
+            .map((t) => iterate(t, depth + 1));
+        lines.unshift(indent.repeat(depth) + rendered);
+        return lines.join("\n");
+      };
+      return iterate(toc);
+    } catch (error) {
+      throw this.RenderError(error, tplName);
+    }
   }
   render(...args: Parameters<TocTemplate["prerender"]>): string {
     return this.prerender(...args);
   }
 }
-
-const toPage = (toc: Toc): number[] | undefined => {
-  const { startPage: start, endPage: end } = toc;
-  if (start && end) return [start, end];
-
-  const toExport = start ? start : end;
-  if (toExport) return [toExport];
-  else return undefined;
-};
 
 export class TocItemSummary {
   constructor(

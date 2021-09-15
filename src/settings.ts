@@ -55,20 +55,20 @@ export const DEFAULT_SETTINGS: MNCompSettings = {
     [/[“”„‟〝〞〟＂]/g, '"'],
   ],
   templates: {
-    sel: getDefault<"sel">({ sel: "{{Selection}}" }, { pin: true }),
+    sel: getDefault<"sel">({ sel: "{{Selection}}" }, { pin: true, cmd: true }),
     note: getDefault<"note">(
       {
         body: "\n{{#Title}}\n## {{.}}\n\n{{/Title}}{{Excerpt}}{{Link}}{{> CmtBreak}}{{> Comments}}\n",
         comment: "> - {{.}}\n",
         cmt_linked: "> - {{Excerpt}}{{Link}}\n",
       },
-      { pin: true },
+      { pin: true, cmd: true },
     ),
     toc: getDefault<"toc">(
       {
         item: `- {{Summary}} {{Link}}`,
       },
-      { pin: true, indentChar: true },
+      { pin: true, indentChar: true, cmd: true },
     ),
   },
   videoMap: new Map() as any,

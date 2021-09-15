@@ -21,7 +21,6 @@ export default class SelTemplate extends Template<"sel"> {
   }
   prerender(body: ReturnBody_Sel, tplName: string): string {
     const templates = this.getTemplate(tplName);
-    if (!templates) throw new Error("No template found for key " + tplName);
 
     const { sel, book } = body.data,
       view: SelRec = {
@@ -29,7 +28,11 @@ export default class SelTemplate extends Template<"sel"> {
         FilePath: book?.pathFile,
         DocTitle: book?.docTitle,
       };
-    return this.renderTemplate(templates.sel, view);
+    try {
+      return this.renderTemplate(templates.sel, view);
+    } catch (error) {
+      throw this.RenderError(error, tplName);
+    }
   }
   render(...args: Parameters<SelTemplate["prerender"]>): string {
     return this.prerender(...args);

@@ -89,11 +89,7 @@ export class MNCompSettingTab extends PluginSettingTab {
       cls: "section",
       attr: { id: "mn-tpls-" + type },
     });
-    const heading = ((type: TplCfgTypes) => {
-      const base = "settings.tpl_cfg.headings." as const,
-        path = (base + type) as `${typeof base}${typeof type}`;
-      return t(path);
-    })(type);
+    const heading = t(`settings.tpl_cfg.headings.${type}`);
 
     // Heading
     new Setting(sectionEl)
@@ -216,16 +212,6 @@ export class MNCompSettingTab extends PluginSettingTab {
           new Setting(entryEl)
             .setName(t("settings.tpl_cfg.indent_char_name"))
             .setDesc(t("settings.tpl_cfg.indent_char_desc"))
-            .addToggle((toggle) =>
-              toggle.setValue(cfgVal === true).onChange(async (val) => {
-                cfgToc[keyToc] = val ? true : "";
-                if (input) {
-                  input.setDisabled(val);
-                  input.inputEl.hidden = val;
-                }
-                await this.plugin.saveSettings();
-              }),
-            )
             .addText((text) => {
               const onChange = async (value: string) => {
                 cfgToc[keyToc] = value;
@@ -238,7 +224,17 @@ export class MNCompSettingTab extends PluginSettingTab {
               text.inputEl.hidden = cfgVal === true;
               text.inputEl.size = 4;
               text.inputEl.addClass("indent-char");
-            });
+            })
+            .addToggle((toggle) =>
+              toggle.setValue(cfgVal === true).onChange(async (val) => {
+                cfgToc[keyToc] = val ? true : "";
+                if (input) {
+                  input.setDisabled(val);
+                  input.inputEl.hidden = val;
+                }
+                await this.plugin.saveSettings();
+              }),
+            );
         } else if (typeof cfgVal === "boolean") {
           toggleKeys.push(cfgK);
         } else {
@@ -251,19 +247,9 @@ export class MNCompSettingTab extends PluginSettingTab {
       }
       toggleKeys.length > 0 &&
         toggleKeys.sort().forEach((key) => {
-          const getName = () => {
-            const base = `settings.tpl_cfg.toggles_name.` as const,
-              path = (base + key) as `${typeof base}${typeof key}`;
-            return t(path);
-          };
-          const getDesc = () => {
-            const base = `settings.tpl_cfg.toggles_desc.` as const,
-              path = (base + key) as `${typeof base}${typeof key}`;
-            return strToFragment(t(path));
-          };
           new Setting(entryEl)
-            .setName(getName())
-            .setDesc(getDesc())
+            .setName(t(`settings.tpl_cfg.toggles_name.${key}`))
+            .setDesc(strToFragment(t(`settings.tpl_cfg.toggles_desc.${key}`)))
             .addToggle((toggle) =>
               toggle.setValue(cfg[key]).onChange(async (value) => {
                 cfg[key] = value;

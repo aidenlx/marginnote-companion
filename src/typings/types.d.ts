@@ -5,9 +5,6 @@ declare module "obsidian" {
   interface MenuItem {
     iconEl: HTMLDivElement;
   }
-  interface App {
-    isMobile: boolean;
-  }
   interface Vault {
     getAvailablePathForAttachments(
       basename: string,
