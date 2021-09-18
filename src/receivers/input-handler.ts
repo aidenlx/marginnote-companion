@@ -44,7 +44,7 @@ export default class InputListener extends Events {
    */
   constructor(public timeInterval = 500, public immediate = false) {
     super();
-    if (Platform.isDesktopApp) {
+    if (Platform.isDesktopApp && !Platform.isMobile) {
       let electron: typeof Electron;
       try {
         electron = require("electron");
