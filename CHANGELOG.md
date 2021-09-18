@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/aidenlx/marginnote-companion/compare/0.6.0...0.6.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* fix failed to import picture from url; use wildcard(patch) to comapre version ([1601321](https://github.com/aidenlx/marginnote-companion/commit/1601321d345f5e01247b7df892b67bd88e0e6223))
+
 # [0.6.0](https://github.com/aidenlx/marginnote-companion/compare/0.5.1...0.6.0) (2021-09-15)
 
 
