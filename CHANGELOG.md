@@ -1,3 +1,11 @@
+## [0.6.2](https://github.com/aidenlx/marginnote-companion/compare/0.6.1...0.6.2) (2021-09-20)
+
+
+### Bug Fixes
+
+* **insert:** fix failed to paste plain text ([40e852b](https://github.com/aidenlx/marginnote-companion/commit/40e852b830e630c05ad4f0fc5acb8d04ef9509d8)), closes [#8](https://github.com/aidenlx/marginnote-companion/issues/8)
+* **setting-tab:** fix date time settings not get saved ([4197157](https://github.com/aidenlx/marginnote-companion/commit/4197157eae8b7806f6e53492e4ba189f9dfb2aa8)), closes [#7](https://github.com/aidenlx/marginnote-companion/issues/7)
+
 ## [0.6.1](https://github.com/aidenlx/marginnote-companion/compare/0.6.0...0.6.1) (2021-09-18)
 
 
