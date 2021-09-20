@@ -51,7 +51,15 @@ export class MNCompSettingTab extends PluginSettingTab {
           });
         }),
       )
-      .addText((t) => t.setValue(this.plugin.settings.defaultDateFormat));
+      .addText((text) => {
+        const onChange = async (value: string) => {
+          this.plugin.settings.defaultDateFormat = value;
+          await this.plugin.saveSettings();
+        };
+        text
+          .setValue(this.plugin.settings.defaultDateFormat)
+          .onChange(debounce(onChange, 500, true));
+      });
     this.templates();
   }
 
