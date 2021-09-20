@@ -23,7 +23,7 @@ export const getPastedHandler =
             }),
           );
       e.preventDefault();
-      await insert(plugin);
+      await insert(plugin, noDataCallback);
     }
   };
 
