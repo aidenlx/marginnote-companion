@@ -146,7 +146,7 @@ export default class MNDataHandler {
     else throw new MNDataHandlerErr(ErrType.NoMNData);
   }
 
-  private callback = (view: MarkdownView) => (refSource: string) => {
+  private refCallback = (view: MarkdownView) => (refSource: string) => {
     const { editor, file } = view,
       // cache = this.metadataCache.getFileCache(file),
       cursor = editor.getCursor();
@@ -206,7 +206,6 @@ export default class MNDataHandler {
       return null;
     }
   }
-
   async insertToNote(
     view?: MarkdownView,
     data?: {
@@ -222,7 +221,9 @@ export default class MNDataHandler {
         if (val) view = val;
         else throw new MNDataHandlerErr(ErrType.NoMDView);
       }
-      const refCallback = refSourceToBottom ? this.callback(view) : undefined;
+      const refCallback = refSourceToBottom
+        ? this.refCallback(view)
+        : undefined;
 
       let body: ReturnBody, templateName: string;
       if (data) {

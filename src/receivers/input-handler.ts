@@ -6,14 +6,7 @@ import {
 } from "@aidenlx/obsidian-bridge";
 import type { Clipboard } from "electron";
 import equal from "fast-deep-equal/es6";
-import {
-  App,
-  EventRef,
-  Events,
-  Notice,
-  ObsidianProtocolHandler,
-  Platform,
-} from "obsidian";
+import { EventRef, Events, Notice, Platform } from "obsidian";
 import { ObsidianProtocolData } from "obsidian";
 
 import { OBBRIDGE_MIN_VERSION } from "../misc";
