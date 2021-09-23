@@ -40,9 +40,9 @@ An Obsidian plugin to bridge MarginNote 3 and Obsidian
 
 ## How to use 如何使用
 
-Go to [MarginNote Companion wiki](https://github.com/aidenlx/obsidian-bridge/wiki) for more details
+Go to [MarginNote Companion wiki](https://github.com/aidenlx/marginnote-companion/wiki) for more details
 
-前往 [MarginNote Companion wiki](https://github.com/aidenlx/obsidian-bridge/wiki) 查看更多使用说明
+前往 [MarginNote Companion wiki](https://github.com/aidenlx/marginnote-companion/wiki) 查看更多使用说明
 
 ## Compatibility 兼容性
 
