@@ -19,7 +19,7 @@ import { getPastedHandler, setInsertCommands } from "./receivers/insert";
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
-  inputListener = new InputListener();
+  inputListener = new InputListener(this);
   mnHandler = new MNDataHandler(this);
 
   PastedNoteHandler = getPastedHandler(this);
@@ -38,7 +38,11 @@ export default class MNComp extends Plugin {
     this.registerCodeMirror((cm) => {
       if (cm.on) {
         cm.on("paste", this.PastedNoteHandler);
-        this.register(() => cm.off("paste", this.PastedNoteHandler));
+        this.register(() =>
+          this.app.workspace.iterateCodeMirrors((cm) =>
+            cm.off("paste", this.PastedNoteHandler),
+          ),
+        );
       } else {
         // reserved for cm6 implementations
         // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395

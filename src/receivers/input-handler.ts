@@ -6,7 +6,7 @@ import {
 } from "@aidenlx/obsidian-bridge";
 import type { Clipboard } from "electron";
 import equal from "fast-deep-equal/es6";
-import { EventRef, Events, Notice, Platform } from "obsidian";
+import { EventRef, Events, Notice, Platform, Plugin } from "obsidian";
 import { ObsidianProtocolData } from "obsidian";
 
 import { OBBRIDGE_MIN_VERSION } from "../misc";
@@ -35,8 +35,13 @@ export default class InputListener extends Events {
   /**
    * @param immediate emit event immediately after calling start()
    */
-  constructor(public timeInterval = 500, public immediate = false) {
+  constructor(
+    plugin: Plugin,
+    public timeInterval = 500,
+    public immediate = false,
+  ) {
     super();
+    plugin.register(this.destroy.bind(this));
     if (Platform.isDesktopApp && !Platform.isMobile) {
       let electron: typeof Electron;
       try {
@@ -168,5 +173,9 @@ export default class InputListener extends Events {
       this.info.autoPasteRef && this.offref(this.info.autoPasteRef);
       this.info.autoPasteRef = null;
     }
+  }
+
+  destroy() {
+    this.stop();
   }
 }
