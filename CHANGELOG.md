@@ -1,3 +1,10 @@
+## [0.6.3](https://github.com/aidenlx/marginnote-companion/compare/0.6.2...0.6.3) (2021-09-28)
+
+
+### Bug Fixes
+
+* fix unload not handled properly ([a1e8f68](https://github.com/aidenlx/marginnote-companion/commit/a1e8f688eb55cae90f08eb53fe63554e017798ae)), closes [/github.com/obsidianmd/obsidian-releases/pull/490#issuecomment-928158603](https://github.com//github.com/obsidianmd/obsidian-releases/pull/490/issues/issuecomment-928158603)
+
 ## [0.6.2](https://github.com/aidenlx/marginnote-companion/compare/0.6.1...0.6.2) (2021-09-20)
 
 
