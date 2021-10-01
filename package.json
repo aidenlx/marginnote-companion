@@ -94,7 +94,7 @@
         "git add .",
         "npm run build"
       ],
-      "before:release": "zip -r build/marginnote-companion.zip build/main.js build/styles.css build/manifest.json",
+      "before:release": "zip -FSrj build/marginnote-companion.zip build/main.js build/styles.css build/manifest.json",
       "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
     },
     "git": {
