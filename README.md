@@ -52,19 +52,22 @@ The required API feature is only available for Obsidian v0.12.5+.
 
 ## Installation 安装
 
-Before installing this plugin, go to [the mainpage of obsidian-bridge](https://github.com/aidenlx/obsidian-bridge)
+Before installing this plugin:
 
-1. download the latest `.mnaddon` installer from GitHub Release
+1. download the latest `.mnaddon` installer from [GitHub Release of obsidian-bridge](https://github.com/aidenlx/obsidian-bridge/releases)
 2. follow the [instruction](https://github.com/aidenlx/obsidian-bridge#installation-%E5%AE%89%E8%A3%85) to install and enable obsidian-bridge in MarginNote 3 (it should be a bridge icon at one side of the screen when a notebook/document is opened, click/tap on the icon to enable it)
 
-在安装这个插件之前，[打开 obsidian-bridge 的主页](https://github.com/aidenlx/obsidian-bridge)
+---
 
-1.从 GitHub Release 下载最新的`.mnaddon`安装程序 2.按照[说明](https://github.com/aidenlx/obsidian-bridge#installation-%E5%AE%89%E8%A3%85)在 MarginNote 3 中安装和启用 obsidian-bridge（打开笔记本/文档时在屏幕一侧显示的桥图标，单击图标以启用插件）
+在安装这个插件之前：
+
+1. 从 [obsidian-bridge 的 GitHub Release](https://github.com/aidenlx/obsidian-bridge/releases) 下载最新的`.mnaddon`安装程序
+2. 按照[说明](https://github.com/aidenlx/obsidian-bridge#installation-%E5%AE%89%E8%A3%85)在 MarginNote 3 中安装和启用 obsidian-bridge（打开笔记本/文档时在屏幕一侧显示的桥图标，单击图标以启用插件）
 
 ### From GitHub
 
-1. Download the Latest Release `marginnote-companion.zip` from the Releases section of the GitHub Repository
-2. Put three decompressed files to your vault's plugins folder: `<vault>/.obsidian/plugins/marginnote-companion`
+1. Download the latest release `marginnote-companion.zip` from [the Releases section of the GitHub Repository](https://github.com/aidenlx/marginnote-companion/releases)
+2. Put the files (`main.js`, `manifest.json`, `styles.css`) in `marginnote-companion.zip` to your vault's plugins folder: `<vault>/.obsidian/plugins/marginnote-companion`
 3. Reload Obsidian
 4. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
    Otherwise, head to Settings, third-party plugins, make sure safe mode is off and
@@ -74,8 +77,8 @@ Before installing this plugin, go to [the mainpage of obsidian-bridge](https://g
 
 ---
 
-1. 从 GitHub 仓库的 Releases 下载`marginnote-companion.zip`
-2. 把解压后的三个文件放在对应 Vault 的插件文件夹下：`<vault>/.obsidian/plugins/marginnote-companion`
+1. 从 [此插件 GitHub 仓库的 Releases](https://github.com/aidenlx/marginnote-companion/releases) 下载`marginnote-companion.zip`
+2. 把`marginnote-companion.zip`内的三个文件（`main.js`, `manifest.json`, `styles.css`）放在对应 Vault 的插件文件夹下：`<vault>/.obsidian/plugins/marginnote-companion`
 3. 重新加载 Obsidian
 4. 如果出现有关安全模式的提示，则可以禁用安全模式并启用插件。否则，请转到`设置`→`第三方插件`，确保关闭安全模式，然后从`第三方插件`启用插件
 
