@@ -64,7 +64,7 @@
     "lodash-es": "^4.17.21",
     "marked": "^3.0.0",
     "mustache": "^4.2.0",
-    "obsidian": "^0.12.11",
+    "obsidian": "^0.12.17",
     "query-string": "^7.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

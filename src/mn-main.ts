@@ -35,19 +35,7 @@ export default class MNComp extends Plugin {
     this.addSettingTab(new MNCompSettingTab(this));
 
     // register mn note handlers
-    this.registerCodeMirror((cm) => {
-      if (cm.on) {
-        cm.on("paste", this.PastedNoteHandler);
-        this.register(() =>
-          this.app.workspace.iterateCodeMirrors((cm) =>
-            cm.off("paste", this.PastedNoteHandler),
-          ),
-        );
-      } else {
-        // reserved for cm6 implementations
-        // https://discuss.codemirror.net/t/codemirror-6-proper-way-to-listen-for-changes/2395
-      }
-    });
+    this.app.workspace.on("editor-paste", this.PastedNoteHandler);
     setInsertCommands(this);
 
     this.registerEditorMenu();
@@ -108,7 +96,11 @@ export default class MNComp extends Plugin {
           item
             .setTitle(`${data.type}: ...`)
             .setIcon("mn-fill")
-            .onClick((evt) => subMenu.showAtMouseEvent(evt)),
+            .onClick((evt) =>
+              evt instanceof MouseEvent
+                ? subMenu.showAtMouseEvent(evt)
+                : subMenu.showAtPosition(item.iconEl.getBoundingClientRect()),
+            ),
         );
     };
     this.registerEvent(this.app.workspace.on("editor-menu", onEditorMenu));

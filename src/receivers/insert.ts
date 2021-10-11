@@ -1,29 +1,34 @@
 import { ReturnBody } from "@aidenlx/obsidian-bridge";
 import equal from "fast-deep-equal/es6";
-import { MarkdownView } from "obsidian";
+import { Editor, MarkdownView } from "obsidian";
 
 import t from "../lang/helper";
 import MNComp from "../mn-main";
 import { TplCfgTypes } from "../typings/tpl-cfg";
 
 export const getPastedHandler =
-  (plugin: MNComp) => async (cm: CodeMirror.Editor, e: ClipboardEvent) => {
+  (plugin: MNComp) =>
+  async (
+    e: ClipboardEvent & { mnHandled?: any },
+    _editor: Editor,
+    view: MarkdownView,
+  ) => {
     if (
-      e.cancelable &&
+      e.mnHandled !== true &&
       e.target &&
       // plain text only to avoid breaking html->md
       equal(e.clipboardData?.types, ["text/plain"])
     ) {
       const target = e.target,
-        noDataCallback = () =>
-          target.dispatchEvent(
-            new ClipboardEvent("paste", {
-              clipboardData: e.clipboardData,
-              cancelable: false,
-            }),
-          );
+        noDataCallback = () => {
+          let newEvt = new ClipboardEvent("paste", {
+            clipboardData: e.clipboardData,
+          }) as typeof e;
+          newEvt.mnHandled = true;
+          target.dispatchEvent(newEvt);
+        };
       e.preventDefault();
-      await insert(plugin, noDataCallback);
+      await insert(plugin, noDataCallback, view);
     }
   };
 
