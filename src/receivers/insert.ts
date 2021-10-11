@@ -1,55 +1,35 @@
-import { ReturnBody } from "@aidenlx/obsidian-bridge";
 import equal from "fast-deep-equal/es6";
-import { Editor, MarkdownView } from "obsidian";
 
 import t from "../lang/helper";
 import MNComp from "../mn-main";
 import { TplCfgTypes } from "../typings/tpl-cfg";
 
-export const getPastedHandler =
-  (plugin: MNComp) =>
-  async (
-    e: ClipboardEvent & { mnHandled?: any },
-    _editor: Editor,
-    view: MarkdownView,
-  ) => {
-    if (
-      e.mnHandled !== true &&
-      e.target &&
-      // plain text only to avoid breaking html->md
-      equal(e.clipboardData?.types, ["text/plain"])
-    ) {
-      const target = e.target,
-        noDataCallback = () => {
-          let newEvt = new ClipboardEvent("paste", {
-            clipboardData: e.clipboardData,
-          }) as typeof e;
-          newEvt.mnHandled = true;
-          target.dispatchEvent(newEvt);
-        };
-      e.preventDefault();
-      await insert(plugin, noDataCallback, view);
-    }
-  };
+const setInsertData = (plugin: MNComp): void => {
+  const { workspace } = plugin.app,
+    insertToNote = plugin.mnHandler.insertToNote.bind(plugin.mnHandler),
+    checkIsMNData = plugin.inputListener.checkIsMNData.bind(
+      plugin.inputListener,
+    );
 
-const insert = (
-  plugin: MNComp,
-  noDataCallback?: () => void,
-  view?: MarkdownView,
-  tpl?: {
-    target: TplCfgTypes | ReturnBody;
-    tplName: string;
-  },
-) =>
-  plugin.mnHandler.insertToNote(view, tpl, {
-    NoMNData: noDataCallback,
-  });
+  // setPastedHandler
+  plugin.registerEvent(
+    workspace.on("editor-paste", (evt, _editor, view) => {
+      if (
+        // plain text only to avoid breaking html->md
+        equal(evt.clipboardData?.types, ["text/plain"]) &&
+        checkIsMNData(evt)
+      ) {
+        evt.preventDefault();
+        insertToNote(view);
+      }
+    }),
+  );
 
-export const setInsertCommands = (plugin: MNComp) => {
+  // setInsertCommands
   plugin.addCommand({
     id: "mn-insert2doc",
     name: t("cmd.insert2doc"),
-    editorCallback: async () => insert(plugin),
+    editorCallback: (_e, view) => insertToNote(view),
   });
   const { templates } = plugin.settings;
   for (const key of Object.keys(templates)) {
@@ -62,9 +42,11 @@ export const setInsertCommands = (plugin: MNComp) => {
           tplName: name,
           data_type: t(`settings.tpl_cfg.headings.${type}`),
         }),
-        editorCallback: async (_e, view) =>
-          insert(plugin, undefined, view, { target: type, tplName: name }),
+        editorCallback: (_e, view) =>
+          insertToNote(view, { target: type, tplName: name }),
       });
     }
   }
 };
+
+export default setInsertData;

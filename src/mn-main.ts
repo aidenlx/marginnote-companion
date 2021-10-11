@@ -14,15 +14,13 @@ import icons from "./icons";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { setAutoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
-import { getPastedHandler, setInsertCommands } from "./receivers/insert";
+import setInsertData from "./receivers/insert";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
 
   inputListener = new InputListener(this);
   mnHandler = new MNDataHandler(this);
-
-  PastedNoteHandler = getPastedHandler(this);
 
   loadSettings = loadSettings.bind(this);
   saveSettings = saveSettings.bind(this);
@@ -35,8 +33,7 @@ export default class MNComp extends Plugin {
     this.addSettingTab(new MNCompSettingTab(this));
 
     // register mn note handlers
-    this.app.workspace.on("editor-paste", this.PastedNoteHandler);
-    setInsertCommands(this);
+    setInsertData(this);
 
     this.registerEditorMenu();
     setAutoPaste(this);
