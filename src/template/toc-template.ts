@@ -56,14 +56,16 @@ export default class TocTemplate extends Template<"toc"> {
             Summary: new TocItemSummary(Title, Excerpt, AllText),
             Query: new TocQuery({ Page, DocMd5, DocTitle, FilePath }),
           }),
-          lines = childNotes
-            // .sort((a, b) =>
-            //   comparator(
-            //     TocItemSummary.getSummary(a),
-            //     TocItemSummary.getSummary(b),
-            //   ),
-            // )
-            .map((t) => iterate(t, depth + 1));
+          lines = Array.isArray(childNotes)
+            ? childNotes
+                // .sort((a, b) =>
+                //   comparator(
+                //     TocItemSummary.getSummary(a),
+                //     TocItemSummary.getSummary(b),
+                //   ),
+                // )
+                .map((t) => iterate(t, depth + 1))
+            : [];
         lines.unshift(indent.repeat(depth) + rendered);
         return lines.join("\n");
       };
