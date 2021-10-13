@@ -1,3 +1,10 @@
+## [0.6.4](https://github.com/aidenlx/marginnote-companion/compare/0.6.3...0.6.4) (2021-10-13)
+
+
+### Bug Fixes
+
+* **toc:** fix toc failed to insert on mobile ([77d9443](https://github.com/aidenlx/marginnote-companion/commit/77d9443843711f45af8d58a1317c5a5078faec40))
+
 ## [0.6.3](https://github.com/aidenlx/marginnote-companion/compare/0.6.2...0.6.3) (2021-09-28)
 
 
