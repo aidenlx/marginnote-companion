@@ -1,3 +1,11 @@
+# [0.7.0](https://github.com/aidenlx/marginnote-companion/compare/0.6.4...0.7.0) (2021-10-20)
+
+
+### Features
+
+* **insert:** add support for paste-to-insert on mobile ([2842bdf](https://github.com/aidenlx/marginnote-companion/commit/2842bdf8bbeb9dab3c44bf90710ce01e5387750a))
+* update paste hanlder to support cm6 ([87d06aa](https://github.com/aidenlx/marginnote-companion/commit/87d06aaa75707835aba389cd76884999784aaf82))
+
 ## [0.6.4](https://github.com/aidenlx/marginnote-companion/compare/0.6.3...0.6.4) (2021-10-13)
 
 

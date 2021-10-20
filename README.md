@@ -46,7 +46,7 @@ Go to [MarginNote Companion wiki](https://github.com/aidenlx/marginnote-companio
 
 ## Compatibility 兼容性
 
-The required API feature is only available for Obsidian v0.12.5+.
+The required API feature is only available for Obsidian v0.12.17+.
 
 所需的 API 功能需要 Obsidian v0.12.5+.
 
