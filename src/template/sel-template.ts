@@ -2,7 +2,7 @@ import { ReturnBody_Sel } from "@aidenlx/obsidian-bridge";
 
 import { AddForEachProp } from "../misc";
 import MNComp from "../mn-main";
-import { Text } from "./basic";
+import Text from "./basic/text";
 import Template, { getViewKeys, PHValMap } from "./template";
 
 /** accepted placeholders */

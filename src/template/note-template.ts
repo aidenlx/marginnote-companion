@@ -2,17 +2,18 @@ import { Book, Note, ReturnBody_Note } from "@aidenlx/obsidian-bridge";
 import {
   excerptPic,
   excerptPic_video,
-  linkComment,
   linkComment_pic,
 } from "@alx-plugins/marginnote";
 import assertNever from "assert-never";
-import { Notice } from "obsidian";
 import replaceAsync from "string-replace-async";
 
 import AddNewVideo from "../handlers/add-new-video";
-import { AddForEachProp, NonTypeProps } from "../misc";
+import { AddForEachProp, getBookFromMap, NonTypeProps, toPage } from "../misc";
 import MNComp from "../mn-main";
-import { Comment, Excerpt, getLink, Link } from "./basic";
+import Comment from "./basic/comment";
+import Excerpt from "./basic/excerpt";
+import Link from "./basic/link";
+import Query from "./basic/query";
 import Template, { getViewKeys, PHValMap } from "./template";
 
 type Partials = Record<"Comments" | "CmtBreak", string>;
@@ -20,7 +21,9 @@ type Partials = Record<"Comments" | "CmtBreak", string>;
 /**
  * for comments, use {{> Comments}}; for excerpt, use {{> Excerpt}}; for title with heading level, use {{Title.1}}
  */
-type BodyRec = PHValMap<"Created" | "Modified" | "FilePath" | "DocTitle"> &
+type BodyRec = PHValMap<
+  "Created" | "Modified" | "FilePath" | "DocTitle" | "DocMd5"
+> &
   AddForEachProp<{
     Excerpt: Excerpt;
     Comments: CommentRec[];
@@ -28,6 +31,7 @@ type BodyRec = PHValMap<"Created" | "Modified" | "FilePath" | "DocTitle"> &
     Title: string;
     Aliases: string;
     Link: Link;
+    Query: Query;
   }>;
 
 type CommentRec =
@@ -44,11 +48,13 @@ export const NoteViewKeys = {
     Modified: null,
     FilePath: null,
     DocTitle: null,
+    DocMd5: null,
     RawTitle: null,
     Title: null,
     Aliases: null,
     Link: null,
     Excerpt: null,
+    Query: null,
   }),
   cmt_linked: getViewKeys<keyof Exclude<CommentRec, Comment>>({
     Excerpt: null,
@@ -106,7 +112,7 @@ export default class NoteTemplate extends Template<"note"> {
       switch (c.type) {
         case "TextNote": // LinkedNote (mnUrl in c.text) or comment
           return c.text?.startsWith("marginnote3app")
-            ? new Comment(getLink(c.text), c.noteid)
+            ? new Comment(Link.getInst(c.text), c.noteid)
             : new Comment(this.getText(c.text), c.noteid);
         case "HtmlNote": // if with noteid: from merged note
           return new Comment(this.getText(c.html, true), c.noteid);
@@ -137,7 +143,7 @@ export default class NoteTemplate extends Template<"note"> {
               },
               mediaMap,
             ),
-            Link: getLink({ id: c.noteid }),
+            Link: Link.getInst({ id: c.noteid }),
           };
         default:
           assertNever(c);
@@ -150,17 +156,23 @@ export default class NoteTemplate extends Template<"note"> {
     mediaMap: Record<string, string>,
     refCallback?: (refSource: string) => any,
   ): Omit<BodyRec, "Comments"> {
-    const { noteTitle, createDate, modifiedDate, docMd5, noteId } = note,
-      book = getBook(docMd5, bookMap);
+    const Page = toPage(note),
+      { noteTitle, createDate, modifiedDate, docMd5: DocMd5, noteId } = note,
+      { docTitle: DocTitle, pathFile: FilePath } = getBookFromMap(
+        DocMd5,
+        bookMap,
+      );
     return {
       RawTitle: noteTitle,
       ...getTitleAliasesProps(noteTitle),
       Created: this.formatDate(createDate),
       Modified: this.formatDate(modifiedDate),
-      Link: getLink({ id: noteId }, undefined, refCallback),
-      FilePath: book?.pathFile,
-      DocTitle: book?.docTitle,
+      Link: Link.getInst({ id: noteId }, undefined, refCallback),
+      FilePath,
+      DocTitle,
+      DocMd5,
       Excerpt: this.getExcerpt({ note }, mediaMap),
+      Query: new Query({ Page, DocMd5, DocTitle, FilePath }),
     };
   }
 
@@ -256,7 +268,8 @@ export default class NoteTemplate extends Template<"note"> {
             return (await getPicLink(picMd5, data)) ?? _match;
         } else if (type === "video" && params.length === 3) {
           const [videoMd5, hash, SnapshotMd5] = params,
-            srcName = getBook(videoMd5, bookMap)?.docTitle ?? "Unknown Video",
+            srcName =
+              getBookFromMap(videoMd5, bookMap).docTitle ?? "Unknown Video",
             target = await new AddNewVideo(
               this.plugin,
               srcName,
@@ -311,11 +324,6 @@ const getTitleAliasesProps = (
       Aliases: undefined,
     };
 };
-
-const getBook = (
-  md5: string | undefined,
-  map: Record<string, Book> | undefined,
-) => (md5 && map ? map[md5] : undefined);
 
 const getAttName = (id: string | undefined): string => {
   const date = "YYYYMMDDHHmmss";

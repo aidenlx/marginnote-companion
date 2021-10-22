@@ -1,3 +1,4 @@
+import { Book } from "@aidenlx/obsidian-bridge";
 import { unescape } from "html-escaper";
 
 export const OBBRIDGE_MIN_VERSION = "3.0.4".replace(/\.\d+$/, ".x");
@@ -71,3 +72,8 @@ export const toPage = (
   if (isPosInteger(toExport)) return [toExport, toExport];
   else return undefined;
 };
+
+export const getBookFromMap = (
+  md5: string | undefined,
+  map: Record<string, Book> | undefined,
+) => (md5 && map ? map[md5] : {}) as Partial<Book>;

@@ -1,13 +1,13 @@
 import { ReturnBody_Toc, Toc } from "@aidenlx/obsidian-bridge";
-import { stringify } from "query-string";
 
-import { AddForEachProp, toPage } from "../misc";
+import { AddForEachProp, getBookFromMap, toPage } from "../misc";
 import MNComp from "../mn-main";
-import { getLink, Link } from "./basic";
+import Link from "./basic/link";
+import Query from "./basic/query";
 import Template, { getViewKeys, PHValMap } from "./template";
 
 type TocRec = PHValMap<"FilePath" | "DocTitle" | "DocMd5"> &
-  AddForEachProp<{ Link: Link; Summary: TocItemSummary; Query: TocQuery }>;
+  AddForEachProp<{ Link: Link; Summary: TocItemSummary; Query: Query }>;
 
 export const TocViewKeys = getViewKeys<keyof TocRec>({
   FilePath: null,
@@ -44,17 +44,19 @@ export default class TocTemplate extends Template<"toc"> {
             childNotes,
             excerptText: Excerpt,
             notesText: AllText,
+            docMd5: DocMd5,
           } = toc,
-          DocMd5 = Page ? toc.docMd5 : undefined,
-          { docTitle: DocTitle, pathFile: FilePath } =
-            bookMap[DocMd5 ?? ""] ?? {};
+          { docTitle: DocTitle, pathFile: FilePath } = getBookFromMap(
+            DocMd5,
+            bookMap,
+          );
         const rendered = this.renderTemplate<TocRec>(templates.item, {
             DocMd5,
             DocTitle,
             FilePath,
-            Link: getLink({ id }),
+            Link: Link.getInst({ id }),
             Summary: new TocItemSummary(Title, Excerpt, AllText),
-            Query: new TocQuery({ Page, DocMd5, DocTitle, FilePath }),
+            Query: new Query({ Page, DocMd5, DocTitle, FilePath }),
           }),
           lines = Array.isArray(childNotes)
             ? childNotes
@@ -93,91 +95,6 @@ export class TocItemSummary {
     return toc.noteTitle ?? toc.excerptText ?? toc.notesText ?? "";
   }
 }
-
-const QueryKeys = ["Page", "DocMd5", "DocTitle", "FilePath"] as const;
-type QueryObjRaw = AddForEachProp<
-  {
-    Page: number[];
-    DocMd5: string;
-    DocTitle: string;
-    FilePath: string;
-  },
-  undefined
->;
-type QueryObj = Map<
-  keyof QueryObjRaw,
-  Exclude<QueryObjRaw[keyof QueryObjRaw], undefined>
->;
-const qsConfig = { arrayFormat: "comma", sort: false } as const;
-
-export class TocQuery {
-  constructor(private raw: QueryObjRaw) {}
-  private queryObj: QueryObj = new Map();
-  private encode = false;
-
-  private addToQuery(key: keyof QueryObjRaw) {
-    let rawVal;
-    (rawVal = this.raw[key]) && this.queryObj.set(key, rawVal);
-  }
-
-  get isEmpty(): boolean {
-    for (const v of Object.values(this.raw)) {
-      if (v !== undefined) return false;
-    }
-    return true;
-  }
-
-  get Encode(): TocQuery {
-    this.encode = true;
-    return this;
-  }
-
-  get Page(): TocQuery {
-    this.addToQuery("Page");
-    return this;
-  }
-  get DocMd5(): TocQuery {
-    this.addToQuery("DocMd5");
-    return this;
-  }
-  get DocTitle(): TocQuery {
-    this.addToQuery("DocTitle");
-    return this;
-  }
-  get FilePath(): TocQuery {
-    this.addToQuery("FilePath");
-    return this;
-  }
-
-  toString(): string {
-    if (this.queryObj.size === 0) {
-      QueryKeys.forEach((k) => this.addToQuery(k));
-    }
-    return stringify(CamelKeyToDash(this.queryObj), {
-      ...qsConfig,
-      encode: this.encode,
-    });
-  }
-}
-
-const CamelKeyToDash = (items: QueryObj) => {
-  const entries = items.entries(),
-    convertIterator: typeof entries = {
-      next: () => {
-        let result = entries.next();
-        if (result.value && typeof result.value[0] === "string")
-          result.value[0] = (result.value[0] as string).replace(
-            /[A-Z]/g,
-            (m, offset) => (offset === 0 ? "" : "-") + m.toLowerCase(),
-          );
-        return result;
-      },
-      [Symbol.iterator]: function () {
-        return this;
-      },
-    };
-  return Object.fromEntries(convertIterator);
-};
 
 // async function cmdOutlineHandler(plugin: MNComp): Promise<void> {
 //   console.log("called");

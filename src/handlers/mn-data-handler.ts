@@ -8,7 +8,7 @@ import t from "../lang/helper";
 import { toPage } from "../misc";
 import MNComp from "../mn-main";
 import { DEFAULT_TPL_NAME } from "../settings";
-import { getLink, Link } from "../template/basic";
+import Link from "../template/basic/link";
 import NoteTemplate, { getTitleAliases } from "../template/note-template";
 import SelTemplate from "../template/sel-template";
 import { NoTplFoundError, RenderError } from "../template/template";
@@ -308,7 +308,7 @@ export default class MNDataHandler {
         {
           [docTitle ?? docPath ?? "null"]: getSrcInfo({
             md5: docMd5,
-            url: getLink({ id: noteId })?.Url,
+            url: Link.getInst({ id: noteId })?.Url,
             page: toPage(body.data),
           }),
         },

@@ -1,12 +1,11 @@
 import { ReturnBody } from "@aidenlx/obsidian-bridge";
 import { decode } from "base64-arraybuffer";
 import Mustache from "mustache";
-import { Constructor, MarkdownView, TFile } from "obsidian";
+import { MarkdownView, TFile } from "obsidian";
 
 import MNComp from "../mn-main";
-import { MNCompSettings } from "../settings";
-import { Templates, TplCfgRec, TplCfgTypes } from "../typings/tpl-cfg";
-import { getText } from "./basic";
+import { TplCfgRec, TplCfgTypes } from "../typings/tpl-cfg";
+import Text from "./basic/text";
 
 export type PHValMap<T extends string> = Record<T, string | undefined>;
 
@@ -83,7 +82,7 @@ export default abstract class Template<T extends TplCfgTypes> {
       : undefined;
   }
   protected getText(str: string | undefined, html?: boolean) {
-    return getText(str, this.plugin, html);
+    return Text.getInst(str, this.plugin, html);
   }
 
   protected renderTemplate = <V>(
