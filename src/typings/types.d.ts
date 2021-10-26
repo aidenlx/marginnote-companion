@@ -18,6 +18,34 @@ declare module "obsidian" {
   interface Menu {
     select(index: number): void;
   }
+  interface App {
+    internalPlugins: {
+      plugins: {
+        ["note-composer"]?: {
+          instance: {
+            getSelectionUnderHeading(
+              file: TFile,
+              editor: Editor,
+              startLineNum: number,
+            ): {
+              start: EditorPosition;
+              end: EditorPosition;
+              heading: string;
+            } | null;
+            options: {
+              replacementText: string;
+            };
+          };
+        };
+      };
+    };
+  }
+  interface FileManager {
+    createNewMarkdownFileFromLinktext(
+      linktext: string,
+      path: string,
+    ): Promise<TFile | null>;
+  }
 }
 
 declare global {

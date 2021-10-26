@@ -15,6 +15,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@aidenlx/folder-note-core": "^1.0.0",
     "@aidenlx/obsidian-bridge": "^3.0.4",
     "@release-it/bumper": "^3.0.1",
     "@release-it/conventional-changelog": "^3.3.0",
@@ -62,6 +63,7 @@
     "json2md": "^1.12.0",
     "lodash-es": "^4.17.21",
     "mustache": "^4.2.0",
+    "path-browserify": "^1.0.1",
     "obsidian": "^0.12.17",
     "query-string": "^7.0.1",
     "react": "^17.0.2",
@@ -77,6 +79,9 @@
     "tslib": "^2.3.1",
     "typescript": "^4.4.4",
     "url-parse": "^1.5.3"
+  },
+  "browser": {
+    "path": "path-browserify"
   },
   "release-it": {
     "hooks": {
