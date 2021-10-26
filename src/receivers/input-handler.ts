@@ -69,9 +69,23 @@ export default class InputListener extends Events {
     }
   }
 
-  checkIsMNData(evt: ClipboardEvent): boolean {
-    const text = evt.clipboardData?.getData("text");
-    return !!text && (isDataFromMN(text) || text === RECIEVED_FLAG);
+  checkIsMNData(input: ClipboardEvent | string): boolean {
+    const text =
+      typeof input === "string" ? input : input.clipboardData?.getData("text");
+    if (isCbInfo(this.info)) return !!text && isDataFromMN(text);
+    else if (this.info === undefined) return false;
+    else return !!text && text === RECIEVED_FLAG;
+  }
+
+  isDataAvailable(): boolean {
+    if (this.info === undefined) {
+      console.error("Call InputListener before init");
+      return false;
+    } else if (isCbInfo(this.info)) {
+      return this.checkIsMNData(this.info.instance.readText());
+    } else {
+      return !!this.info.paramsCache;
+    }
   }
 
   /** read from clipboard/cache */
@@ -134,7 +148,8 @@ export default class InputListener extends Events {
   trigger(name: "url-recieved", params: ObsidianProtocolData): void;
   trigger(name: "changed", val: NonNullable<InputListener["lastValue"]>): void;
   trigger(name: string, ...data: any[]): void {
-    super.trigger(name, ...data);
+    if (name !== "url-recieved" || isDataFromMN(data[0]))
+      super.trigger(name, ...data);
   }
 
   /**
