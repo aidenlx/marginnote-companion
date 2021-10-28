@@ -16,6 +16,7 @@ import InputListener from "./receivers/input-handler";
 import setInsertData from "./receivers/insert";
 import setupToSrcTools from "./to-src";
 import ExtractHeading from "./toc-tools/extract-heading";
+import HideInlineSrc from "./toc-tools/hide-inline-src";
 import CopyLinkedToFolder from "./toc-tools/linked2folder";
 import Toc2File from "./toc-tools/toc2file";
 import Toc2Fm from "./toc-tools/toc2fm";
@@ -68,6 +69,7 @@ export default class MNComp extends Plugin {
     Toc2File(this);
     Toc2Heading(this);
     CopyLinkedToFolder(this);
+    HideInlineSrc(this);
   }
 
   registerEditorMenu() {
