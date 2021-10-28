@@ -15,6 +15,9 @@ declare module "obsidian" {
     getConfig(key: "tabSize"): number;
     getConfig(key: string): any;
   }
+  interface Menu {
+    select(index: number): void;
+  }
 }
 
 declare global {

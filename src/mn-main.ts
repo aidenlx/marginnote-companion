@@ -8,13 +8,14 @@ import {
 } from "settings";
 
 import { aliasBelowH1 } from "./controls/heading-alias";
-import { addSourceButton } from "./controls/source-button";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { setAutoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
 import setInsertData from "./receivers/insert";
+import addSrcButton from "./to-source/src-button";
+import addSrcCommand from "./to-source/src-cmd";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
@@ -47,7 +48,8 @@ export default class MNComp extends Plugin {
     registerMacroCmd.call(this);
 
     // Enable GUI Modification
-    addSourceButton(this.app);
+    addSrcButton(this.app);
+    addSrcCommand(this);
     this.registerMarkdownPostProcessor(aliasBelowH1);
 
     // URL Scheme handlers
