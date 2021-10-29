@@ -2,7 +2,6 @@
 import { ObsidianProtocolData } from "obsidian";
 
 import MNComp from "../mn-main";
-import extractLabelFromSel from "./extract-label-from-sel";
 import SelToAilas from "./sel-to-ailas";
 
 export function MacroHandler(this: MNComp, params: ObsidianProtocolData): void {
@@ -26,10 +25,5 @@ export function registerMacroCmd(this: MNComp) {
     id: "autodef",
     name: "Selection to Ailases",
     editorCallback: SelToAilas,
-  });
-  this.addCommand({
-    id: "extractLabelFromSel",
-    name: "Extract Label From Selection",
-    editorCallback: extractLabelFromSel,
   });
 }
