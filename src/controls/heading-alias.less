@@ -1,8 +1,10 @@
-div.heading-alias {
+.markdown-preview-section > div h1 ~ div.heading-alias {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  margin-top: 5px;
+  bottom: 3px;
+  margin: 0 2px;
+  position: relative;
   & > span {
     text-decoration: none;
     background-color: var(--background-secondary-alt);
@@ -10,7 +12,7 @@ div.heading-alias {
     color: var(--text-normal);
     font-size: 0.8em;
     padding: 2px 8px;
-    margin: 2px 4px;
+    margin: 2px 2px;
     line-height: 19px;
     border: 1px solid transparent;
     white-space: nowrap;

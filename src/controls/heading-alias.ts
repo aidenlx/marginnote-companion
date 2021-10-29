@@ -7,6 +7,7 @@ import {
 } from "obsidian";
 
 import MNComp from "../mn-main";
+import { Heading2Inline } from "./utils";
 
 const addAliasEl = <T extends HTMLDivElement>(
   aliases: string[],
@@ -30,9 +31,6 @@ const aliasBelowH1 =
     if (!heading.parentElement)
       throw new Error("heading.parentElement is null");
 
-    // @ts-ignore
-    heading.style = "border-bottom: 0; margin-bottom: 0;";
-
     const container = heading.parentElement.createDiv(
       { cls: "heading-alias" },
       (container) => addAliasEl(aliases, container),
@@ -40,6 +38,8 @@ const aliasBelowH1 =
       aliases: string[];
       updateAliases(aliases: string[] | null): void;
     };
+    Heading2Inline(heading);
+
     container.aliases = aliases;
     // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     container.updateAliases = function (aliases) {
