@@ -7,7 +7,7 @@ import {
   saveSettings,
 } from "settings";
 
-import { aliasBelowH1 } from "./controls/heading-alias";
+import aliasBelowH1 from "./controls/heading-alias";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
@@ -50,7 +50,7 @@ export default class MNComp extends Plugin {
     // Enable GUI Modification
     addSrcButton(this.app);
     addSrcCommand(this);
-    this.registerMarkdownPostProcessor(aliasBelowH1);
+    this.registerMarkdownPostProcessor(aliasBelowH1(this));
 
     // URL Scheme handlers
     this.registerObsidianProtocolHandler("mncomp", (params) => {

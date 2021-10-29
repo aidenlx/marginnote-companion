@@ -1,30 +1,65 @@
 import "./heading-alias.less";
 
+import equal from "fast-deep-equal/es6";
 import {
   MarkdownPostProcessorContext,
   parseFrontMatterAliases,
 } from "obsidian";
 
-export const aliasBelowH1 = (
-  el: HTMLElement,
-  ctx: MarkdownPostProcessorContext,
-): void => {
-  const heading = el.querySelector("h1");
-  if (!heading) return;
+import MNComp from "../mn-main";
 
-  const aliases = parseFrontMatterAliases(ctx.frontmatter)?.map((v) => {
-    return createSpan({ text: v });
-  });
-  if (!aliases) return;
+const addAliasEl = <T extends HTMLDivElement>(
+  aliases: string[],
+  containerEl: T,
+): T => (
+  aliases
+    .map((v) => createSpan({ text: v }))
+    .forEach((span) => containerEl.appendChild(span)),
+  containerEl
+);
 
-  if (!heading.parentElement) throw new Error("heading.parentElement is null");
+const aliasBelowH1 =
+  (plugin: MNComp) =>
+  (el: HTMLElement, ctx: MarkdownPostProcessorContext): void => {
+    const heading = el.querySelector("h1");
+    if (!heading) return;
 
-  // @ts-ignore
-  heading.style = "border-bottom: 0;margin-bottom: 0;";
+    const aliases = parseFrontMatterAliases(ctx.frontmatter);
+    if (!aliases || aliases.length === 0) return;
 
-  heading.parentElement.createDiv({ cls: "heading-alias" }, (container) => {
-    for (const alias of aliases) {
-      container.appendChild(alias);
-    }
-  });
-};
+    if (!heading.parentElement)
+      throw new Error("heading.parentElement is null");
+
+    // @ts-ignore
+    heading.style = "border-bottom: 0; margin-bottom: 0;";
+
+    const container = heading.parentElement.createDiv(
+      { cls: "heading-alias" },
+      (container) => addAliasEl(aliases, container),
+    ) as HTMLDivElement & {
+      aliases: string[];
+      updateAliases(aliases: string[] | null): void;
+    };
+    container.aliases = aliases;
+    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    container.updateAliases = function (aliases) {
+      if (!aliases) return;
+      if (equal(this.aliases, aliases)) return;
+      this.empty();
+      addAliasEl(aliases, this);
+      this.aliases = aliases;
+    };
+    const { metadataCache } = plugin.app;
+    plugin.registerEvent(
+      plugin.app.metadataCache.on("changed", (file) => {
+        if (file.path !== ctx.sourcePath) return;
+        container.updateAliases(
+          parseFrontMatterAliases(
+            metadataCache.getFileCache(file)?.frontmatter ?? null,
+          ),
+        );
+      }),
+    );
+  };
+
+export default aliasBelowH1;
