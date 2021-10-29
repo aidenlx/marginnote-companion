@@ -14,7 +14,7 @@ const srcButton =
     const button = createDiv(
       {
         cls: "heading-src",
-        attr: { "aria-label": "Go to Source", "aria-label-position": "bottom" },
+        attr: { "aria-label": "Go to Source", "aria-label-position": "top" },
       },
       (el) => {
         setIcon(el, "link");
