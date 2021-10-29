@@ -20,12 +20,10 @@ const addButton = (app: App) => (leaf: WorkspaceLeaf) => {
   ) {
     let view = leaf.view;
     view.addAction("forward-arrow", label, (evt) => {
-      console.log(
-        getSrcMenu(
-          app.metadataCache.getFileCache(view.file)?.frontmatter?.sources,
-          app,
-        )?.showAtPosition({ x: evt.x, y: evt.y }),
-      );
+      getSrcMenu(
+        app.metadataCache.getFileCache(view.file)?.frontmatter?.sources,
+        app,
+      )?.showAtPosition({ x: evt.x, y: evt.y });
     });
   }
 };
