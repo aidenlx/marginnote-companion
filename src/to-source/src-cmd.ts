@@ -3,7 +3,7 @@ import { MarkdownView } from "obsidian";
 import MNComp from "../mn-main";
 import getSrcMenu, { isObjSrc } from "./src-menu";
 
-const getIt = (plugin: MNComp) => {
+const getViewSrc = (plugin: MNComp) => {
   const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
   let sources;
   if (
@@ -21,11 +21,11 @@ const addSrcCommand = (plugin: MNComp) => {
     id: "open-src",
     name: "Open Source Link",
     checkCallback: (checking) => {
-      const it = getIt(plugin);
+      const viewSrc = getViewSrc(plugin);
       if (checking) {
-        return !!(it && isObjSrc(it.sources));
-      } else if (it) {
-        const { view, sources } = it;
+        return !!(viewSrc && isObjSrc(viewSrc.sources));
+      } else if (viewSrc) {
+        const { view, sources } = viewSrc;
         if (isObjSrc(sources)) {
           const keys = Object.keys(sources);
           if (Object.keys(sources).length === 1) {
