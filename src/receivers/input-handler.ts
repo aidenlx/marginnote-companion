@@ -3,8 +3,10 @@ import {
   isDataFromMN,
   JsonToObj,
   ReturnBody,
+  ReturnBody_Note,
   UrlToObj,
 } from "@aidenlx/obsidian-bridge";
+import assertNever from "assert-never";
 import type { Clipboard } from "electron";
 import equal from "fast-deep-equal/es6";
 import { EventRef, Events, Notice, Platform, Plugin } from "obsidian";
@@ -30,7 +32,10 @@ export default class InputListener extends Events {
   info: CbInfo | UrlInfo;
 
   /** only used for auto paste */
-  private lastValue: string | ObsidianProtocolData | null = null;
+  private lastValue: {
+    raw: string | ObsidianProtocolData;
+    body: ReturnBody;
+  } | null = null;
   private init = true;
 
   /**
@@ -167,13 +172,56 @@ export default class InputListener extends Events {
       this.init = false;
     }
   }
-  private tryTriggerChange = (value: string | ObsidianProtocolData) => {
-    if (!equal(value, this.lastValue)) {
-      this.lastValue = value;
 
-      let data: ReturnBody | null;
-      if ((this.immediate || !this.init) && (data = this.parse(value))) {
-        this.trigger("changed", data);
+  /**
+   * @returns ReturnBody if updated successfully, null if the same
+   */
+  private tryUpdateLastValue(
+    raw: string | ObsidianProtocolData,
+  ): ReturnBody | null {
+    /**
+     * save if given body param not null
+     * @returns given param body
+     */
+    const save = <T extends ReturnBody | null>(body: T) => (
+      body && (this.lastValue = { raw, body }), body
+    );
+    if (this.lastValue === null) {
+      const body = this.parse(raw);
+      return save(body);
+    } else if (raw === this.lastValue.raw) {
+      return null;
+    } else {
+      const body = this.parse(raw);
+      if (!body) return null;
+      if (body.type !== this.lastValue.body.type) {
+        return save(body);
+      }
+
+      let isEqual: boolean;
+      switch (body.type) {
+        case "note":
+        case "toc":
+          isEqual =
+            body.data.noteId ===
+              (this.lastValue.body as ReturnBody_Note).data.noteId ||
+            equal(body.data, this.lastValue.body.data);
+          break;
+        case "sel":
+          isEqual = equal(body.data, this.lastValue.body.data);
+          break;
+        default:
+          assertNever(body);
+      }
+      return isEqual ? null : save(body);
+    }
+  }
+
+  private tryTriggerChange = (raw: string | ObsidianProtocolData) => {
+    const body = this.tryUpdateLastValue(raw);
+    if (body) {
+      if (this.immediate || !this.init) {
+        this.trigger("changed", body);
       }
       if (this.init) this.init = false;
     }
