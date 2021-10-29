@@ -26,6 +26,7 @@ const dict = {
       date_format_desc:
         "All time-related variable in the template file will be rendered in this format",
       check_details: "Check here for more details",
+      autopaste_only_note: "Only import note when auto-pasting",
     },
     tpl_cfg: {
       heading: "Templates",

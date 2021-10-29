@@ -37,9 +37,12 @@ export const setAutoPaste = (plugin: MNComp) => {
   });
 
   // add clipboard listener callback
-  plugin.inputListener.on("changed", (value) => {
-    if (!value) return;
-    plugin.mnHandler.insertToNote();
+  plugin.inputListener.on("changed", (data) => {
+    if (!plugin.settings.autopasteOnlyNote || data.type === "note")
+      plugin.mnHandler.insertToNote(undefined, {
+        target: data,
+        tplName: "default",
+      });
   });
 
   // add button to status bar

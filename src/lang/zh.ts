@@ -24,6 +24,7 @@ const dict: Dict = {
       date_format_name: "日期时间格式",
       date_format_desc: "所有时间相关的变量都会使用该格式渲染日期时间",
       check_details: "点此查阅更多",
+      autopaste_only_note: "自动粘贴时仅导入笔记",
     },
     tpl_cfg: {
       heading: "模板配置",

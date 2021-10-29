@@ -138,15 +138,12 @@ export default class InputListener extends Events {
     name: "url-recieved",
     callback: (params: ObsidianProtocolData) => void,
   ): EventRef;
-  on(
-    name: "changed",
-    callback: (val: NonNullable<InputListener["lastValue"]>) => void,
-  ): EventRef;
+  on(name: "changed", callback: (data: ReturnBody) => void): EventRef;
   on(name: string, callback: (...data: any) => any, ctx?: any): EventRef {
     return super.on(name, callback, ctx);
   }
   trigger(name: "url-recieved", params: ObsidianProtocolData): void;
-  trigger(name: "changed", val: NonNullable<InputListener["lastValue"]>): void;
+  trigger(name: "changed", data: ReturnBody): void;
   trigger(name: string, ...data: any[]): void {
     if (name !== "url-recieved" || isDataFromMN(data[0]))
       super.trigger(name, ...data);
@@ -174,8 +171,9 @@ export default class InputListener extends Events {
     if (!equal(value, this.lastValue)) {
       this.lastValue = value;
 
-      if (this.immediate || !this.init) {
-        this.trigger("changed", value);
+      let data: ReturnBody | null;
+      if ((this.immediate || !this.init) && (data = this.parse(value))) {
+        this.trigger("changed", data);
       }
       if (this.init) this.init = false;
     }

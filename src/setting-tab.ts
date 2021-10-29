@@ -36,10 +36,19 @@ export class MNCompSettingTab extends PluginSettingTab {
     containerEl.empty();
     this.containerEl.toggleClass("mn-settings", true);
 
-    containerEl.createEl("h2", {
+    this.general();
+    this.templates();
+  }
+
+  general() {
+    this.containerEl.createEl("h2", {
       text: t("settings.general.heading"),
     });
-    new Setting(containerEl)
+    this.dateFormat();
+    this.autoPaste();
+  }
+  dateFormat() {
+    new Setting(this.containerEl)
       .setName(t("settings.general.date_format_name"))
       .setDesc(
         createFragment((el) => {
@@ -60,7 +69,18 @@ export class MNCompSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.defaultDateFormat)
           .onChange(debounce(onChange, 500, true));
       });
-    this.templates();
+  }
+  autoPaste() {
+    new Setting(this.containerEl)
+      .setName(t("settings.general.autopaste_only_note"))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.autopasteOnlyNote)
+          .onChange(async (val) => {
+            this.plugin.settings.autopasteOnlyNote = val;
+            await this.plugin.saveSettings();
+          }),
+      );
   }
 
   templates() {
