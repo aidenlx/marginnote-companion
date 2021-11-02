@@ -8,15 +8,13 @@ import {
 } from "settings";
 
 import aliasBelowH1 from "./controls/heading-alias";
-import srcButton from "./controls/heading-src";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";
 import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { setAutoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
 import setInsertData from "./receivers/insert";
-import addSrcButton from "./to-source/src-button";
-import addSrcCommand from "./to-source/src-cmd";
+import setupToSrcTools from "./to-src";
 
 export default class MNComp extends Plugin {
   settings: MNCompSettings = DEFAULT_SETTINGS;
@@ -49,10 +47,8 @@ export default class MNComp extends Plugin {
     registerMacroCmd.call(this);
 
     // Enable GUI Modification
-    addSrcButton(this.app);
-    addSrcCommand(this);
     this.registerMarkdownPostProcessor(aliasBelowH1(this));
-    this.registerMarkdownPostProcessor(srcButton(this.app));
+    setupToSrcTools(this);
 
     // URL Scheme handlers
     this.registerObsidianProtocolHandler("mncomp", (params) => {
