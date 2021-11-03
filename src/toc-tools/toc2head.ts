@@ -1,30 +1,52 @@
-import { Editor, EditorRange } from "obsidian";
+import { Editor, EditorChange } from "obsidian";
 
 import MNComp from "../mn-main";
-import { entry2Heading, test } from "./utils";
+import { getLinePos } from "./basic";
+import { getIndentLevel, matchEntry } from "./utils";
+
+type EntryInfo = NonNullable<ReturnType<typeof matchEntry>>;
 
 const toc2head = (whole: boolean) => (checking: boolean, editor: Editor) => {
   const { line: cursorLineNum } = editor.getCursor(),
-    activeLine = editor.getLine(cursorLineNum);
+    matchResult = matchEntry(editor, cursorLineNum);
   if (checking) {
-    return test(activeLine);
-  } else {
-    let range: EditorRange = {
-      from: { line: cursorLineNum, ch: 0 },
-      to: { line: cursorLineNum, ch: Infinity },
+    return !!matchResult;
+  } else if (matchResult) {
+    let changes: EditorChange[] = [];
+    const br = "%%LB%%";
+    const handleResult = (result: EntryInfo, toHeading: boolean) => {
+      const { replaceLine, replacePrefix } = result;
+      if (toHeading)
+        changes.push(
+          replaceLine((prefix, desc, links) =>
+            `\n${"#".repeat(
+              getIndentLevel(prefix) + 1,
+            )} ${desc}\n\n${links}\n`.replace(/\n/g, br),
+          ),
+        );
+      else changes.push(replacePrefix((prefix) => prefix.replace(/^\s+/g, "")));
     };
-    while (test(editor.getLine(range.from.line - 1))) {
-      range.from.line--;
+
+    const { prefix: refPrefix } = matchResult;
+    handleResult(matchResult, true);
+    let from = cursorLineNum,
+      to = cursorLineNum;
+    let result;
+    while ((result = matchEntry(editor, from - 1))) {
+      const { prefix } = result;
+      handleResult(result, whole || prefix.length <= refPrefix.length);
+      from--;
     }
-    while (test(editor.getLine(range.to.line + 1))) {
-      range.to.line++;
+    while ((result = matchEntry(editor, to + 1))) {
+      const { prefix } = result;
+      handleResult(result, whole || prefix.length <= refPrefix.length);
+      to++;
     }
-    editor.setSelection(range.from, range.to);
-    editor.replaceSelection(
-      entry2Heading(
-        editor.getSelection(),
-        whole ? undefined : activeLine,
-      ).replace(/\n{3,}/g, "\n\n"),
+    editor.transaction({ changes });
+    const listRange = [getLinePos(from, true), getLinePos(to, false)] as const;
+    editor.replaceRange(
+      editor.getRange(...listRange).replace(new RegExp(br, "g"), "\n"),
+      ...listRange,
     );
   }
 };

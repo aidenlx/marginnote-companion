@@ -3,58 +3,45 @@ import { join } from "path";
 
 import { getFrontmatter } from "../handlers/frontmatter";
 import MNComp from "../mn-main";
-import {
-  getFirstSelectedLine,
-  linkToFmSources,
-  matchEntry,
-  test,
-} from "./utils";
+import { linkToFmSources, matchEntry } from "./utils";
 
 const Toc2File = (plugin: MNComp) => {
   plugin.addCommand({
     id: "toc2file",
     name: "Toc Entry to File",
     editorCheckCallback: (checking, editor, view) => {
-      let { line: firstLine, lineNum: lineStart } =
-        getFirstSelectedLine(editor);
+      const matchResult = matchEntry(editor);
       if (checking) {
-        return test(firstLine);
+        return !!matchResult;
       } else {
-        let matched = matchEntry(firstLine);
-        if (!matched) {
-          console.error("Invaild given", firstLine);
-          return;
-        }
-        const {
-            links,
-            isNextIndent,
-            removeNextIndent,
-            replaceTitleWith,
-            title,
-          } = matched,
-          sources = linkToFmSources(links),
+        if (!matchResult) return;
+        const { links, desc, isDeeper, outdentLine, replacePara } = matchResult,
           /** get range of text to be extracted into new file */
-          getRange = (lineStartNum: number) => {
+          getRange = (lineNumStart: number) => {
             let output = "",
               currLine;
             while (
-              (currLine = editor.getLine(++lineStartNum)) &&
-              isNextIndent(currLine)
+              (currLine = editor.getLine(++lineNumStart)) &&
+              isDeeper(currLine)
             ) {
-              output += "\n" + removeNextIndent(currLine);
+              output += "\n" + outdentLine(currLine);
             }
-            return [output, lineStartNum - 1] as const;
+            return [output, lineNumStart - 1] as const;
           };
-
-        const [content, lineEnd] = getRange(lineStart);
+        const lineStart = editor.getCursor().line,
+          [content, lineEnd] = getRange(lineStart);
         const newFileContent =
-          getFrontmatter({ sources }) + "\n\n" + `# ${title}` + "\n" + content;
+          getFrontmatter({ sources: linkToFmSources(links) }) +
+          "\n\n" +
+          `# ${desc}` +
+          "\n" +
+          content;
         (async () => {
           let folder = getApi(plugin)?.getFolderFromNote(view.file);
           if (!folder) folder = view.file.parent;
           // extract to new file and get link to it
           const file = await plugin.app.vault.create(
-              join(folder.isRoot() ? "" : folder.path, title + ".md"),
+              join(folder.isRoot() ? "" : folder.path, desc + ".md"),
               newFileContent,
             ),
             fileMark = plugin.app.fileManager.generateMarkdownLink(
@@ -62,7 +49,7 @@ const Toc2File = (plugin: MNComp) => {
               view.file.path,
             );
           editor.replaceRange(
-            replaceTitleWith(fileMark),
+            replacePara(() => fileMark).text,
             { line: lineStart, ch: 0 },
             { line: lineEnd, ch: Infinity },
           );

@@ -2,7 +2,7 @@ import { EditorRange } from "obsidian";
 
 import { addToFrontmatter } from "../handlers/frontmatter";
 import MNComp from "../mn-main";
-import { getLinkInfo, linkToFmSources, replaceLink, testLink } from "./utils";
+import { linkToFmSources, matchLinks } from "./utils";
 
 const Toc2Fm = (plugin: MNComp) => {
   plugin.addCommand({
@@ -18,20 +18,12 @@ const Toc2Fm = (plugin: MNComp) => {
           .listSelections()
           .map((sel) => ({ from: sel.anchor, to: sel.head }));
       }
+      const matchResult = matchLinks(editor, ranges);
       if (checking) {
-        return ranges.some((range) =>
-          testLink(editor.getRange(range.from, range.to)),
-        );
+        return !!matchResult;
       } else {
-        let rangeText = ranges
-          .map((range) => ({
-            ...range,
-            text: editor.getRange(range.from, range.to),
-          }))
-          .filter((rt) => testLink(rt.text));
-        const links = rangeText.map((rt) => getLinkInfo(rt.text)).flat(1);
-        rangeText.forEach((rt) => (rt.text = replaceLink(rt.text, "")));
-        editor.transaction({ changes: rangeText });
+        const { changes, links } = matchResult;
+        editor.transaction({ changes });
         addToFrontmatter("sources", linkToFmSources(links), editor);
       }
     },

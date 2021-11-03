@@ -37,14 +37,18 @@ const ExtractHeading = (plugin: MNComp) => {
             .replace(new RegExp(`^${firstHeading.mark}`, "gm"), "#");
 
           // fetch links
-          const matchedInfo = matchLinkOnly(sectionText);
+          const matchedInfo = matchLinkOnly(
+            editor,
+            sectionInfo.start.line,
+            sectionInfo.end.line,
+          );
           if (matchedInfo) {
             sectionText =
               getFrontmatter({
                 sources: linkToFmSources(matchedInfo.links),
               }) +
               "\n\n" +
-              matchedInfo.linksRemoved;
+              matchedInfo.getSection(firstHeading.mark, true);
           }
           // create new note
           let newFile =

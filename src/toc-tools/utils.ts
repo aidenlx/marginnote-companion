@@ -1,132 +1,27 @@
-import { Editor } from "obsidian";
+import { Content, Link, ListItem, Paragraph, Text } from "mdast";
+import { Editor, EditorChange, EditorRange } from "obsidian";
+import { parse } from "query-string";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
+import { pointEnd, pointStart, position } from "unist-util-position";
+import { matches, select, selectAll } from "unist-util-select";
+import { source } from "unist-util-source";
 
-const patterns = {
-  entry:
-    /^(?<indent>(?:  )*)(?<listmark>- )(?<title>[^:]+?)?(?<links>(?:\[[^\]]+?\]\(marginnote3app[^ \)]+? "[^\)]*"\))+)\s*$/m,
-  linkOnlyEntry:
-    /^(?<heading># .+)\s*(?<links>(?:\[[^\]]+?\]\(marginnote3app[^ \)]+? "[^\)]*"\)\s*)+)\s*$/m,
-  links:
-    /\[(?<book>[^\]]+?)\]\((?<url>marginnote3app[^ \)]+?) "page=(?<page1>\d+?),(?<page2>\d+?)&doc-md5=(?<md5>[^:\W]+?)"\)/g,
-};
-const indentChar = "  ";
+import {
+  fetchTextForChildren,
+  getLinePos,
+  getSection,
+  LinkWithLT,
+  UPointToObPos,
+  UPosToObRange,
+} from "./basic";
 
-export interface LinkInfo {
+interface LinkInfo {
   book: string;
   url: string;
   md5: string;
   page: [start: number, end: number];
 }
-
-type MatchedInfo = ReturnType<typeof matchEntry>;
-
-export const test = (line: string, linkOnly = false): boolean =>
-  RegExp.prototype.test.call(
-    linkOnly ? patterns.linkOnlyEntry : patterns.entry,
-    line,
-  ) && testLink(line);
-export const matchEntry = (line: string) => {
-  let matched = line.match(patterns.entry);
-  if (!matched || !matched.groups) return null;
-
-  const {
-    links: linksRaw,
-    indent,
-    title,
-    listmark,
-  } = matched.groups as Partial<typeof matched.groups> & { links: string };
-
-  if (!linksRaw) {
-    console.log("missing links in:", line);
-    return null;
-  }
-
-  const nextIndentPattern = new RegExp(
-    `^${indent}${indentChar}((?:${indentChar})*${listmark})`,
-    "m",
-  );
-  return {
-    // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-    replaceTitleWith: (str?: string) => {
-      return (indent ?? "") + (listmark ?? "") + (str ?? title ?? "");
-    },
-    removeNextIndent: (str: string) => str.replace(nextIndentPattern, "$1"),
-    isNextIndent: (str: string) => nextIndentPattern.test(str),
-    indent: indent ?? "",
-    // indentChar,
-    // get currIndentLevel(): number {
-    //   return (indent?.length ?? 0) / indentChar.length;
-    // },
-    title: title ?? "",
-    links: getLinkInfo(linksRaw),
-  };
-};
-export const entry2Heading = (section: string, refEntry?: string) => {
-  const level = refEntry?.match(patterns.entry)?.groups?.indent?.length ?? -1;
-  return section
-    .replace(
-      new RegExp(patterns.entry, patterns.entry.flags + "g"),
-      (...args) => {
-        let group = args.last() as Record<"indent" | "title" | "links", string>;
-        if (
-          group &&
-          typeof group.indent === "string" &&
-          typeof group.title === "string" &&
-          typeof group.links === "string"
-        ) {
-          if (level < 0 || group.indent.length / indentChar.length <= level) {
-            const headingMark =
-              "#" + group.indent.replace(new RegExp(indentChar, "g"), "#");
-            return `\n${headingMark} ${group.title}\n\n${group.links}\n`;
-          } else return args[0].substring((level + 1) * indentChar.length);
-        } else throw new Error("Missing group in match result");
-      },
-    )
-    .replace(/^\n+|\n+$/g, "");
-};
-export const matchLinkOnly = (section: string) => {
-  let matched = section.match(patterns.linkOnlyEntry);
-  if (!matched || !matched.groups) return null;
-
-  const { links: linksRaw } = matched.groups;
-
-  if (!linksRaw) {
-    console.log("missing links in:", section);
-    return null;
-  }
-
-  return {
-    links: getLinkInfo(linksRaw),
-    linksRemoved: section.replace(patterns.linkOnlyEntry, "$1\n"),
-  };
-};
-
-export const testLink = (str: string) => (
-  (patterns.links.lastIndex = 0), patterns.links.test(str)
-);
-export const replaceLink = (str: string, replaceValue: string) => (
-  (patterns.links.lastIndex = 0), str.replace(patterns.links, replaceValue)
-);
-export const getLinkInfo = (str: string) => (
-  (patterns.links.lastIndex = 0),
-  [...str.matchAll(patterns.links)].map((matched) => {
-    const { book, url, page1, page2, md5 } = matched.groups as Record<
-      string,
-      string
-    >;
-    return {
-      book,
-      url,
-      md5,
-      page: [+page1, +page2] as [start: number, end: number],
-    } as LinkInfo;
-  })
-);
-
-export const getFirstSelectedLine = (editor: Editor) => {
-  const { line } = editor.getCursor();
-  let sel = editor.getLine(line);
-  return { lineNum: line, line: sel };
-};
 
 interface FmSrcInfo {
   [book: string]: {
@@ -136,9 +31,184 @@ interface FmSrcInfo {
   };
 }
 
+const indentChar = "  ";
+export const getIndentLevel = (line: string) => {
+  let index = line.search(/[^ ]/); // index of first non-space char
+  return index >= 0 ? index / indentChar.length : -1;
+};
+
+export const getLinkInfo = (links: LinkWithLT[]) =>
+  links.map((link) => {
+    const { linktext: book, title, url } = link,
+      qs = title as string,
+      { "doc-md5": md5, page } = parse(qs, { arrayFormat: "comma" });
+
+    return {
+      book,
+      url,
+      md5,
+      page: (page as string[]).map((str) => +str) as [
+        start: number,
+        end: number,
+      ],
+    } as LinkInfo;
+  });
+
 export const linkToFmSources = (links: LinkInfo[]): FmSrcInfo =>
   links.reduce((srcs, link) => {
     const { book, md5, url, page } = link;
     srcs[book] = { md5, url, page };
     return srcs;
   }, {} as FmSrcInfo);
+
+const isLinks = (children: Content[]): children is (Link | Text)[] =>
+  children.length > 0 && children.every(isLinknEmptyText);
+
+const isLinknEmptyText = (node: Content): node is Text | Link => {
+  switch (node.type) {
+    case "link":
+      return isMNLink(node);
+    case "text":
+      return !node.value.trim();
+    default:
+      return false;
+  }
+};
+
+const mnlinkSelector = 'link[url^="marginnote3app"][title]';
+const isMNLink = (node: Content): node is Link => {
+  if (
+    matches<Link & { title: string }>(mnlinkSelector, node) &&
+    node.children.length > 0
+  ) {
+    const qsObj = parse(node.title, { arrayFormat: "comma" });
+    return (
+      "doc-md5" in qsObj &&
+      Array.isArray(qsObj.page) &&
+      qsObj.page.length === 2 &&
+      qsObj.page.every((str) => Number.isInteger(+str) && +str > 0)
+    );
+  }
+  return false;
+};
+
+const LinkAddLT = (src: string) => (link: Link) => {
+  (link as LinkWithLT).linktext = fetchTextForChildren(src, link.children);
+  return link as LinkWithLT;
+};
+
+export const matchLinkOnly = (editor: Editor, from: number, to: number) => {
+  const sectionStr = getSection(editor, from, to),
+    root = unified().use(remarkParse).parse(sectionStr),
+    para = select<Paragraph>(":root > heading + paragraph", root);
+  if (!para || !isLinks(para.children)) return null;
+  const linksRaw = selectAll<Link>("link", para).map(LinkAddLT(sectionStr));
+  return {
+    links: getLinkInfo(linksRaw),
+    getSection: (headingMark: string, no1stLink: boolean) => {
+      let sec = sectionStr;
+      if (no1stLink)
+        sec =
+          sec.substring(0, pointStart(para).offset) +
+          sec.substring(pointEnd(para).offset as number);
+      return sec.replace(new RegExp(`^${headingMark}`, "gm"), "#");
+    },
+    // remove1stLink: [
+    //   { ...UPosToObRange(position(para), getLinePos(from)), text: "" },
+    // ],
+    // removeSection: [{ from: getLinePos(from), to: getLinePos(to), text: "" }],
+  };
+};
+
+export const matchLinks = (editor: Editor, ranges: EditorRange[]) => {
+  let linkInfos: LinkInfo[] = [],
+    changes: EditorChange[] = [];
+  ranges.forEach((range) => {
+    const sectionStr = editor.getRange(range.from, range.to),
+      root = unified().use(remarkParse).parse(sectionStr),
+      links = selectAll<Link>(mnlinkSelector, root).filter(isMNLink);
+    if (links.length === 0) return;
+    const linksRaw = links.map(LinkAddLT(sectionStr));
+
+    linkInfos.push(...getLinkInfo(linksRaw));
+    linksRaw.forEach((link) =>
+      changes.push({
+        ...UPosToObRange(position(link), range.from),
+        text: "",
+      }),
+    );
+  });
+
+  return { links: linkInfos, changes };
+};
+
+export const matchEntry = (editor: Editor, line?: number) => {
+  const lineNum = line === undefined ? editor.getCursor().line : line;
+  if (lineNum < 0 || lineNum >= editor.lineCount()) return null;
+  const lineStr = getSection(editor, lineNum),
+    root = unified().use(remarkParse).parse(lineStr),
+    li = select<ListItem>(":root > list > listItem", root),
+    p = li && select<Paragraph>("paragraph:first-child", li);
+  if (!li || !p) return null;
+
+  const prefixPos = {
+      start: { ...pointStart(li), column: 1 },
+      end: {
+        line: pointStart(p).line,
+        column: pointStart(p).column - 1,
+      },
+    },
+    prefix = source(prefixPos, lineStr);
+  if (!prefix) return null;
+  const firstLinkIndex = p.children.findIndex(isMNLink);
+  if (firstLinkIndex <= 0) return null; // no title or no link
+  const descNodes = p.children.slice(0, firstLinkIndex),
+    linknTextNodes = p.children.slice(firstLinkIndex);
+  if (!isLinks(linknTextNodes)) return null;
+  const desc = fetchTextForChildren(lineStr, descNodes),
+    linksRaw = linknTextNodes
+      .filter((node): node is Link => node.type === "link")
+      .map(LinkAddLT(lineStr)),
+    links = getLinkInfo(linksRaw),
+    linkRawText = fetchTextForChildren(lineStr, linknTextNodes);
+  return {
+    links,
+    desc,
+    prefix,
+    replacePara: (
+      replaceFunc: (
+        desc: string,
+        links: LinkInfo[],
+        linksRaw: string,
+      ) => string,
+    ): EditorChange => ({
+      ...UPosToObRange(position(p), getLinePos(lineNum)),
+      text: replaceFunc(desc, links, linkRawText),
+    }),
+    replacePrefix: (replaceFunc: (prefix: string) => string): EditorChange => ({
+      ...UPosToObRange(prefixPos, getLinePos(lineNum)),
+      text: replaceFunc(prefix),
+    }),
+    replaceLine: (
+      replaceFunc: (
+        prefix: string,
+        desc: string,
+        linksRaw: string,
+        links: LinkInfo[],
+      ) => string,
+    ): EditorChange => ({
+      ...UPosToObRange(
+        { start: { ...pointStart(li), column: 1 }, end: pointEnd(li) },
+        getLinePos(lineNum),
+      ),
+      text: replaceFunc(prefix, desc, linkRawText, links),
+    }),
+    isDeeper: (line: string) => line.startsWith(indentChar + prefix),
+    outdentLine: (line: string) => {
+      const srcIndentLength = prefix.search(/[^ ]/);
+      return line.substring(
+        indentChar.length + (srcIndentLength < 0 ? 0 : srcIndentLength),
+      );
+    },
+  };
+};
