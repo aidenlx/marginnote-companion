@@ -1,3 +1,4 @@
+import { kebabCase } from "lodash-es";
 import { stringify } from "query-string";
 
 import { AddForEachProp } from "../../misc";
@@ -17,16 +18,13 @@ type QueryObj = Map<
   Exclude<QueryObjRaw[keyof QueryObjRaw], undefined>
 >;
 const qsConfig = { arrayFormat: "comma", sort: false } as const;
-const CamelKeyToDash = (items: QueryObj) => {
+const CamelKeyToKebab = (items: QueryObj) => {
   const entries = items.entries(),
     convertIterator: typeof entries = {
       next: () => {
         let result = entries.next();
         if (result.value && typeof result.value[0] === "string")
-          result.value[0] = (result.value[0] as string).replace(
-            /[A-Z]/g,
-            (m, offset) => (offset === 0 ? "" : "-") + m.toLowerCase(),
-          );
+          result.value[0] = kebabCase(result.value[0]);
         return result;
       },
       [Symbol.iterator]: function () {
@@ -79,7 +77,7 @@ export default class Query {
     if (this.queryObj.size === 0) {
       QueryKeys.forEach((k) => this.addToQuery(k));
     }
-    return stringify(CamelKeyToDash(this.queryObj), {
+    return stringify(CamelKeyToKebab(this.queryObj), {
       ...qsConfig,
       encode: this.encode,
     });
