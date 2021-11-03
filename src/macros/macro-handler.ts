@@ -2,7 +2,7 @@
 import { MarkdownView, ObsidianProtocolData } from "obsidian";
 
 import MNComp from "../mn-main";
-import SelToAilas from "./sel-to-ailas";
+import SelToAilas from "./autodef";
 
 export function MacroHandler(this: MNComp, params: ObsidianProtocolData): void {
   const macroName = params.macro;
@@ -12,7 +12,7 @@ export function MacroHandler(this: MNComp, params: ObsidianProtocolData): void {
   switch (macroName) {
     case "autodef": {
       let mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
-      if (mdView) SelToAilas(this)(false, mdView.editor);
+      if (mdView) SelToAilas(this)(mdView.editor);
       break;
     }
     default:
@@ -26,6 +26,6 @@ export function registerMacroCmd(this: MNComp) {
   this.addCommand({
     id: "autodef",
     name: "AutoDef",
-    editorCheckCallback: SelToAilas(this),
+    editorCallback: SelToAilas(this),
   });
 }

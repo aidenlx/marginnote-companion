@@ -6,11 +6,47 @@ const cleanText = (src: string) => {
     .replace(/([A-Z])\s*-\s*(?=[A-Z])/gi, ""); // 英文连字符处理
 };
 
-export const ExtractDef = (raw: string): string[] => {
+const ExtractDef = (raw: string): string[] => {
   raw = cleanText(raw);
   raw = raw.replace(/[.?!+·"。，？！—“”:：；;'<>]/g, "");
 
   return raw
-    .split(/[,、()（）\/【】「」《》«»]+|或者?|[简又]?称(之?为)?/g)
+    .split(/[,、()（）\/【】「」《》«»]+|或者?|[简又也]?称(之?为)?/g)
     .filter((e) => e);
 };
+
+import assertNever from "assert-never";
+import { Editor } from "obsidian";
+
+import { addToFrontmatter } from "../handlers/frontmatter";
+import MNComp from "../mn-main";
+
+const SelToAilas = (plugin: MNComp) => async (editor: Editor) => {
+  const FromSelection = () => editor.getSelection(),
+    FromMN = async () => {
+      const body = await plugin.inputListener.readFromInput();
+      if (!body) return undefined;
+      switch (body.type) {
+        case "note":
+          return body.data.excerptText;
+        case "sel":
+          return body.data.sel;
+        case "toc":
+          return body.data.excerptText || body.data.noteTitle;
+        default:
+          assertNever(body);
+      }
+    },
+    FromClipboard = async () => {
+      const text = await navigator.clipboard.readText();
+      return text ? text : undefined;
+    };
+  let text: string | undefined = FromSelection();
+  if (!text) text = await FromMN();
+  if (!text) text = await FromClipboard();
+  if (!text) return;
+  addToFrontmatter("aliases", ExtractDef(text), editor);
+  editor.replaceSelection("");
+};
+
+export default SelToAilas;
