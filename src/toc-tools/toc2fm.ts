@@ -1,5 +1,4 @@
-import { EditorRange } from "obsidian";
-
+import { getSelectedRanges } from "../cm-tools";
 import { addToFrontmatter } from "../handlers/frontmatter";
 import MNComp from "../mn-main";
 import { linkToFmSources, matchLinks } from "./utils";
@@ -9,16 +8,7 @@ const Toc2Fm = (plugin: MNComp) => {
     id: "toc2fm",
     name: "Toc Item to Frontmatter",
     editorCheckCallback: (checking, editor) => {
-      let ranges: EditorRange[] = [];
-      const { line } = editor.getCursor();
-      if (!editor.somethingSelected()) {
-        ranges = [{ from: { ch: 0, line }, to: { ch: Infinity, line } }];
-      } else {
-        ranges = editor
-          .listSelections()
-          .map((sel) => ({ from: sel.anchor, to: sel.head }));
-      }
-      const matchResult = matchLinks(editor, ranges);
+      const matchResult = matchLinks(editor, getSelectedRanges(editor));
       if (checking) {
         return !!matchResult;
       } else {

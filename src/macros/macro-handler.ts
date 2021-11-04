@@ -3,6 +3,7 @@ import { MarkdownView, ObsidianProtocolData } from "obsidian";
 
 import MNComp from "../mn-main";
 import SelToAilas from "./autodef";
+import StripChapterNum from "./strip-ch-num";
 
 export function MacroHandler(this: MNComp, params: ObsidianProtocolData): void {
   const macroName = params.macro;
@@ -27,5 +28,10 @@ export function registerMacroCmd(this: MNComp) {
     id: "autodef",
     name: "AutoDef",
     editorCallback: SelToAilas(this),
+  });
+  this.addCommand({
+    id: "strip-ch-num",
+    name: "Strip Chapter Numbers",
+    editorCheckCallback: StripChapterNum,
   });
 }
