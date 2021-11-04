@@ -153,10 +153,7 @@ export const matchEntry = (editor: Editor, line?: number) => {
 
   const prefixPos = {
       start: { ...pointStart(li), column: 1 },
-      end: {
-        line: pointStart(p).line,
-        column: pointStart(p).column - 1,
-      },
+      end: pointStart(p),
     },
     prefix = source(prefixPos, lineStr);
   if (!prefix) return null;

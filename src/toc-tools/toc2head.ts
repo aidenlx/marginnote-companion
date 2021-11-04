@@ -19,7 +19,7 @@ const toc2head = (whole: boolean) => (checking: boolean, editor: Editor) => {
       if (toHeading)
         changes.push(
           replaceLine((prefix, desc, links) =>
-            `\n${"#".repeat(
+            `${"#".repeat(
               getIndentLevel(prefix) + 1,
             )} ${desc}\n\n${links}\n`.replace(/\n/g, br),
           ),
