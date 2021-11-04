@@ -34,7 +34,7 @@ export default class InputListener extends Events {
   /** only used for auto paste */
   private lastValue: {
     raw: string | ObsidianProtocolData;
-    body: ReturnBody;
+    body: ReturnBody | null;
   } | null = null;
   private init = true;
 
@@ -174,7 +174,7 @@ export default class InputListener extends Events {
   }
 
   /**
-   * @returns ReturnBody if updated successfully, null if the same
+   * @returns ReturnBody if updated successfully, null if the same/invaild
    */
   private tryUpdateLastValue(raw: string | ObsidianProtocolData): {
     body: ReturnBody;
@@ -188,22 +188,20 @@ export default class InputListener extends Events {
       body: T,
       sameData = false,
     ): { body: NonNullable<T>; sameData: boolean } | null => {
-      if (body) {
-        this.lastValue = { raw, body };
-        return { body: body as any, sameData: sameData };
-      } else return null;
+      this.lastValue = { raw, body };
+      return body ? { body: body as any, sameData } : null;
     };
-    if (this.lastValue === null) {
+    const saveRaw = () => ((this.lastValue = { raw, body: null }), null);
+
+    if (this.lastValue && raw === this.lastValue.raw) {
+      return null;
+    } else if (!this.lastValue || !this.lastValue.body) {
       const body = this.parse(raw);
       return save(body);
-    } else if (raw === this.lastValue.raw) {
-      return null;
     } else {
       const body = this.parse(raw);
-      if (!body) return null;
-      if (body.type !== this.lastValue.body.type) {
-        return save(body);
-      }
+      if (!body) return saveRaw();
+      if (body.type !== this.lastValue.body.type) return save(body);
 
       let isEqual: boolean;
       switch (body.type) {
@@ -230,7 +228,8 @@ export default class InputListener extends Events {
     const result = this.tryUpdateLastValue(raw);
     if (!result) {
       // if clipboard data not saved in lastValue, toggle init false
-      if (!this.lastValue && this.init) this.init = false;
+      if ((!this.lastValue || !this.lastValue.body) && this.init)
+        this.init = false;
       return;
     }
     const { body, sameData } = result;
