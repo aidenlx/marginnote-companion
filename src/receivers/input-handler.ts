@@ -176,16 +176,23 @@ export default class InputListener extends Events {
   /**
    * @returns ReturnBody if updated successfully, null if the same
    */
-  private tryUpdateLastValue(
-    raw: string | ObsidianProtocolData,
-  ): ReturnBody | null {
+  private tryUpdateLastValue(raw: string | ObsidianProtocolData): {
+    body: ReturnBody;
+    sameData: boolean /** same data, but different timestamp */;
+  } | null {
     /**
      * save if given body param not null
      * @returns given param body
      */
-    const save = <T extends ReturnBody | null>(body: T) => (
-      body && (this.lastValue = { raw, body }), body
-    );
+    const save = <T extends ReturnBody | null>(
+      body: T,
+      sameData = false,
+    ): { body: NonNullable<T>; sameData: boolean } | null => {
+      if (body) {
+        this.lastValue = { raw, body };
+        return { body: body as any, sameData: sameData };
+      } else return null;
+    };
     if (this.lastValue === null) {
       const body = this.parse(raw);
       return save(body);
@@ -213,18 +220,24 @@ export default class InputListener extends Events {
         default:
           assertNever(body);
       }
-      return isEqual ? null : save(body);
+      return isEqual ? save(body, true) : save(body);
     }
   }
 
+  /** toggle true once triggered "changed" evt, enable same data filter */
+  private noMoreSameDataAllowed = false;
   private tryTriggerChange = (raw: string | ObsidianProtocolData) => {
-    const body = this.tryUpdateLastValue(raw);
-    if (body) {
-      if (this.immediate || !this.init) {
-        this.trigger("changed", body);
-      }
-      if (this.init) this.init = false;
+    const result = this.tryUpdateLastValue(raw);
+    if (!result) return;
+    const { body, sameData } = result;
+    if (
+      !(!this.immediate && this.init) &&
+      (!this.noMoreSameDataAllowed || !sameData)
+    ) {
+      this.trigger("changed", body);
+      if (!this.noMoreSameDataAllowed) this.noMoreSameDataAllowed = true;
     }
+    if (this.init) this.init = false;
   };
 
   /**
@@ -238,6 +251,7 @@ export default class InputListener extends Events {
         this.info.intervalId = 0;
         // this.refs.forEach((ref) => this.offref(ref));
         this.lastValue = null;
+        this.noMoreSameDataAllowed = false;
       }
     } else {
       this.info.autoPasteRef && this.offref(this.info.autoPasteRef);
