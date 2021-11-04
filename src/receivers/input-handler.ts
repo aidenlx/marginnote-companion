@@ -228,7 +228,11 @@ export default class InputListener extends Events {
   private noMoreSameDataAllowed = false;
   private tryTriggerChange = (raw: string | ObsidianProtocolData) => {
     const result = this.tryUpdateLastValue(raw);
-    if (!result) return;
+    if (!result) {
+      // if clipboard data not saved in lastValue, toggle init false
+      if (!this.lastValue && this.init) this.init = false;
+      return;
+    }
     const { body, sameData } = result;
     if (
       !(!this.immediate && this.init) &&
