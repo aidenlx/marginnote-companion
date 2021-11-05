@@ -48,11 +48,7 @@ const Toc2File = (plugin: MNComp) => {
               file,
               view.file.path,
             );
-          editor.replaceRange(
-            replacePara(() => fileMark).text,
-            { line: lineStart, ch: 0 },
-            { line: lineEnd, ch: Infinity },
-          );
+          editor.transaction({ changes: [replacePara(() => fileMark)] });
         })();
       }
     },
