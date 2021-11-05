@@ -20,7 +20,7 @@ const toc2head = (whole: boolean) => (checking: boolean, editor: Editor) => {
         changes.push(
           replaceLine((prefix, desc, links) =>
             `${"#".repeat(
-              getIndentLevel(prefix) + 1,
+              getIndentLevel(prefix) + 2,
             )} ${desc}\n\n${links}\n`.replace(/\n/g, br),
           ),
         );
