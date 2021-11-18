@@ -168,6 +168,7 @@ export const matchEntry = (editor: Editor, line?: number) => {
       .map(LinkAddLT(lineStr)),
     links = getLinkInfo(linksRaw),
     linkRawText = fetchTextForChildren(lineStr, linknTextNodes);
+  const deeperIndentPattern = new RegExp(`^(?:${indentChar})+${prefix}`);
   return {
     links,
     desc,
@@ -200,7 +201,7 @@ export const matchEntry = (editor: Editor, line?: number) => {
       ),
       text: replaceFunc(prefix, desc, linkRawText, links),
     }),
-    isDeeper: (line: string) => line.startsWith(indentChar + prefix),
+    isDeeper: (line: string) => deeperIndentPattern.test(line),
     outdentLine: (line: string) => {
       const srcIndentLength = prefix.search(/[^ ]/);
       return line.substring(

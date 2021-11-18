@@ -1,7 +1,9 @@
 import { getApi } from "@aidenlx/folder-note-core";
+import { Notice } from "obsidian";
 import { join } from "path";
 
 import { getFrontmatter } from "../handlers/frontmatter";
+import StripChapterNum, { StripChNumPattern } from "../macros/strip-ch-num";
 import MNComp from "../mn-main";
 import { linkToFmSources, matchEntry } from "./utils";
 
@@ -30,25 +32,43 @@ const Toc2File = (plugin: MNComp) => {
           };
         const lineStart = editor.getCursor().line,
           [content, lineEnd] = getRange(lineStart);
+        const title = desc.replace(StripChNumPattern, "");
         const newFileContent =
           getFrontmatter({ sources: linkToFmSources(links) }) +
           "\n\n" +
-          `# ${desc}` +
+          `# ${title}` +
           "\n" +
           content;
         (async () => {
           let folder = getApi(plugin)?.getFolderFromNote(view.file);
           if (!folder) folder = view.file.parent;
           // extract to new file and get link to it
+          const newFilePath = join(
+            folder.isRoot() ? "" : folder.path,
+            title + ".md",
+          );
+          if (await plugin.app.vault.adapter.exists(newFilePath)) {
+            new Notice(`File ${newFilePath} already exists`);
+            return;
+          }
           const file = await plugin.app.vault.create(
-              join(folder.isRoot() ? "" : folder.path, desc + ".md"),
+              newFilePath,
               newFileContent,
             ),
             fileMark = plugin.app.fileManager.generateMarkdownLink(
               file,
               view.file.path,
-            );
-          editor.transaction({ changes: [replacePara(() => fileMark)] });
+            ),
+            changes = [
+              replacePara(() => fileMark),
+              {
+                from: { line: lineStart, ch: Infinity },
+                to: { line: lineEnd, ch: Infinity },
+                text: "",
+              },
+            ];
+          // replace text with link to new file
+          editor.transaction({ changes });
         })();
       }
     },
