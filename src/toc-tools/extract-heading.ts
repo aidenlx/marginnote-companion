@@ -14,7 +14,7 @@ const ExtractHeading = (plugin: MNComp) => {
       plugin.app.internalPlugins.plugins["note-composer"]?.instance;
   plugin.registerEvent(
     plugin.app.workspace.on("editor-menu", (menu, editor, view) => {
-      if (!getNoteComposer() || editor.somethingSelected()) return;
+      if (!getNoteComposer()) return;
       const { line: lineCursorAt } = editor.getCursor();
 
       if (getHeading(editor.getLine(lineCursorAt)) !== null) {
