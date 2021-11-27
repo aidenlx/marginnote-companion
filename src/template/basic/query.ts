@@ -17,24 +17,19 @@ type QueryObj = Map<
   Exclude<QueryObjRaw[keyof QueryObjRaw], undefined>
 >;
 const qsConfig = { arrayFormat: "comma", sort: false } as const;
-const CamelKeyToDash = (items: QueryObj) => {
-  const entries = items.entries(),
-    convertIterator: typeof entries = {
-      next: () => {
-        let result = entries.next();
-        if (result.value && typeof result.value[0] === "string")
-          result.value[0] = (result.value[0] as string).replace(
-            /[A-Z]/g,
-            (m, offset) => (offset === 0 ? "" : "-") + m.toLowerCase(),
-          );
-        return result;
-      },
-      [Symbol.iterator]: function () {
-        return this;
-      },
-    };
-  return Object.fromEntries(convertIterator);
-};
+const CameltoDash = (str: string) =>
+  str.replace(
+    /[A-Z]/g,
+    (m, offset) => (offset === 0 ? "" : "-") + m.toLowerCase(),
+  );
+const CamelKeyToDash = (items: QueryObj) =>
+  Object.fromEntries(
+    (function* () {
+      for (const [key, value] of items) {
+        yield [CameltoDash(key), value];
+      }
+    })(),
+  );
 
 export default class Query {
   constructor(private raw: QueryObjRaw) {}
