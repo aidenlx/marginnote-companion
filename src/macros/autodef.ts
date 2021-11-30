@@ -22,7 +22,10 @@ import { addToFrontmatter } from "../handlers/frontmatter";
 import MNComp from "../mn-main";
 
 const SelToAilas = (plugin: MNComp) => async (editor: Editor) => {
-  const FromSelection = () => editor.getSelection(),
+  const FromSelection = () => {
+      const sel = editor.getSelection();
+      return sel ? sel : null;
+    },
     FromMN = async () => {
       const body = await plugin.inputListener.readFromInput();
       if (!body) return undefined;
@@ -41,9 +44,7 @@ const SelToAilas = (plugin: MNComp) => async (editor: Editor) => {
       const text = await navigator.clipboard.readText();
       return text ? text : undefined;
     };
-  let text: string | undefined = FromSelection();
-  if (!text) text = await FromMN();
-  if (!text) text = await FromClipboard();
+  const text = FromSelection() ?? (await FromMN()) ?? (await FromClipboard());
   if (!text) return;
   addToFrontmatter("aliases", ExtractDef(text), editor);
   editor.replaceSelection("");
