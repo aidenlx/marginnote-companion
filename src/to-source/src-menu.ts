@@ -1,10 +1,12 @@
 import { App, Menu } from "obsidian";
 
 interface Sources {
-  [book: string]: {
-    [key: string]: any;
-    url: string;
-  };
+  [book: string]:
+    | {
+        [key: string]: any;
+        url: string;
+      }
+    | string;
 }
 
 export const isObjSrc = (obj: any): obj is Sources => {
@@ -13,7 +15,10 @@ export const isObjSrc = (obj: any): obj is Sources => {
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
       hasProp || (hasProp = true);
-      if (typeof key !== "string" || typeof obj[key].url !== "string")
+      if (
+        typeof key !== "string" ||
+        !(typeof obj[key] === "string" || typeof obj[key].url === "string")
+      )
         return false;
     }
   }
@@ -26,7 +31,8 @@ const getSrcMenu = (sources: unknown, app: App): Menu | null => {
     for (const key in sources) {
       if (Object.prototype.hasOwnProperty.call(sources, key)) {
         const docName = key,
-          { url } = sources[key];
+          info = sources[key],
+          url = typeof info === "string" ? info : info.url;
         menu.addItem((item) => {
           item
             .setIcon(
