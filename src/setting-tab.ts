@@ -46,6 +46,7 @@ export class MNCompSettingTab extends PluginSettingTab {
     });
     this.dateFormat();
     this.autoPaste();
+    this.aliasBelowH1();
   }
   aliasBelowH1() {
     new Setting(this.containerEl)
