@@ -10,6 +10,7 @@ import TemplateSettings, {
 export type MNCompSettings = {
   defaultDateFormat: string;
   autopasteOnlyNote: boolean;
+  aliasBelowH1: boolean;
 } & {
   [K in keyof PatchJSON]: PatchJSON[K]["src"];
 };
@@ -45,6 +46,7 @@ const getDefault = <T extends TplCfgTypes>(
 export const DEFAULT_SETTINGS: MNCompSettings = {
   defaultDateFormat: "YY-MM-DD HH:mm",
   autopasteOnlyNote: false,
+  aliasBelowH1: false,
   textPostProcess: [
     [/ {2,}/g, " "],
     [/(\d+?\.(?![\d]).+?) +?/g, "$1："],

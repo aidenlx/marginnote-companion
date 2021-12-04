@@ -47,7 +47,8 @@ export default class MNComp extends Plugin {
     registerMacroCmd.call(this);
 
     // Enable GUI Modification
-    this.registerMarkdownPostProcessor(aliasBelowH1(this));
+    if (this.settings.aliasBelowH1)
+      this.registerMarkdownPostProcessor(aliasBelowH1(this));
     setupToSrcTools(this);
 
     // URL Scheme handlers

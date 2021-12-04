@@ -47,6 +47,19 @@ export class MNCompSettingTab extends PluginSettingTab {
     this.dateFormat();
     this.autoPaste();
   }
+  aliasBelowH1() {
+    new Setting(this.containerEl)
+      .setName(t("settings.general.alias_below_h1_name"))
+      .setDesc(t("settings.general.alias_below_h1_desc"))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.aliasBelowH1)
+          .onChange(async (val) => {
+            this.plugin.settings.aliasBelowH1 = val;
+            await this.plugin.saveSettings();
+          }),
+      );
+  }
   dateFormat() {
     new Setting(this.containerEl)
       .setName(t("settings.general.date_format_name"))
