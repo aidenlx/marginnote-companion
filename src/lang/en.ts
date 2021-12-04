@@ -27,6 +27,9 @@ const dict = {
         "All time-related variable in the template file will be rendered in this format",
       check_details: "Check here for more details",
       autopaste_only_note: "Only import note when auto-pasting",
+      alias_below_h1_name: "Alias below H1",
+      alias_below_h1_desc:
+        "Show aliases below H1 in preview mode so that it can be seen in embeds as well, reload obsidian to take effects",
     },
     tpl_cfg: {
       heading: "Templates",

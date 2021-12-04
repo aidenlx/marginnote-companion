@@ -25,6 +25,9 @@ const dict: Dict = {
       date_format_desc: "所有时间相关的变量都会使用该格式渲染日期时间",
       check_details: "点此查阅更多",
       autopaste_only_note: "自动粘贴时仅导入笔记",
+      alias_below_h1_name: "在H1下显示别名",
+      alias_below_h1_desc:
+        "将别名显示在预览模式的一级标题下方，从而在笔记嵌入中也可以看到别名，重启obsidian生效",
     },
     tpl_cfg: {
       heading: "模板配置",

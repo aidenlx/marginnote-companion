@@ -1,3 +1,40 @@
+## [0.8.1](https://github.com/aidenlx/marginnote-companion/compare/0.8.0...0.8.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* **setting-tab:** fix alias_below_H1 option not showing up ([9aa2763](https://github.com/aidenlx/marginnote-companion/commit/9aa2763e69ddf6884737f89f0cf3041042e464e8))
+
+# [0.8.0](https://github.com/aidenlx/marginnote-companion/compare/0.7.0...0.8.0) (2021-12-04)
+
+
+### Bug Fixes
+
+* **autodef:** fix issue on priorities ([035170f](https://github.com/aidenlx/marginnote-companion/commit/035170f7ad068bba590cd25aed2a97a7ef899192))
+* **autopaste:** fix note need to be selected twice if  clipboard has text before autopaste enabled ([fde67ae](https://github.com/aidenlx/marginnote-companion/commit/fde67ae8be5260bf4e01cc7e2c55bf7835f35bc7))
+* **autopaste:** repeatedly selecting on same note/sel/toc no longer trigger change event ([f07fd3c](https://github.com/aidenlx/marginnote-companion/commit/f07fd3c4227d53b2d06bd8e4c5331d87265d5e8d))
+* **autopaste:** same note filter is now disabled after copied some text ([c48001e](https://github.com/aidenlx/marginnote-companion/commit/c48001edf0b30b0f36dce1776fc34bf326726416))
+* **input-handler:** fix autopaste failed to work on notes selected before autopaste enabled ([eac93d9](https://github.com/aidenlx/marginnote-companion/commit/eac93d98f5fe2b229cc5637c82b95386d6488d68))
+
+
+### Features
+
+* add button below h1 to open src menu ([a7d96df](https://github.com/aidenlx/marginnote-companion/commit/a7d96df524a17c86a557f0b8b0fe0d01b8f6384b))
+* add command to open source link ([0c0b832](https://github.com/aidenlx/marginnote-companion/commit/0c0b832f7a5a020b6eb58080e6b61d9dbd65af62))
+* adjust heading-src and heading-alias style to in line with h1 ([ce525a4](https://github.com/aidenlx/marginnote-companion/commit/ce525a418fd13588d42bc307405f17548a06556d))
+* **autodef:** autodef now read text from clipboard ([789f87b](https://github.com/aidenlx/marginnote-companion/commit/789f87bfe197c8bf5e4d1724590faf55fcab4e5d))
+* **autopaste:** add option to only import note when auto-pasting ([c31ba52](https://github.com/aidenlx/marginnote-companion/commit/c31ba5210dafc0409d81377e7017650353b878c7))
+* **heading-alias:** add live update for aliases under h1 ([7259fa3](https://github.com/aidenlx/marginnote-companion/commit/7259fa3a7cab1a36e28271ed3893cd6282ac73a5))
+* **note-template:** expose DocTitle and Query in body template of notes ([d2a7cec](https://github.com/aidenlx/marginnote-companion/commit/d2a7cec9e8c90da23809ca74eb0db3e80d547fec))
+* **sel-to-alias:** update sel-to-alias to support import from mn data ([2f0a4c4](https://github.com/aidenlx/marginnote-companion/commit/2f0a4c4a4d6f9ab814354bd6ae19d99bc6255b7c))
+* **settings:** add option to disable alias below h1 ([0132c96](https://github.com/aidenlx/marginnote-companion/commit/0132c96cf4abd9983830bad08a010a3595cd7dc6)), closes [#15](https://github.com/aidenlx/marginnote-companion/issues/15)
+* **src-menu:** "sources" field now accept url as key's value directly ([1a0a28c](https://github.com/aidenlx/marginnote-companion/commit/1a0a28c2ad18eec6bd303861c77f42b5a1769f5f))
+
+
+### Reverts
+
+* **query:** revert kebabCase method ([b8a821e](https://github.com/aidenlx/marginnote-companion/commit/b8a821e8728b6a1a9e4b0692068f3a6fe96bfdf1))
+
 # [0.7.0](https://github.com/aidenlx/marginnote-companion/compare/0.6.4...0.7.0) (2021-10-20)
 
 
