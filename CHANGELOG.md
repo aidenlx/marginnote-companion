@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/aidenlx/marginnote-companion/compare/0.8.0...0.8.1) (2021-12-04)
+
+
+### Bug Fixes
+
+* **setting-tab:** fix alias_below_H1 option not showing up ([9aa2763](https://github.com/aidenlx/marginnote-companion/commit/9aa2763e69ddf6884737f89f0cf3041042e464e8))
+
 # [0.8.0](https://github.com/aidenlx/marginnote-companion/compare/0.7.0...0.8.0) (2021-12-04)
 
 
