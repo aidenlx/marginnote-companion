@@ -3,6 +3,7 @@ import { Notice } from "obsidian";
 import { join } from "path";
 
 import { getFrontmatter } from "../handlers/frontmatter";
+import { ExtractDef } from "../macros/autodef";
 import StripChapterNum, { StripChNumPattern } from "../macros/strip-ch-num";
 import MNComp from "../mn-main";
 import { linkToFmSources, matchEntry } from "./utils";
@@ -32,13 +33,15 @@ const Toc2File = (plugin: MNComp) => {
           };
         const lineStart = editor.getCursor().line,
           [content, lineEnd] = getRange(lineStart);
-        const title = desc.replace(StripChNumPattern, "");
+        const [title, ...aliases] = ExtractDef(
+          desc.replace(StripChNumPattern, ""),
+        );
+
+        let fmObj: any = { sources: linkToFmSources(links) };
+        if (aliases && aliases.length > 0) fmObj.aliases = aliases;
+
         const newFileContent =
-          getFrontmatter({ sources: linkToFmSources(links) }) +
-          "\n\n" +
-          `# ${title}` +
-          "\n" +
-          content;
+          getFrontmatter(fmObj) + "\n\n" + `# ${title}` + "\n" + content;
         (async () => {
           let folder = getApi(plugin)?.getFolderFromNote(view.file);
           if (!folder) folder = view.file.parent;

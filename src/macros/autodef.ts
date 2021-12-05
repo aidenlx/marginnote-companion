@@ -6,7 +6,7 @@ const cleanText = (src: string) => {
     .replace(/([A-Z])\s*-\s*(?=[A-Z])/gi, ""); // 英文连字符处理
 };
 
-const ExtractDef = (raw: string): string[] => {
+export const ExtractDef = (raw: string): string[] => {
   raw = cleanText(raw);
   raw = raw.replace(/[.?!+·"。，？！—“”:：；;'<>]/g, "");
 
