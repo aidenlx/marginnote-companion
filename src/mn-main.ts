@@ -7,6 +7,7 @@ import {
   saveSettings,
 } from "settings";
 
+import H1Suggester from "./controls/h1-suggester";
 import aliasBelowH1 from "./controls/heading-alias";
 import MNDataHandler from "./handlers/mn-data-handler";
 import icons from "./icons";
@@ -46,6 +47,8 @@ export default class MNComp extends Plugin {
       },
     });
     registerMacroCmd.call(this);
+
+    this.registerEditorSuggest(new H1Suggester(this));
 
     // Enable GUI Modification
     if (this.settings.aliasBelowH1)
