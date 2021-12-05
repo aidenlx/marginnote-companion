@@ -85,8 +85,12 @@ export class TocItemSummary {
   constructor(
     public Title: string | undefined,
     public Excerpt: string | undefined,
-    public AllText: string | undefined,
+    private _allText: string | undefined,
   ) {}
+
+  get AllText() {
+    return this._allText?.trim().replace(/\n+/g, "; ");
+  }
 
   toString(): string {
     return this.Title ?? this.Excerpt ?? this.AllText ?? "";
