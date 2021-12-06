@@ -1,3 +1,11 @@
+## [0.8.3](https://github.com/aidenlx/marginnote-companion/compare/0.8.2...0.8.3) (2021-12-06)
+
+
+### Bug Fixes
+
+* **autodef:** note name is now filtered in generated aliases ([4aeff9c](https://github.com/aidenlx/marginnote-companion/commit/4aeff9cd2a79dadbd89e5b89fb7f19d58dac5965))
+* **toc-template:** fix Summary.AllText not include excerpt ([4f42c52](https://github.com/aidenlx/marginnote-companion/commit/4f42c52164e94601ca872e30e4de431ebdfa53e8))
+
 ## [0.8.2](https://github.com/aidenlx/marginnote-companion/compare/0.8.1...0.8.2) (2021-12-05)
 
 
