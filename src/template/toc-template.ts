@@ -82,14 +82,35 @@ export default class TocTemplate extends Template<"toc"> {
 }
 
 export class TocItemSummary {
+  private _comments: string[];
+  public get Comments(): string | undefined {
+    return this._comments.length > 0 ? this._comments.join("; ") : undefined;
+  }
+
+  public Excerpt: string | undefined;
   constructor(
     public Title: string | undefined,
-    public Excerpt: string | undefined,
-    public AllText: string | undefined,
-  ) {}
+    excerpt: string | undefined,
+    comments: string | undefined,
+  ) {
+    this.Excerpt = excerpt?.trim().replace(/\n+/g, " ");
+    this._comments = comments
+      ? comments
+          .trim()
+          .split(/\n{2,}/g)
+          .map((str) => str.replace(/\n/g, " "))
+      : [];
+  }
+
+  get AllText() {
+    const texts = this.Excerpt
+      ? [this.Excerpt].concat(this._comments)
+      : this._comments;
+    return texts.join("; ");
+  }
 
   toString(): string {
-    return this.Title ?? this.Excerpt ?? this.AllText ?? "";
+    return this.Title ?? this.Excerpt ?? this.Comments ?? "";
   }
   static getSummary(toc: Toc) {
     return toc.noteTitle ?? toc.excerptText ?? toc.notesText ?? "";

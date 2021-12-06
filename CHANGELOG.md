@@ -1,3 +1,10 @@
+## [0.8.2](https://github.com/aidenlx/marginnote-companion/compare/0.8.1...0.8.2) (2021-12-05)
+
+
+### Bug Fixes
+
+* **toc-template:** line breaks in Summary.AllText are now replaced with semicolons ([f7bcfaf](https://github.com/aidenlx/marginnote-companion/commit/f7bcfafc5077d9f87c1edaa9822b82412bf2de5b))
+
 ## [0.8.1](https://github.com/aidenlx/marginnote-companion/compare/0.8.0...0.8.1) (2021-12-04)
 
 

@@ -311,7 +311,11 @@ class PreviewTpl extends Modal {
     super(app);
   }
   onOpen() {
-    this.contentEl.setText(this.md);
+    let previewEl = this.contentEl.createEl("textarea");
+    previewEl.readOnly = true;
+    previewEl.value = this.md;
+    previewEl.style.width = "100%";
+    previewEl.style.minHeight = "25em";
   }
   onClose() {
     this.contentEl.empty();
