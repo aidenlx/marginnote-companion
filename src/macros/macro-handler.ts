@@ -12,7 +12,7 @@ export function MacroHandler(this: MNComp, params: ObsidianProtocolData): void {
   switch (macroName) {
     case "autodef": {
       let mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
-      if (mdView) SelToAilas(this)(mdView.editor);
+      if (mdView) SelToAilas(this)(mdView.editor, mdView);
       break;
     }
     default:
