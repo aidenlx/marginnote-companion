@@ -15,6 +15,7 @@ import { MacroHandler, registerMacroCmd } from "./macros/macro-handler";
 import { setAutoPaste } from "./receivers/autopaste";
 import InputListener from "./receivers/input-handler";
 import setInsertData from "./receivers/insert";
+import url2src from "./to-source/url2src";
 import setupToSrcTools from "./to-src";
 import setupTocTools from "./toc-tools";
 
@@ -42,8 +43,10 @@ export default class MNComp extends Plugin {
     this.addCommand({
       id: "getMeta",
       name: "get Metadata from MarginNote notes",
-      editorCallback: async (_editor, view) => {
-        this.mnHandler.importMeta(view);
+      editorCallback: async (editor, view) => {
+        if (!(await url2src(editor))) {
+          await this.mnHandler.importMeta(view);
+        }
       },
     });
     registerMacroCmd.call(this);
