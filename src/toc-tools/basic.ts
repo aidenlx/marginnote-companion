@@ -40,7 +40,7 @@ export const UPointToObPos = (
   ch = 0,
 ): EditorPosition => ({
   line: point.line - 1 + line,
-  ch: point.column - 1 + (point.line === line ? ch : 0),
+  ch: point.column - 1 + ch,
 });
 
 export const getLinePos = (
@@ -59,7 +59,7 @@ export const UPosToObRange = (
   start: EditorPosition = { line: 0, ch: 0 },
 ): EditorRange => ({
   from: UPointToObPos(pos.start, start.line, start.ch),
-  to: UPointToObPos(pos.end, start.line),
+  to: UPointToObPos(pos.end, start.line, start.ch),
 });
 
 export type LinkWithLT = Link & { linktext: string };

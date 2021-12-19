@@ -145,17 +145,19 @@ export const matchLinks = (editor: Editor, ranges: EditorRange[]) => {
 export const matchEntry = (editor: Editor, line?: number) => {
   const lineNum = line === undefined ? editor.getCursor().line : line;
   if (lineNum < 0 || lineNum >= editor.lineCount()) return null;
-  const lineStr = getSection(editor, lineNum),
-    root = unified().use(remarkParse).parse(lineStr),
+  let lineStr = getSection(editor, lineNum);
+  const indent = lineStr.match(/^ */)?.[0] ?? null;
+  lineStr = lineStr.substring(indent?.length ?? 0);
+  const root = unified().use(remarkParse).parse(lineStr),
     li = select<ListItem>(":root > list > listItem", root),
     p = li && select<Paragraph>("paragraph:first-child", li);
   if (!li || !p) return null;
 
   const prefixPos = {
-      start: { ...pointStart(li), column: 1 },
-      end: pointStart(p),
-    },
-    prefix = source(prefixPos, lineStr);
+    start: { ...pointStart(li), column: 1 },
+    end: pointStart(p),
+  };
+  const prefix = (indent ?? "") + (source(prefixPos, lineStr) ?? "");
   if (!prefix) return null;
   const firstLinkIndex = p.children.findIndex(isMNLink);
   if (firstLinkIndex <= 0) return null; // no title or no link
@@ -180,11 +182,11 @@ export const matchEntry = (editor: Editor, line?: number) => {
         linksRaw: string,
       ) => string,
     ): EditorChange => ({
-      ...UPosToObRange(position(p), getLinePos(lineNum)),
+      ...UPosToObRange(position(p), getLinePos(lineNum, indent?.length ?? 0)),
       text: replaceFunc(desc, links, linkRawText),
     }),
     replacePrefix: (replaceFunc: (prefix: string) => string): EditorChange => ({
-      ...UPosToObRange(prefixPos, getLinePos(lineNum)),
+      ...UPosToObRange(prefixPos, getLinePos(lineNum, indent?.length ?? 0)),
       text: replaceFunc(prefix),
     }),
     replaceLine: (
@@ -197,7 +199,7 @@ export const matchEntry = (editor: Editor, line?: number) => {
     ): EditorChange => ({
       ...UPosToObRange(
         { start: { ...pointStart(li), column: 1 }, end: pointEnd(li) },
-        getLinePos(lineNum),
+        getLinePos(lineNum, indent?.length ?? 0),
       ),
       text: replaceFunc(prefix, desc, linkRawText, links),
     }),
