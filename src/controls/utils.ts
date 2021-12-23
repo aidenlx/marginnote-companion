@@ -1,5 +1,5 @@
 import "./util.less";
 
 export const Heading2Inline = (heading: HTMLHeadingElement) => {
-  heading.addClass("inline-h1");
+  heading.parentElement?.addClass("inline-h1");
 };
