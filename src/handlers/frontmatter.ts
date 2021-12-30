@@ -31,7 +31,8 @@ export const addToFrontmatter = (
 
   if (fmRange) {
     const { from, to } = fmRange;
-    const fmObj = matter(cm.getRange(from, to)).data;
+    // disable caching with empty options
+    const fmObj = matter(cm.getRange(from, to), {}).data;
     if (fmObj[entry]) {
       if (Array.isArray(fmObj[entry]) && Array.isArray(items)) {
         (fmObj[entry] as string[]).push(...items);
