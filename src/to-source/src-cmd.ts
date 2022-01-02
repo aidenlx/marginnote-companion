@@ -29,7 +29,8 @@ const addSrcCommand = (plugin: MNComp) => {
         if (isObjSrc(sources)) {
           const keys = Object.keys(sources);
           if (Object.keys(sources).length === 1) {
-            window.open(sources[keys[0]].url);
+            const entry = sources[keys[0]];
+            window.open(typeof entry === "string" ? entry : entry.url);
           } else {
             const { x, y } = view.contentEl.getBoundingClientRect();
             getSrcMenu(sources, plugin.app)?.showAtPosition({ x, y });
