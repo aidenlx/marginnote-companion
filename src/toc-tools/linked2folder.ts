@@ -6,26 +6,19 @@ import MNComp from "../mn-main";
 
 const getRenameAction = (srcNote: TFile, linkFile: TFile, plugin: MNComp) => {
   const { fileManager } = plugin.app;
-  const folderForNote = getApi(plugin)?.getFolderFromNote(srcNote);
-  if (linkFile.parent.path === (folderForNote ?? srcNote.parent).path) {
+  const targetFolder =
+    getApi(plugin)?.getFolderFromNote(srcNote) ?? srcNote.parent;
+  if (linkFile.parent.path === targetFolder.path) {
     return null;
-  } else if (folderForNote) {
-    return () =>
-      fileManager.renameFile(
-        folderForNote,
-        join(folderForNote.parent.path, folderForNote.name),
-      );
   } else {
+    let toMove = getApi(plugin)?.getFolderFromNote(linkFile) ?? linkFile;
     return () =>
-      fileManager.renameFile(
-        linkFile,
-        join(srcNote.parent.path, linkFile.name),
-      );
+      fileManager.renameFile(toMove, join(targetFolder.path, toMove.name));
   }
 };
 
 const CopyLinkedToFolder = (plugin: MNComp) => {
-  const { metadataCache, workspace, fileManager } = plugin.app;
+  const { metadataCache, workspace } = plugin.app;
   plugin.addCommand({
     id: "linked2folder",
     name: "linked to folder",
@@ -45,7 +38,7 @@ const CopyLinkedToFolder = (plugin: MNComp) => {
     },
   });
   plugin.registerEvent(
-    workspace.on("file-menu", (menu, linkFile, source, leaf) => {
+    workspace.on("file-menu", (menu, linkFile, source) => {
       if (source !== "link-context-menu" || !(linkFile instanceof TFile))
         return;
       const srcNote = workspace.getActiveViewOfType(MarkdownView)?.file;
