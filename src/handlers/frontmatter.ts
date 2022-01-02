@@ -24,6 +24,8 @@ export const addToFrontmatter = (
   items: keyValue | string[],
   cm: Editor,
 ) => {
+  if (items?.length === 0 || Object.keys(items).length === 0) return;
+
   const fmRange = getFrontmatterRange(cm);
   const render = (fmObj: { [k: string]: any }) =>
     // @ts-ignore
