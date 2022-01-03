@@ -52,5 +52,8 @@ export const addToFrontmatter = (
 
 export const getFrontmatter = (fmObj: { [k: string]: any }) =>
   matter
-    .stringify("", fmObj, { flowLevel: 3 } as any)
+    .stringify("", fmObj, {
+      flowLevel: 3,
+      indent: 4 /** always use 4 space in accordance with markdown spec */,
+    } as any)
     .replace(/^\s+|\s+$/g, "");
