@@ -5,8 +5,8 @@ import { addToFrontmatter } from "../handlers/frontmatter";
 const url2src = async (editor: Editor) => {
   const addUrlToSrc = (id: string, url: URL) => {
     addToFrontmatter("sources", { [id]: url.toString() }, editor);
-    let name;
-    if ((name = url.pathname.split("/").last()?.replace(/[_-]/g, " "))) {
+    let name = url.pathname.split("/").last();
+    if (name && (name = decodeURI(name).replace(/[_-]/g, " "))) {
       addToFrontmatter("aliases", [name], editor);
     }
   };
