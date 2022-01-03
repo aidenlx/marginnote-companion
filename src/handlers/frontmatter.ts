@@ -27,9 +27,6 @@ export const addToFrontmatter = (
   if (items?.length === 0 || Object.keys(items).length === 0) return;
 
   const fmRange = getFrontmatterRange(cm);
-  const render = (fmObj: { [k: string]: any }) =>
-    // @ts-ignore
-    matter.stringify("", fmObj, { flowLevel: 3 }).replace(/^\s+|\s+$/g, "");
 
   if (fmRange) {
     const { from, to } = fmRange;
@@ -47,8 +44,16 @@ export const addToFrontmatter = (
     } else {
       fmObj[entry] = items;
     }
-    cm.replaceRange(render(fmObj), from, to);
+    cm.replaceRange(getFrontmatter(fmObj), from, to);
   } else {
-    InsertTo(render({ [entry]: items }) + "\n", cm, 0, 0);
+    InsertTo(getFrontmatter({ [entry]: items }) + "\n", cm, 0, 0);
   }
 };
+
+export const getFrontmatter = (fmObj: { [k: string]: any }) =>
+  matter
+    .stringify("", fmObj, {
+      flowLevel: 3,
+      indent: 4 /** always use 4 space in accordance with markdown spec */,
+    } as any)
+    .replace(/^\s+|\s+$/g, "");
