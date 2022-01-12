@@ -19,11 +19,12 @@ const addAliasEl = <T extends HTMLDivElement>(
   containerEl
 );
 
+const cls = "heading-alias";
 const aliasBelowH1 =
   (plugin: MNComp) =>
   (el: HTMLElement, ctx: MarkdownPostProcessorContext): void => {
     const heading = el.querySelector("h1");
-    if (!heading) return;
+    if (!heading || !!heading.querySelector(`:scope > .${cls}`)) return;
 
     const aliases = parseFrontMatterAliases(ctx.frontmatter);
     if (!aliases || aliases.length === 0) return;
@@ -31,9 +32,8 @@ const aliasBelowH1 =
     if (!heading.parentElement)
       throw new Error("heading.parentElement is null");
 
-    const container = heading.parentElement.createDiv(
-      { cls: "heading-alias" },
-      (container) => addAliasEl(aliases, container),
+    const container = heading.parentElement.createDiv({ cls }, (container) =>
+      addAliasEl(aliases, container),
     ) as HTMLDivElement & {
       aliases: string[];
       updateAliases(aliases: string[] | null): void;
