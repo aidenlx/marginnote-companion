@@ -2,7 +2,7 @@ import "./heading-src.less";
 
 import { App, MarkdownPostProcessorContext, setIcon } from "obsidian";
 
-import getSrcMenu from "../to-source/src-menu";
+import getSrcMenu, { getSourcesFromFile } from "../to-source/src-menu";
 import { Heading2Inline } from "./utils";
 
 const srcButton =
@@ -19,10 +19,8 @@ const srcButton =
       (el) => {
         setIcon(el, "link");
         el.onClickEvent((evt) => {
-          getSrcMenu(
-            app.metadataCache.getCache(ctx.sourcePath)?.frontmatter?.sources,
-            app,
-          )?.showAtPosition(
+          const sources = getSourcesFromFile(ctx.sourcePath, app);
+          getSrcMenu(sources, app)?.showAtPosition(
             (evt.target as HTMLElement).getBoundingClientRect(),
           );
         });

@@ -1,4 +1,4 @@
-import { App, Menu } from "obsidian";
+import { App, Menu, TFile } from "obsidian";
 
 interface Sources {
   [book: string]:
@@ -9,7 +9,23 @@ interface Sources {
     | string;
 }
 
-export const isObjSrc = (obj: any): obj is Sources => {
+const parseFrontMatterSources = (frontmatter: any): Sources | null => {
+  if (frontmatter?.sources && isObjSrc(frontmatter.sources))
+    return frontmatter.sources;
+  else return null;
+};
+
+export const getSourcesFromFile = (
+  file: string | TFile,
+  app: App,
+): Sources | null => {
+  return parseFrontMatterSources(
+    app.metadataCache.getCache(typeof file === "string" ? file : file.path)
+      ?.frontmatter,
+  );
+};
+
+const isObjSrc = (obj: any): obj is Sources => {
   if (!(obj instanceof Object)) return false;
   let hasProp = false;
   for (const key in obj) {
@@ -25,27 +41,24 @@ export const isObjSrc = (obj: any): obj is Sources => {
   return hasProp;
 };
 
-const getSrcMenu = (sources: unknown, app: App): Menu | null => {
-  if (isObjSrc(sources)) {
-    const menu = new Menu(app);
-    for (const key in sources) {
-      if (Object.prototype.hasOwnProperty.call(sources, key)) {
-        const docName = key,
-          info = sources[key],
-          url = typeof info === "string" ? info : info.url;
-        menu.addItem((item) => {
-          item
-            .setIcon(
-              url.startsWith("marginnote3app") ? "mn-fill-color" : "link",
-            )
-            .setTitle(docName)
-            .onClick(() => window.open(url));
-        });
-      }
+const getSrcMenu = (sources: Sources | null, app: App): Menu | null => {
+  if (!sources) return null;
+  const menu = new Menu(app);
+  for (const key in sources) {
+    if (Object.prototype.hasOwnProperty.call(sources, key)) {
+      const docName = key,
+        info = sources[key],
+        url = typeof info === "string" ? info : info.url;
+      menu.addItem((item) => {
+        item
+          .setIcon(url.startsWith("marginnote3app") ? "mn-fill-color" : "link")
+          .setTitle(docName)
+          .onClick(() => window.open(url));
+      });
     }
-    menu.select(0);
-    return menu;
-  } else return null;
+  }
+  menu.select(0);
+  return menu;
 };
 
 export default getSrcMenu;

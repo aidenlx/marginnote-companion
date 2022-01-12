@@ -1,31 +1,26 @@
-import { App, MarkdownView, WorkspaceLeaf } from "obsidian";
+import { around } from "monkey-around";
+import { MarkdownView, Plugin } from "obsidian";
 
-import getSrcMenu from "./src-menu";
+import getSrcMenu, { getSourcesFromFile } from "./src-menu";
 
 const label = "Go to Source";
 
-const addSrcButton = (app: App) => {
-  const apply = () => app.workspace.iterateAllLeaves(addButton(app));
-
-  app.workspace.onLayoutReady(apply);
-  app.workspace.on("layout-change", apply);
-};
-
-const addButton = (app: App) => (leaf: WorkspaceLeaf) => {
-  if (
-    leaf.view instanceof MarkdownView &&
-    leaf.view.containerEl.querySelector(
-      `a.view-action[aria-label="${label}"]`,
-    ) === null
-  ) {
-    let view = leaf.view;
-    view.addAction("forward-arrow", label, (evt) => {
-      getSrcMenu(
-        app.metadataCache.getFileCache(view.file)?.frontmatter?.sources,
-        app,
-      )?.showAtPosition({ x: evt.x, y: evt.y });
-    });
-  }
+const addSrcButton = (plugin: Plugin) => {
+  plugin.register(
+    around(MarkdownView.prototype, {
+      onload: (original) =>
+        function (this: MarkdownView) {
+          this.addAction("forward-arrow", label, (evt) => {
+            const sources = getSourcesFromFile(this.file, plugin.app);
+            getSrcMenu(sources, plugin.app)?.showAtPosition({
+              x: evt.x,
+              y: evt.y,
+            });
+          });
+          return original.call(this);
+        },
+    }),
+  );
 };
 
 export default addSrcButton;

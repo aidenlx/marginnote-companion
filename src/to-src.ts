@@ -4,7 +4,7 @@ import addSrcButton from "./to-source/src-button";
 import addSrcCommand from "./to-source/src-cmd";
 
 const setupToSrcTools = (plugin: MNComp) => {
-  addSrcButton(plugin.app);
+  addSrcButton(plugin);
   addSrcCommand(plugin);
   plugin.registerMarkdownPostProcessor(srcButton(plugin.app));
 };
